@@ -21,7 +21,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginActivity" />
-        <activity android:name=".RegisterActivity" />
         <activity android:name=".ReportPositionActivity" />
         <activity android:name=".UserActivity" />
         <!--
