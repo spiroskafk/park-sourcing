@@ -8,13 +8,13 @@
 
     <ImageView
         android:id="@+id/imageView3"
-        android:layout_width="385dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="false"
         android:cropToPadding="false"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/bg"
-        tools:layout_editor_absoluteX="-1dp"
+        tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp" />
 
     <Button
