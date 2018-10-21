@@ -3,6 +3,7 @@ package com.spiroskafk.parking.model;
 public class ParkingSpot {
     private String id;
     private String category;
+    private String address;
     private float latitude;
     private float longitude;
 
@@ -40,12 +41,21 @@ public class ParkingSpot {
         return category;
     }
 
-    public ParkingSpot(String id, String category, float latitude, float longitude) {
+    public ParkingSpot(String id, String category, String address, float latitude, float longitude) {
         this.id = id;
         this.category = category;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.address = address;
 
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public ParkingSpot() {}

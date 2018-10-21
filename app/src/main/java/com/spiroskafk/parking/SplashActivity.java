@@ -20,7 +20,7 @@ public class SplashActivity extends AppCompatActivity
             public void run()
             {
                 startActivity(new Intent(SplashActivity.this,
-                        MapsActivity.class));
+                        MainActivity.class));
                 finish();
             }
         }, secondsDelayed * 1000);

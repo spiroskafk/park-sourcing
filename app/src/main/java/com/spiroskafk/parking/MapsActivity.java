@@ -1,5 +1,7 @@
 package com.spiroskafk.parking;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -23,6 +25,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.model.ParkingSpot;
 import com.google.android.gms.location.places.GeoDataClient;
+
+import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     public final String TAG = "HI";
@@ -116,9 +121,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void updateMap(ParkingSpot spot) {
+        String address = getCompleteAddressString(spot.getLatitude(), spot.getLongitude());
         LatLng coordinates = new LatLng(spot.getLatitude(), spot.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(coordinates).title("Whatever"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 20));
+        mMap.addMarker(new MarkerOptions().position(coordinates).title(address));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15));
 
 
     }
@@ -127,5 +133,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void initFirebaseComponents() {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mParkingSpotsDatabaseReference = mFirebaseDatabase.getReference().child("parking_spots");
+    }
+
+    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
+        String strAdd = "";
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
+            if (addresses != null) {
+                Address returnedAddress = addresses.get(0);
+                StringBuilder strReturnedAddress = new StringBuilder("");
+
+                for (int i = 0; i <= returnedAddress.getMaxAddressLineIndex(); i++) {
+                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
+                }
+                strAdd = strReturnedAddress.toString();
+                Log.w("My Current loction add", strReturnedAddress.toString());
+            } else {
+                Log.w("My Current loction add", "No Address returned!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.w("My Current loction addr", "Canont get Address!");
+        }
+        return strAdd;
     }
 }

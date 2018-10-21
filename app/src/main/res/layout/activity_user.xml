@@ -13,7 +13,7 @@
         android:adjustViewBounds="false"
         android:cropToPadding="false"
         android:scaleType="fitXY"
-        app:srcCompat="@drawable/bg"
+        app:srcCompat="@drawable/bg3"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp" />
 
