@@ -10,4 +10,7 @@
     <color name="red">#f44336</color>
     <color name="blue">#2196f3</color>
     <color name="black">#000000</color>
+    <color name="google">#DD4B39</color>
+    <color name="email">#6B6B6B</color>
+    <color name="register">#036565</color>
 </resources>

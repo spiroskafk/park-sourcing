@@ -1,9 +1,12 @@
 package com.spiroskafk.parking;
 
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,6 +26,7 @@ import com.spiroskafk.parking.utils.Permissions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class ReportPositionActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -33,8 +37,7 @@ public class ReportPositionActivity extends AppCompatActivity implements Adapter
 
     // UI components
     private Spinner spinner;
-    private TextView latTv;
-    private TextView longTv;
+    private TextView addrTv;
     private Button mSubmitBtn;
 
     // Location
@@ -42,6 +45,7 @@ public class ReportPositionActivity extends AppCompatActivity implements Adapter
 
     private static String id;
     private static String category;
+    private static String address;
     private static float latitude;
     private static float longitude;
 
@@ -60,8 +64,13 @@ public class ReportPositionActivity extends AppCompatActivity implements Adapter
 
         // Spinner drop down elements
         List<String> categories = new ArrayList<String>();
-        categories.add("On the road");
-        categories.add("Public parking spot");
+        categories.add("Παρακαλώ επέλεξε");
+        categories.add("Θέση ΑΜΕΑ");
+        categories.add("Θέση Επισκεπτών");
+        categories.add("Δημοτικό πάρκινγκ");
+        categories.add("Θέση Φορτοεκφόρτωσης");
+        categories.add("Θέση μόνιμης κατοικίας");
+        categories.add("Ιδιωτική θέση πάρκινγκ");
 
         // Creating adapter
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
@@ -81,13 +90,11 @@ public class ReportPositionActivity extends AppCompatActivity implements Adapter
                         @Override
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                latTv.setVisibility(View.VISIBLE);
-                                longTv.setVisibility(View.VISIBLE);
-                                latTv.setText("Latitude : " + location.getLatitude());
-                                longTv.setText("Longitude : " + location.getLongitude());
-
-                                // populate lat,long
+                            if (location != null)
+                            {
+                                address = getCompleteAddressString(location.getLatitude(), location.getLongitude());
+                                addrTv.setVisibility(View.VISIBLE);
+                                addrTv.setText("Διεύθυνση: " + address);
                                 latitude = (float)location.getLatitude();
                                 longitude = (float)location.getLongitude();
                             } else {
@@ -98,6 +105,7 @@ public class ReportPositionActivity extends AppCompatActivity implements Adapter
 
         }
 
+
         // Submit button listener
         mSubmitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,8 +113,9 @@ public class ReportPositionActivity extends AppCompatActivity implements Adapter
                 // Gather the stuff and create the parking spot object
                 // generate uid
                 id = UUID.randomUUID().toString();
-                ParkingSpot newSpot = new ParkingSpot(id, category, latitude, longitude);
+                ParkingSpot newSpot = new ParkingSpot(id, category, address, latitude, longitude);
                 mParkingSpotsDatabaseReference.push().setValue(newSpot);
+                Toast.makeText(ReportPositionActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -116,12 +125,46 @@ public class ReportPositionActivity extends AppCompatActivity implements Adapter
 
     }
 
-    public void onItemSelected(AdapterView<?> parent, View view,
-                               int pos, long id) {
-        // An item was selected. You can retrieve the selected item using
-        // parent.getItemAtPosition(pos)
-        Toast.makeText(ReportPositionActivity.this, "You've just selected an item, you badass!", Toast.LENGTH_SHORT).show();
-        category = parent.getItemAtPosition(pos).toString();
+
+    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
+        String strAdd = "";
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
+            if (addresses != null) {
+                Address returnedAddress = addresses.get(0);
+                StringBuilder strReturnedAddress = new StringBuilder("");
+
+                for (int i = 0; i <= returnedAddress.getMaxAddressLineIndex(); i++) {
+                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
+                }
+                strAdd = strReturnedAddress.toString();
+                Log.w("My Current loction add", strReturnedAddress.toString());
+            } else {
+                Log.w("My Current loction add", "No Address returned!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.w("My Current loction addr", "Canont get Address!");
+        }
+        return strAdd;
+    }
+
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
+    {
+        if (pos > 0)
+        {
+            // Get spinner value
+            // An item was selected. You can retrieve the selected item using
+            // parent.getItemAtPosition(pos)
+            Toast.makeText(ReportPositionActivity.this, "Επέλεξες θέση!", Toast.LENGTH_SHORT).show();
+            category = parent.getItemAtPosition(pos).toString();
+        }
+        else
+        {
+            Toast.makeText(ReportPositionActivity.this, "Παρακαλώ επέλεξε μια θέση", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
@@ -135,8 +178,7 @@ public class ReportPositionActivity extends AppCompatActivity implements Adapter
 
     private void initUIComponenets() {
         spinner = findViewById(R.id.spinner);
-        latTv = findViewById(R.id.latTv);
-        longTv = findViewById(R.id.longTv);
+        addrTv = findViewById(R.id.addressTv);
         mSubmitBtn = findViewById(R.id.submitBtn);
     }
 
