@@ -34,70 +34,64 @@ public class RegisterUserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register_user);
-
-        // Initialize UI components
-        initUIComponents();
-
-        // Init firebase
-        initFirebaseComponents();
+        setContentView(R.layout.activity_nav);
 
         // RegisterButton Listener
-        mRegisterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                registerUser();
-            }
-        });
+//        mRegisterButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                registerUser();
+//            }
+//        });
     }
 
-    private void registerUser() {
-        final String name = mNameEditText.getText().toString().trim();
-        final String email = mEmailEditText.getText().toString().trim();
-        final String password = mPasswordEditText.getText().toString().trim();
-
-        if (!name.isEmpty() && !email.isEmpty() && !password.isEmpty()) {
-            mProgressBar.setVisibility(View.VISIBLE);
-            mFirebaseAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Create new user
-                                User user = new User(name, email, "simple_user");
-                                FirebaseDatabase.getInstance().getReference("users")
-                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                        .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        mProgressBar.setVisibility(View.GONE);
-                                        if (task.isSuccessful()) {
-                                            Toast.makeText(RegisterUserActivity.this, "You have successfulled registered", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            // display failure message
-                                        }
-                                    }
-                                });
-                            } else {
-                                Toast.makeText(RegisterUserActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                                mProgressBar.setVisibility(View.GONE);
-                            }
-                        }
-                    });
-
-        }
-    }
-
-    private void initUIComponents() {
-        mNameEditText = findViewById(R.id.reg_display_name);
-        mEmailEditText = findViewById(R.id.reg_email);
-        mPasswordEditText = findViewById(R.id.reg_password);
-        mRegisterButton = findViewById(R.id.reg_btn);
-        mProgressBar = findViewById(R.id.progressBar);
-        mProgressBar.setVisibility(View.GONE);
-    }
-
-    private void initFirebaseComponents() {
-        mFirebaseAuth = FirebaseAuth.getInstance();
-    }
+//    private void registerUser() {
+//        final String name = mNameEditText.getText().toString().trim();
+//        final String email = mEmailEditText.getText().toString().trim();
+//        final String password = mPasswordEditText.getText().toString().trim();
+//
+//        if (!name.isEmpty() && !email.isEmpty() && !password.isEmpty()) {
+//            mProgressBar.setVisibility(View.VISIBLE);
+//            mFirebaseAuth.createUserWithEmailAndPassword(email, password)
+//                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<AuthResult> task) {
+//                            if (task.isSuccessful()) {
+//                                // Create new user
+//                                User user = new User(name, email, "simple_user");
+//                                FirebaseDatabase.getInstance().getReference("users")
+//                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+//                                        .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                    @Override
+//                                    public void onComplete(@NonNull Task<Void> task) {
+//                                        mProgressBar.setVisibility(View.GONE);
+//                                        if (task.isSuccessful()) {
+//                                            Toast.makeText(RegisterUserActivity.this, "You have successfulled registered", Toast.LENGTH_SHORT).show();
+//                                        } else {
+//                                            // display failure message
+//                                        }
+//                                    }
+//                                });
+//                            } else {
+//                                Toast.makeText(RegisterUserActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+//                                mProgressBar.setVisibility(View.GONE);
+//                            }
+//                        }
+//                    });
+//
+//        }
+//    }
+//
+//    private void initUIComponents() {
+//        mNameEditText = findViewById(R.id.reg_display_name);
+//        mEmailEditText = findViewById(R.id.reg_email);
+//        mPasswordEditText = findViewById(R.id.reg_password);
+//        mRegisterButton = findViewById(R.id.reg_btn);
+//        mProgressBar = findViewById(R.id.progressBar);
+//        mProgressBar.setVisibility(View.GONE);
+//    }
+//
+//    private void initFirebaseComponents() {
+//        mFirebaseAuth = FirebaseAuth.getInstance();
+//    }
 }
