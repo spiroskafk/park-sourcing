@@ -7,4 +7,12 @@
 
     <string name="web_client_id">AIzaSyDYAXoQ0iS7--KybQcNzKwm2L75c2LnMus</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_nav">NavActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="register_text">Registration gives you several benefits such as connecting with friends, leaving reviews and adding parkings. We won\'t post anything on your profile.</string>
 </resources>
