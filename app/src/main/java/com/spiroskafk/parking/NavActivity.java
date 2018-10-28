@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
@@ -29,6 +30,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,6 +39,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.model.ParkingSpot;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,13 +47,17 @@ import java.util.Locale;
 public class NavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
-    public final String TAG = "HI";
+    public final String TAG = "NAVACTIVITY";
+    private static final int RC_SIGN_IN = 123;
 
     private GoogleMap mMap;
+
     // Firebase components
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mParkingSpotsDatabaseReference;
     private ChildEventListener mChildEventListener;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +66,9 @@ public class NavActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        // Initialize Firebase components
+        mFirebaseAuth = FirebaseAuth.getInstance();
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -121,7 +132,51 @@ public class NavActivity extends AppCompatActivity
             }
         };
 
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                // Check if the user is signed in or not
+                // firebaseAuth contains that information
+                FirebaseUser user = mFirebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // signed in
+                    Log.i(TAG, "USER IS SIGNED IN");
+
+                } else {
+                    Log.i(TAG, "NOT SIGNED IN");
+                    // Launch sign in activity
+                    startActivity(new Intent(NavActivity.this, SignInActivity.class));
+//                    // signed out
+//                    // Here we want to launch the sign in flow
+//                    startActivityForResult(
+//                            AuthUI.getInstance()
+//                                    .createSignInIntentBuilder()
+//                                    .setIsSmartLockEnabled(false)
+//                                    .setAvailableProviders(Arrays.asList(
+//                                            new AuthUI.IdpConfig.EmailBuilder().build(),
+//                                            new AuthUI.IdpConfig.GoogleBuilder().build()))
+//                                    .build(),
+//                            RC_SIGN_IN);
+
+                }
+            }
+        };
+
         mParkingSpotsDatabaseReference.addChildEventListener(mChildEventListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Attach the authStatelistener
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Detatch the authStateListener
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
     }
 
     private void updateMap(ParkingSpot spot) {
@@ -161,19 +216,15 @@ public class NavActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(GoogleMap googleMap)
+    {
         mMap = googleMap;
-
-//        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
 
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -183,7 +234,8 @@ public class NavActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.nav, menu);
         return true;
