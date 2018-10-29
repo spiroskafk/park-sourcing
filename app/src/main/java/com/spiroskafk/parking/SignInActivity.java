@@ -1,18 +1,14 @@
 package com.spiroskafk.parking;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.ButtonBarLayout;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -26,30 +22,46 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.util.Arrays;
-import java.util.List;
+public class SignInActivity extends AppCompatActivity {
 
-public class SignInActivity extends AppCompatActivity
-{
-    private static final int RC_SIGN_IN = 1;
-    private Button googleButton;
-    private FirebaseAuth mAuth;
+    // Log TAG
     private static final String TAG = "SignInActivity";
+
+    // Firebase
+    private FirebaseAuth mAuth;
+
+    // UI components
+    private Button googleButton;
+
+    // Rest
+    private static final int RC_SIGN_IN = 1;
     private GoogleSignInClient mGoogleSignInClient;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+        // Initialize phase
+        init();
+
+        // GSign in
+        googleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signInWithGoogle();
+            }
+        });
+    }
+
+
+    private void init() {
+
+        // Init UI
         initUIComponents();
 
-        // Initialize Firebase Auth
-        //mAuth = FirebaseAuth.getInstance();
-
-        // Setup toolbar
+        // Init - Setup toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
@@ -57,36 +69,25 @@ public class SignInActivity extends AppCompatActivity
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        // Add google sign in
-        googleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signInWithGoogle();
-            }
-        });
-
-
+        // Init firebase
+        mAuth = FirebaseAuth.getInstance();
     }
 
 
-    private void signInWithGoogle()
-    {
+    private void signInWithGoogle() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        mAuth = FirebaseAuth.getInstance();
-        signIn();
-    }
-
-    private void signIn() {
+        
+        // Start sign in
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -98,9 +99,10 @@ public class SignInActivity extends AppCompatActivity
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
+                Log.i(TAG, "Google sign in successful");
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
-                Log.w(TAG, "Google sign in failed", e);
+                Log.i(TAG, "Google sign in failed", e);
                 // ...
             }
         }
@@ -123,7 +125,7 @@ public class SignInActivity extends AppCompatActivity
                             //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            Log.i(TAG, "signInWithCredential:failure", task.getException());
                             //Snackbar.make(findViewById(R.l), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                             //updateUI(null);
                         }
@@ -134,14 +136,12 @@ public class SignInActivity extends AppCompatActivity
     }
 
 
-    private void initUIComponents()
-    {
+    private void initUIComponents() {
         googleButton = findViewById(R.id.google_sign_in_button);
     }
 
     @Override
-    public boolean onSupportNavigateUp()
-    {
+    public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
     }

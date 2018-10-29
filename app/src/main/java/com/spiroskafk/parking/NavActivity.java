@@ -6,20 +6,16 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
@@ -39,7 +35,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.model.ParkingSpot;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -47,9 +42,10 @@ import java.util.Locale;
 public class NavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
-    public final String TAG = "NAVACTIVITY";
-    private static final int RC_SIGN_IN = 123;
+    // Log TAG
+    public final String TAG = "NavActivityLog";
 
+    // Google map
     private GoogleMap mMap;
 
     // Firebase components
@@ -59,20 +55,19 @@ public class NavActivity extends AppCompatActivity
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
+
+    // Auto-complete address
+    private PlaceAutocompleteFragment autocompleteFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        // Initialize Firebase components
-        mFirebaseAuth = FirebaseAuth.getInstance();
+        // Initialize phase
+        init();
 
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-
+        // Autocomplete listener
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
@@ -88,22 +83,7 @@ public class NavActivity extends AppCompatActivity
         });
 
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        initFirebaseComponents();
-
+        // Firebase - Add to database listener
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -112,26 +92,19 @@ public class NavActivity extends AppCompatActivity
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
         };
 
+        // Firebase state listener
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -144,25 +117,49 @@ public class NavActivity extends AppCompatActivity
 
                 } else {
                     Log.i(TAG, "NOT SIGNED IN");
+
                     // Launch sign in activity
                     startActivity(new Intent(NavActivity.this, SignInActivity.class));
-//                    // signed out
-//                    // Here we want to launch the sign in flow
-//                    startActivityForResult(
-//                            AuthUI.getInstance()
-//                                    .createSignInIntentBuilder()
-//                                    .setIsSmartLockEnabled(false)
-//                                    .setAvailableProviders(Arrays.asList(
-//                                            new AuthUI.IdpConfig.EmailBuilder().build(),
-//                                            new AuthUI.IdpConfig.GoogleBuilder().build()))
-//                                    .build(),
-//                            RC_SIGN_IN);
 
                 }
             }
         };
 
         mParkingSpotsDatabaseReference.addChildEventListener(mChildEventListener);
+    }
+
+
+    private void init() {
+
+        // Init - Setup toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        // Init navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        // Init Google map
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        // Init auto-complete address
+        autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
+        // Init Firebase
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        initFirebaseComponents();
+
+
     }
 
     @Override
@@ -191,40 +188,15 @@ public class NavActivity extends AppCompatActivity
         mParkingSpotsDatabaseReference = mFirebaseDatabase.getReference().child("parking_spots");
     }
 
-    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
-        String strAdd = "";
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
-            if (addresses != null) {
-                Address returnedAddress = addresses.get(0);
-                StringBuilder strReturnedAddress = new StringBuilder("");
-
-                for (int i = 0; i <= returnedAddress.getMaxAddressLineIndex(); i++) {
-                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
-                }
-                strAdd = strReturnedAddress.toString();
-                Log.w("My Current loction add", strReturnedAddress.toString());
-            } else {
-                Log.w("My Current loction add", "No Address returned!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.w("My Current loction addr", "Canont get Address!");
-        }
-        return strAdd;
-    }
 
     @Override
-    public void onMapReady(GoogleMap googleMap)
-    {
+    public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -234,10 +206,9 @@ public class NavActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.nav, menu);
+        //getMenuInflater().inflate(R.menu.nav, menu);
         return true;
     }
 
@@ -248,7 +219,6 @@ public class NavActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
 //        if (id == R.id.action_settings) {
 //            return true;
 //        }
@@ -277,5 +247,29 @@ public class NavActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
+        String strAdd = "";
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
+            if (addresses != null) {
+                Address returnedAddress = addresses.get(0);
+                StringBuilder strReturnedAddress = new StringBuilder("");
+
+                for (int i = 0; i <= returnedAddress.getMaxAddressLineIndex(); i++) {
+                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
+                }
+                strAdd = strReturnedAddress.toString();
+                Log.i(TAG, "Address = " + strReturnedAddress.toString());
+            } else {
+                Log.i(TAG, "No Address returned!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i(TAG, "Cannot get Address!");
+        }
+        return strAdd;
     }
 }
