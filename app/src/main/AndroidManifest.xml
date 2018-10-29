@@ -43,7 +43,8 @@
             android:label="@string/title_activity_nav"
             android:theme="@style/AppTheme" />
         <activity android:name=".LeaveSpotActivity" />
-        <activity android:name=".SignInActivity"></activity>
+        <activity android:name=".SignInActivity" />
+        <activity android:name=".EmailSignInActivity"></activity>
     </application>
 
 </manifest>

@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
@@ -31,7 +33,9 @@ public class SignInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     // UI components
-    private Button googleButton;
+    private Button mGSignInButton;
+    private Button mEmailSignInButton;
+    private Button mRegisterButton;
 
     // Rest
     private static final int RC_SIGN_IN = 1;
@@ -47,10 +51,28 @@ public class SignInActivity extends AppCompatActivity {
         init();
 
         // GSign in
-        googleButton.setOnClickListener(new View.OnClickListener() {
+        mGSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 signInWithGoogle();
+            }
+        });
+
+        // Email Sign in
+        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Launch email sign in
+                startActivity(new Intent(SignInActivity.this, EmailSignInActivity.class));
+            }
+        });
+
+        // Register button
+        mRegisterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Launch register
+                startActivity(new Intent(SignInActivity.this, RegisterUserActivity.class));
             }
         });
     }
@@ -87,7 +109,7 @@ public class SignInActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -137,7 +159,10 @@ public class SignInActivity extends AppCompatActivity {
 
 
     private void initUIComponents() {
-        googleButton = findViewById(R.id.google_sign_in_button);
+        mGSignInButton = findViewById(R.id.google_sign_in_btn);
+        mEmailSignInButton = findViewById(R.id.email_sign_in_btn);
+        mRegisterButton = findViewById(R.id.register_btn);
+
     }
 
     @Override
