@@ -44,7 +44,10 @@
             android:theme="@style/AppTheme" />
         <activity android:name=".LeaveSpotActivity" />
         <activity android:name=".SignInActivity" />
-        <activity android:name=".EmailSignInActivity"></activity>
+        <activity android:name=".EmailSignInActivity" />
+        <activity android:name=".MyProfileActivity" />
+        <activity android:name=".VehicleActivity" />
+        <activity android:name=".RentYourPlace"></activity>
     </application>
 
 </manifest>

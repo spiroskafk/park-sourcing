@@ -26,4 +26,8 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="CheckBoxTintTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/red</item>
+    </style>
+
 </resources>

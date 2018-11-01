@@ -13,4 +13,10 @@
     <color name="google">#DD4B39</color>
     <color name="email">#6B6B6B</color>
     <color name="register">#036565</color>
+
+
+    <color name="graylight">#fafafa</color>
+    <color name="startblue">#09c6df</color>
+    <color name="endblue">#0bcce6</color>
+    <color name="primaryDark">#292b3d</color>
 </resources>

@@ -1,12 +1,18 @@
 package com.spiroskafk.parking;
 
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -21,8 +27,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.skydoves.powermenu.MenuAnimation;
+import com.skydoves.powermenu.OnMenuItemClickListener;
+import com.skydoves.powermenu.PowerMenu;
+import com.skydoves.powermenu.PowerMenuItem;
 import com.spiroskafk.parking.utils.Permissions;
+import com.yarolegovich.lovelydialog.LovelyChoiceDialog;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,12 +51,18 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
     private DatabaseReference mParkingSpotsDatabaseReference;
     private ChildEventListener mChildEventListener;
 
+    // UI elements
+    private Button mLeaveBtn;
+
     // LocationClient
     private FusedLocationProviderClient mFusedLocationClient;
 
     // latlong
     private static float latit;
     private static float longtit;
+
+    PowerMenu powerMenu;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +71,51 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
 
         // Initialize phase
         init();
+
+        final List<PowerMenuItem> list = new ArrayList<PowerMenuItem>();
+        list.add(new PowerMenuItem("WHAAT", false));
+
+
+        mLeaveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                powerMenu = new PowerMenu.Builder(getApplicationContext())
+                        .addItemList(list) // list has "Novel", "Poerty", "Art"
+                        .addItem(new PowerMenuItem("Επέλεξε το είδος της θέσης", false))
+                        .addItem(new PowerMenuItem("Journals", false))
+                        .addItem(new PowerMenuItem("Travel", false))
+                        .setAnimation(MenuAnimation.SHOWUP_TOP_LEFT) // Animation start point (TOP | LEFT)
+                        .setMenuRadius(10f)
+                        .setMenuShadow(10f)
+                        .setTextColor(getApplicationContext().getResources().getColor(R.color.red))
+                        .setSelectedTextColor(Color.WHITE)
+                        .setMenuColor(Color.WHITE)
+                        .setSelectedMenuColor(getApplicationContext().getResources().getColor(R.color.colorPrimary))
+                        .setOnMenuItemClickListener(onMenuItemClickListener)
+                        .build();
+
+                powerMenu.showAsAnchorCenter(view);
+
+            }
+
+
+        });
+
+
     }
+
+    private OnMenuItemClickListener<PowerMenuItem> onMenuItemClickListener = new OnMenuItemClickListener<PowerMenuItem>() {
+        @Override
+        public void onItemClick(int position, PowerMenuItem item) {
+            Toast.makeText(getBaseContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
+            powerMenu.setSelectedPosition(position); // change selected item
+            powerMenu.dismiss();
+        }
+    };
+
+
+
+
 
 
     private void updateMap(float latit, float longit) {
@@ -62,7 +124,7 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
         mMap.addMarker(new MarkerOptions()
                 .position(coordinates)
                 .title(address)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.park)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.car_marker)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15));
 
 
@@ -110,6 +172,9 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
 
         // Init Location Services
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Init UI elements
+        mLeaveBtn = findViewById(R.id.leave_btn);
 
         // Init google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

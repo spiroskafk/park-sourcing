@@ -236,10 +236,10 @@ public class NavActivity extends AppCompatActivity
             startActivity(new Intent(NavActivity.this, SignInActivity.class));
         } else if (id == R.id.nav_report_spot) {
             startActivity(new Intent(NavActivity.this, LeaveSpotActivity.class));
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
+        } else if (id == R.id.nav_myprofile) {
+            startActivity(new Intent(NavActivity.this, MyProfileActivity.class));
+        } else if (id == R.id.nav_rent_your_space) {
+            startActivity(new Intent(NavActivity.this, RentYourPlace.class));
         } else if (id == R.id.nav_share) {
 
         }
