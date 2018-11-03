@@ -1,13 +1,10 @@
 package com.spiroskafk.parking;
 
 import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -22,7 +19,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.skydoves.powermenu.MenuAnimation;
@@ -31,10 +27,10 @@ import com.skydoves.powermenu.PowerMenu;
 import com.skydoves.powermenu.PowerMenuItem;
 import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.utils.Permissions;
+import com.spiroskafk.parking.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -48,7 +44,6 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
     // Firebase components
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mParkingSpotsDatabaseReference;
-    private ChildEventListener mChildEventListener;
 
     // UI elements
     private Button mLeaveBtn;
@@ -78,12 +73,13 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
         list.add(new PowerMenuItem("Θέση Μόνιμης Κατοικίας", false));
 
 
+        // Popup window list
         mLeaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 powerMenu = new PowerMenu.Builder(getApplicationContext())
                         .addItemList(list)
-                        .setAnimation(MenuAnimation.SHOW_UP_CENTER) // Animation start point (TOP | LEFT)
+                        .setAnimation(MenuAnimation.SHOW_UP_CENTER)
                         .setMenuRadius(10f)
                         .setMenuShadow(10f)
                         .setTextColor(getApplicationContext().getResources().getColor(R.color.black))
@@ -96,18 +92,14 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
                 powerMenu.showAtCenter(view);
 
             }
-
-
         });
-
-
     }
 
     private OnMenuItemClickListener<PowerMenuItem> onMenuItemClickListener = new OnMenuItemClickListener<PowerMenuItem>() {
         @Override
         public void onItemClick(int position, PowerMenuItem item) {
             Toast.makeText(getBaseContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
-            powerMenu.setSelectedPosition(position); // change selected item
+            powerMenu.setSelectedPosition(position);
             powerMenu.dismiss();
 
             // Update database entry
@@ -117,19 +109,15 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
     };
 
     private void updateDatabase(String title) {
-        // Gather the stuff and create the parking spot object
-        // get lat, long
-        getCurrentLocation();
-        String address = getCompleteAddressString(latit, longtit);
+        String address = Utils.getStreetAddress(latit, longtit, this);
         String id = UUID.randomUUID().toString();
         ParkingSpot newSpot = new ParkingSpot(id, title, address, latit, longtit);
         mParkingSpotsDatabaseReference.push().setValue(newSpot);
         Toast.makeText(LeaveSpotActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
     }
 
-
     private void updateMap(float latit, float longit) {
-        String address = getCompleteAddressString(latit, longit);
+        String address = Utils.getStreetAddress(latit, longtit, this);
         LatLng coordinates = new LatLng(latit, longit);
         mMap.addMarker(new MarkerOptions()
                 .position(coordinates)
@@ -190,7 +178,6 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mParkingSpotsDatabaseReference = mFirebaseDatabase.getReference().child("parking_spots");
 
-
         // Init google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -202,29 +189,5 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
-    }
-
-    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
-        String strAdd = "";
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
-            if (addresses != null) {
-                Address returnedAddress = addresses.get(0);
-                StringBuilder strReturnedAddress = new StringBuilder("");
-
-                for (int i = 0; i <= returnedAddress.getMaxAddressLineIndex(); i++) {
-                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
-                }
-                strAdd = strReturnedAddress.toString();
-                Log.i(TAG, "Address = " + strReturnedAddress.toString());
-            } else {
-                Log.i(TAG, "No Address returned!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.i(TAG, "Cannot get Address!");
-        }
-        return strAdd;
     }
 }

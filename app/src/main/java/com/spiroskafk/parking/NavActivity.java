@@ -1,8 +1,6 @@
 package com.spiroskafk.parking;
 
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,9 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.model.ParkingSpot;
-
-import java.util.List;
-import java.util.Locale;
+import com.spiroskafk.parking.utils.Utils;
 
 
 public class NavActivity extends AppCompatActivity
@@ -51,9 +47,6 @@ public class NavActivity extends AppCompatActivity
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mParkingSpotsDatabaseReference;
     private ChildEventListener mChildEventListener;
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
-
 
     // Auto-complete address
     private PlaceAutocompleteFragment autocompleteFragment;
@@ -139,7 +132,6 @@ public class NavActivity extends AppCompatActivity
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
         // Init Firebase
-        mFirebaseAuth = FirebaseAuth.getInstance();
         initFirebaseComponents();
 
 
@@ -147,7 +139,7 @@ public class NavActivity extends AppCompatActivity
 
 
     private void updateMap(ParkingSpot spot) {
-        String address = getCompleteAddressString(spot.getLatitude(), spot.getLongitude());
+        String address = Utils.getStreetAddress(spot.getLatitude(), spot.getLongitude(), this);
         LatLng coordinates = new LatLng(spot.getLatitude(), spot.getLongitude());
         mMap.addMarker(new MarkerOptions().position(coordinates).title(address));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15));
@@ -209,27 +201,4 @@ public class NavActivity extends AppCompatActivity
     }
 
 
-    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
-        String strAdd = "";
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
-            if (addresses != null) {
-                Address returnedAddress = addresses.get(0);
-                StringBuilder strReturnedAddress = new StringBuilder("");
-
-                for (int i = 0; i <= returnedAddress.getMaxAddressLineIndex(); i++) {
-                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
-                }
-                strAdd = strReturnedAddress.toString();
-                Log.i(TAG, "Address = " + strReturnedAddress.toString());
-            } else {
-                Log.i(TAG, "No Address returned!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.i(TAG, "Cannot get Address!");
-        }
-        return strAdd;
-    }
 }

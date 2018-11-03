@@ -37,7 +37,6 @@ public class SignInActivity extends AppCompatActivity {
     private Button mEmailSignInButton;
     private Button mRegisterButton;
     private GoogleSignInClient mGoogleSignInClient;
-
     private Boolean exit = false;
 
 
@@ -49,26 +48,8 @@ public class SignInActivity extends AppCompatActivity {
         // Initialize phase
         init();
 
-        // Check if user is already signed in
-        // Firebase state listener
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                // Check if the user is signed in or not
-                // firebaseAuth contains that information
-                FirebaseUser user = mAuth.getCurrentUser();
-                if (user != null) {
-                    // signed in
-                    Log.i(TAG, "USER IS SIGNED IN");
-                    // Launch sign in activity
-                    startActivity(new Intent(SignInActivity.this, NavActivity.class));
-
-                } else {
-                    Log.i(TAG, "NOT SIGNED IN");
-                }
-            }
-        };
-
+        // Check if user is signed in, then proceed
+        isSignedIn();
 
         // GSign in
         mGSignInButton.setOnClickListener(new View.OnClickListener() {
@@ -97,20 +78,6 @@ public class SignInActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Attach the authStatelistener
-        mAuth.addAuthStateListener(mAuthStateListener);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // Detatch the authStateListener
-        mAuth.removeAuthStateListener(mAuthStateListener);
-    }
-
 
     private void init() {
 
@@ -119,6 +86,23 @@ public class SignInActivity extends AppCompatActivity {
 
         // Init firebase
         mAuth = FirebaseAuth.getInstance();
+    }
+
+    private void isSignedIn() {
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null) {
+                    Log.i(TAG, "USER IS SIGNED IN");
+                    // Launch sign in activity
+                    startActivity(new Intent(SignInActivity.this, NavActivity.class));
+
+                } else {
+                    Log.i(TAG, "NOT SIGNED IN");
+                }
+            }
+        };
     }
 
 
@@ -154,7 +138,6 @@ public class SignInActivity extends AppCompatActivity {
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.i(TAG, "Google sign in failed", e);
-                // ...
             }
         }
     }
@@ -171,17 +154,11 @@ public class SignInActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            // back to main page
                             finish();
-                            //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.i(TAG, "signInWithCredential:failure", task.getException());
-                            //Snackbar.make(findViewById(R.l), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                            //updateUI(null);
                         }
-
-                        // ...
                     }
                 });
     }
@@ -210,7 +187,21 @@ public class SignInActivity extends AppCompatActivity {
             }, 3 * 1000);
 
         }
-
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Attach the authStatelistener
+        mAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Detatch the authStateListener
+        mAuth.removeAuthStateListener(mAuthStateListener);
+    }
+
 
 }
