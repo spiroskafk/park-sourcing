@@ -1,11 +1,8 @@
 package com.spiroskafk.parking;
 
-import com.google.firebase.database.FirebaseDatabase;
-import com.spiroskafk.parking.model.*;
-
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +14,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.spiroskafk.parking.model.User;
 
 
 public class RegisterUserActivity extends AppCompatActivity {
@@ -35,8 +34,7 @@ public class RegisterUserActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_user);
 
@@ -74,6 +72,7 @@ public class RegisterUserActivity extends AppCompatActivity {
                                         mProgressBar.setVisibility(View.GONE);
                                         if (task.isSuccessful()) {
                                             Toast.makeText(RegisterUserActivity.this, "You have successfulled registered", Toast.LENGTH_SHORT).show();
+                                            finish();
                                         } else {
                                             // display failure message
                                         }

@@ -2,14 +2,13 @@ package com.spiroskafk.parking;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -28,18 +27,18 @@ public class SignInActivity extends AppCompatActivity {
 
     // Log TAG
     private static final String TAG = "SignInActivity";
-
+    // Rest
+    private static final int RC_SIGN_IN = 1;
     // Firebase
     private FirebaseAuth mAuth;
-
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
     // UI components
     private Button mGSignInButton;
     private Button mEmailSignInButton;
     private Button mRegisterButton;
-
-    // Rest
-    private static final int RC_SIGN_IN = 1;
     private GoogleSignInClient mGoogleSignInClient;
+
+    private Boolean exit = false;
 
 
     @Override
@@ -49,6 +48,27 @@ public class SignInActivity extends AppCompatActivity {
 
         // Initialize phase
         init();
+
+        // Check if user is already signed in
+        // Firebase state listener
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                // Check if the user is signed in or not
+                // firebaseAuth contains that information
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null) {
+                    // signed in
+                    Log.i(TAG, "USER IS SIGNED IN");
+                    // Launch sign in activity
+                    startActivity(new Intent(SignInActivity.this, NavActivity.class));
+
+                } else {
+                    Log.i(TAG, "NOT SIGNED IN");
+                }
+            }
+        };
+
 
         // GSign in
         mGSignInButton.setOnClickListener(new View.OnClickListener() {
@@ -77,19 +97,25 @@ public class SignInActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Attach the authStatelistener
+        mAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Detatch the authStateListener
+        mAuth.removeAuthStateListener(mAuthStateListener);
+    }
+
 
     private void init() {
 
         // Init UI
         initUIComponents();
-
-        // Init - Setup toolbar
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Init firebase
         mAuth = FirebaseAuth.getInstance();
@@ -103,7 +129,7 @@ public class SignInActivity extends AppCompatActivity {
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        
+
         // Start sign in
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -122,6 +148,9 @@ public class SignInActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
                 Log.i(TAG, "Google sign in successful");
+
+                // launch NavActivity
+                startActivity(new Intent(SignInActivity.this, NavActivity.class));
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.i(TAG, "Google sign in failed", e);
@@ -166,8 +195,22 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
+    public void onBackPressed() {
+        if (exit) {
+            finishAndRemoveTask(); // finish activity
+        } else {
+            Toast.makeText(this, "Press Back again to Exit.",
+                    Toast.LENGTH_SHORT).show();
+            exit = true;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    exit = false;
+                }
+            }, 3 * 1000);
+
+        }
+
     }
+
 }

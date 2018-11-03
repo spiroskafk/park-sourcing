@@ -6,9 +6,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,7 +31,6 @@ import com.skydoves.powermenu.PowerMenu;
 import com.skydoves.powermenu.PowerMenuItem;
 import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.utils.Permissions;
-import com.yarolegovich.lovelydialog.LovelyChoiceDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +93,7 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
                         .setOnMenuItemClickListener(onMenuItemClickListener)
                         .build();
 
-                  powerMenu.showAtCenter(view);
+                powerMenu.showAtCenter(view);
 
             }
 
@@ -120,7 +117,7 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
     };
 
     private void updateDatabase(String title) {
-         // Gather the stuff and create the parking spot object
+        // Gather the stuff and create the parking spot object
         // get lat, long
         getCurrentLocation();
         String address = getCompleteAddressString(latit, longtit);
@@ -129,10 +126,6 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
         mParkingSpotsDatabaseReference.push().setValue(newSpot);
         Toast.makeText(LeaveSpotActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
     }
-
-
-
-
 
 
     private void updateMap(float latit, float longit) {

@@ -27,7 +27,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -92,38 +91,22 @@ public class NavActivity extends AppCompatActivity
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
-        };
-
-        // Firebase state listener
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                // Check if the user is signed in or not
-                // firebaseAuth contains that information
-                FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // signed in
-                    Log.i(TAG, "USER IS SIGNED IN");
-
-                } else {
-                    Log.i(TAG, "NOT SIGNED IN");
-
-                    // Launch sign in activity
-                    startActivity(new Intent(NavActivity.this, SignInActivity.class));
-
-                }
+            public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         };
+
 
         mParkingSpotsDatabaseReference.addChildEventListener(mChildEventListener);
     }
@@ -162,19 +145,6 @@ public class NavActivity extends AppCompatActivity
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Attach the authStatelistener
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // Detatch the authStateListener
-        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-    }
 
     private void updateMap(ParkingSpot spot) {
         String address = getCompleteAddressString(spot.getLatitude(), spot.getLongitude());
@@ -207,22 +177,12 @@ public class NavActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.nav, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -232,22 +192,22 @@ public class NavActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_sign_in) {
-            startActivity(new Intent(NavActivity.this, SignInActivity.class));
-        } else if (id == R.id.nav_report_spot) {
+        if (id == R.id.nav_report_spot) {
             startActivity(new Intent(NavActivity.this, LeaveSpotActivity.class));
         } else if (id == R.id.nav_myprofile) {
             startActivity(new Intent(NavActivity.this, MyProfileActivity.class));
         } else if (id == R.id.nav_rent_your_space) {
             startActivity(new Intent(NavActivity.this, RentYourPlace.class));
-        } else if (id == R.id.nav_share) {
-
+        } else if (id == R.id.nav_sign_out) {
+            FirebaseAuth.getInstance().signOut();
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 
     private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
         String strAdd = "";

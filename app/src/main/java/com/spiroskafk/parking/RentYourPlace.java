@@ -1,7 +1,7 @@
 package com.spiroskafk.parking;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 public class RentYourPlace extends AppCompatActivity {

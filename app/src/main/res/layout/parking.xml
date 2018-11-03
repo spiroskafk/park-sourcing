@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SignInActivity"
+    tools:context=".LeaveSpotActivity"
     android:background="@color/graylight"
     android:orientation="vertical">
 
@@ -48,8 +48,25 @@
             android:layout_width="500dp"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:layout_marginTop="450dp"
+            android:layout_marginTop="300dp"
             android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_marginTop="50dp"
+                android:orientation="horizontal"
+                android:layout_width="350dp"
+                android:layout_height="100dp">
+
+                <TextView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="match_parent"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/dancing"
+                    android:layout_height="match_parent"
+                    android:text="@string/register_text"
+                    android:textStyle="italic"/>
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/google_sign_in_btn"
@@ -104,6 +121,8 @@
 
 
         </LinearLayout>
+
+
 
     </RelativeLayout>
 
