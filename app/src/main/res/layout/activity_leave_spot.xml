@@ -36,14 +36,30 @@
             android:layout_gravity="center" />
     </android.support.v7.widget.Toolbar>
 
+    <!--<Button-->
+        <!--android:id="@+id/leave_btn"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_marginBottom="56dp"-->
+        <!--android:textAllCaps="false"-->
+        <!--android:text="Leave" />-->
+
+
     <Button
         android:id="@+id/leave_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="56dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="51dp"
+        android:background="@drawable/buttonstyle"
+        android:text="Leave"
         android:textAllCaps="false"
-        android:text="Leave" />
+        android:textColor="#fff" />
+
+
 
 </RelativeLayout>

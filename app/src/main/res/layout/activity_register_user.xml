@@ -27,11 +27,12 @@
     <EditText
         android:id="@+id/reg_display_name"
         android:layout_width="250dp"
+        android:background="@drawable/oval"
+        android:padding="3dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="189dp"
-        android:ems="10"
         android:hint="Full Name"
         android:inputType="textPersonName" />
 
@@ -39,10 +40,11 @@
         android:id="@+id/reg_email"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/oval"
+        android:padding="3dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="250dp"
-        android:ems="10"
         android:hint="Email"
         android:inputType="textEmailAddress" />
 
@@ -53,6 +55,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="314dp"
+        android:background="@drawable/oval"
+        android:padding="3dp"
         android:ems="10"
         android:inputType="textPassword"
         android:text="Password" />
@@ -66,22 +70,35 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="266dp" />
 
+    <!--<Button-->
+        <!--android:id="@+id/reg_btn"-->
+        <!--android:layout_width="260dp"-->
+        <!--android:layout_height="100dp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_marginBottom="69dp"-->
+        <!--android:background="@color/signupColor"-->
+        <!--android:drawableLeft="@drawable/ic_register_account"-->
+        <!--android:drawablePadding="-20dp"-->
+        <!--android:gravity="center"-->
+        <!--android:paddingLeft="15dp"-->
+        <!--android:text="Register account"-->
+        <!--android:textAlignment="gravity"-->
+        <!--android:textAllCaps="false"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:visibility="visible" />-->
+
     <Button
         android:id="@+id/reg_btn"
-        android:layout_width="260dp"
-        android:layout_height="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="69dp"
-        android:background="@color/signupColor"
-        android:drawableLeft="@drawable/ic_register_account"
-        android:drawablePadding="-20dp"
-        android:gravity="center"
-        android:paddingLeft="15dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="114dp"
+        android:background="@drawable/buttonstyle"
         android:text="Register account"
-        android:textAlignment="gravity"
         android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:visibility="visible" />
+        android:textColor="#fff" />
 
 </RelativeLayout>

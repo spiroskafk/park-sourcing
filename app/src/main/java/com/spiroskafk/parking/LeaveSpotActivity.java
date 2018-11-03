@@ -31,12 +31,14 @@ import com.skydoves.powermenu.MenuAnimation;
 import com.skydoves.powermenu.OnMenuItemClickListener;
 import com.skydoves.powermenu.PowerMenu;
 import com.skydoves.powermenu.PowerMenuItem;
+import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.utils.Permissions;
 import com.yarolegovich.lovelydialog.LovelyChoiceDialog;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -73,28 +75,28 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
         init();
 
         final List<PowerMenuItem> list = new ArrayList<PowerMenuItem>();
-        list.add(new PowerMenuItem("WHAAT", false));
+        list.add(new PowerMenuItem("Θέση ΑΜΕΑ", false));
+        list.add(new PowerMenuItem("Θέση Επισκεπτών", false));
+        list.add(new PowerMenuItem("Δημοτικό Πάρκινγκ", false));
+        list.add(new PowerMenuItem("Θέση Μόνιμης Κατοικίας", false));
 
 
         mLeaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 powerMenu = new PowerMenu.Builder(getApplicationContext())
-                        .addItemList(list) // list has "Novel", "Poerty", "Art"
-                        .addItem(new PowerMenuItem("Επέλεξε το είδος της θέσης", false))
-                        .addItem(new PowerMenuItem("Journals", false))
-                        .addItem(new PowerMenuItem("Travel", false))
-                        .setAnimation(MenuAnimation.SHOWUP_TOP_LEFT) // Animation start point (TOP | LEFT)
+                        .addItemList(list)
+                        .setAnimation(MenuAnimation.SHOW_UP_CENTER) // Animation start point (TOP | LEFT)
                         .setMenuRadius(10f)
                         .setMenuShadow(10f)
-                        .setTextColor(getApplicationContext().getResources().getColor(R.color.red))
+                        .setTextColor(getApplicationContext().getResources().getColor(R.color.black))
                         .setSelectedTextColor(Color.WHITE)
                         .setMenuColor(Color.WHITE)
                         .setSelectedMenuColor(getApplicationContext().getResources().getColor(R.color.colorPrimary))
                         .setOnMenuItemClickListener(onMenuItemClickListener)
                         .build();
 
-                powerMenu.showAsAnchorCenter(view);
+                  powerMenu.showAtCenter(view);
 
             }
 
@@ -110,8 +112,23 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
             Toast.makeText(getBaseContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
             powerMenu.setSelectedPosition(position); // change selected item
             powerMenu.dismiss();
+
+            // Update database entry
+            updateDatabase(item.getTitle());
+
         }
     };
+
+    private void updateDatabase(String title) {
+         // Gather the stuff and create the parking spot object
+        // get lat, long
+        getCurrentLocation();
+        String address = getCompleteAddressString(latit, longtit);
+        String id = UUID.randomUUID().toString();
+        ParkingSpot newSpot = new ParkingSpot(id, title, address, latit, longtit);
+        mParkingSpotsDatabaseReference.push().setValue(newSpot);
+        Toast.makeText(LeaveSpotActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
+    }
 
 
 
@@ -175,6 +192,11 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
 
         // Init UI elements
         mLeaveBtn = findViewById(R.id.leave_btn);
+
+        // Init Firebase
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mParkingSpotsDatabaseReference = mFirebaseDatabase.getReference().child("parking_spots");
+
 
         // Init google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
