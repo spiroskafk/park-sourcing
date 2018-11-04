@@ -32,9 +32,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="279dp"
         android:background="@drawable/oval"
-        android:padding="3dp"
         android:hint="Email"
-        android:inputType="textEmailAddress" />
+        android:inputType="textEmailAddress"
+        android:padding="3dp" />
 
     <EditText
         android:id="@+id/pswEditText"
@@ -44,26 +44,10 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="337dp"
         android:background="@drawable/oval"
-        android:padding="3dp"
         android:inputType="textPassword"
+        android:padding="3dp"
         android:text="Password" />
 
-    <!--<Button-->
-        <!--android:id="@+id/email_sign_in_btn"-->
-        <!--android:layout_width="260dp"-->
-        <!--android:layout_height="100dp"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_marginBottom="64dp"-->
-        <!--android:background="@color/email"-->
-        <!--android:drawableLeft="@drawable/ic_email_signin"-->
-        <!--android:drawablePadding="-20dp"-->
-        <!--android:paddingLeft="15dp"-->
-        <!--android:text="Sign in with Email"-->
-        <!--android:textAlignment="center"-->
-        <!--android:textAllCaps="false"-->
-        <!--android:textColor="@color/white"-->
-        <!--android:visibility="visible" />-->
 
     <Button
         android:id="@+id/email_sign_in_btn"
@@ -72,7 +56,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="114dp"
+        android:layout_marginBottom="25dp"
         android:background="@drawable/buttonstyle"
         android:text="Sign in with email"
         android:textAllCaps="false"

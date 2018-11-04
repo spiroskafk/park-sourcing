@@ -7,7 +7,6 @@
     tools:context=".LeaveSpotActivity">
 
 
-
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -27,24 +26,14 @@
 
         <TextView
             android:id="@+id/toolbar_title"
+            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Report spot"
-            android:textSize="18sp"
+            android:layout_gravity="center"
             android:fontFamily="@font/dancing"
-            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-            android:layout_gravity="center" />
+            android:text="Report spot"
+            android:textSize="18sp" />
     </android.support.v7.widget.Toolbar>
-
-    <!--<Button-->
-        <!--android:id="@+id/leave_btn"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_marginBottom="56dp"-->
-        <!--android:textAllCaps="false"-->
-        <!--android:text="Leave" />-->
 
 
     <Button
@@ -54,12 +43,11 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="51dp"
+        android:layout_marginBottom="25dp"
         android:background="@drawable/buttonstyle"
         android:text="Leave"
         android:textAllCaps="false"
         android:textColor="#fff" />
-
 
 
 </RelativeLayout>
