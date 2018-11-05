@@ -22,6 +22,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,7 +33,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.model.ParkingSpot;
+import com.spiroskafk.parking.model.RentData;
 import com.spiroskafk.parking.utils.Utils;
+
+import java.util.ArrayList;
 
 
 public class NavActivity extends AppCompatActivity
@@ -39,15 +44,16 @@ public class NavActivity extends AppCompatActivity
 
     // Log TAG
     public final String TAG = "NavActivityLog";
-
     // Google map
     private GoogleMap mMap;
-
+    // Firebase
+    private FirebaseAuth mAuth;
     // Firebase components
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mParkingSpotsDatabaseReference;
+    private DatabaseReference mRentedPlacesDatabaseReference;
     private ChildEventListener mChildEventListener;
-
+    private ChildEventListener mChildEventListener2;
     // Auto-complete address
     private PlaceAutocompleteFragment autocompleteFragment;
 
@@ -81,7 +87,33 @@ public class NavActivity extends AppCompatActivity
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 ParkingSpot spot = dataSnapshot.getValue(ParkingSpot.class);
                 updateMap(spot);
+
             }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        };
+
+        mChildEventListener2 = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                RentData rentData = dataSnapshot.getValue(RentData.class);
+                updateRentedSpots(rentData.getLatit(), rentData.getLongtit());
+            }
+
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -102,6 +134,8 @@ public class NavActivity extends AppCompatActivity
 
 
         mParkingSpotsDatabaseReference.addChildEventListener(mChildEventListener);
+        mRentedPlacesDatabaseReference.addChildEventListener(mChildEventListener2);
+
     }
 
 
@@ -131,8 +165,24 @@ public class NavActivity extends AppCompatActivity
         autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
+
         // Init Firebase
         initFirebaseComponents();
+
+
+    }
+
+    private void updateRentedSpots(float latit, float longtit) {
+        String address = Utils.getStreetAddress(latit, longtit, this);
+
+
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.icon_marker);
+        LatLng coordinates = new LatLng(latit, longtit);
+        MarkerOptions marker = new MarkerOptions();
+        marker.position(coordinates)
+                .title(address)
+                .icon(icon);
+        mMap.addMarker(marker).showInfoWindow();
 
 
     }
@@ -146,8 +196,11 @@ public class NavActivity extends AppCompatActivity
     }
 
     private void initFirebaseComponents() {
+        // Init firebase
+        mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mParkingSpotsDatabaseReference = mFirebaseDatabase.getReference().child("parking_spots");
+        mRentedPlacesDatabaseReference = mFirebaseDatabase.getReference().child("rented_spots");
     }
 
 
@@ -199,6 +252,4 @@ public class NavActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
 }

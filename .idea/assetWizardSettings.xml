@@ -34,9 +34,9 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundLayerName" value="ic_launcher_background" />
-                                      <entry key="foregroundImage" value="C:\Users\Administrator\Downloads\if_Parking_751082.svg" />
-                                      <entry key="foregroundLayerName" value="ic_launcher_parking" />
-                                      <entry key="outputName" value="ic_car_marker" />
+                                      <entry key="foregroundImage" value="C:\Users\Administrator\Downloads\if_Map-Marker-Ball-Azure_73012.png" />
+                                      <entry key="foregroundLayerName" value="ic_marker_map" />
+                                      <entry key="outputName" value="ic_map_marker" />
                                     </map>
                                   </option>
                                 </PersistentState>

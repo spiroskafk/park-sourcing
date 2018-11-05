@@ -116,9 +116,9 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
         Toast.makeText(LeaveSpotActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
     }
 
-    private void updateMap(float latit, float longit) {
+    private void updateMap(float latit, float longtit) {
         String address = Utils.getStreetAddress(latit, longtit, this);
-        LatLng coordinates = new LatLng(latit, longit);
+        LatLng coordinates = new LatLng(latit, longtit);
         mMap.addMarker(new MarkerOptions()
                 .position(coordinates)
                 .title(address)
