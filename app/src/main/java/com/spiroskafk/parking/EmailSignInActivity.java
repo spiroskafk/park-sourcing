@@ -1,11 +1,14 @@
 package com.spiroskafk.parking;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -29,6 +32,8 @@ public class EmailSignInActivity extends AppCompatActivity {
     private EditText mEmailEditText;
     private EditText mPswEditText;
     private Button mEmailSignInBtn;
+    private CheckBox mUserCheckBbox;
+    private CheckBox mCompanyCheckBox;
 
     // Firebase
     private FirebaseAuth mFirebaseAuth;
@@ -40,6 +45,20 @@ public class EmailSignInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_email_sign_in);
 
         init();
+
+        // Checkbox listener
+        mUserCheckBbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                mCompanyCheckBox.setChecked(false);
+            }
+        });
+        mCompanyCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                mUserCheckBbox.setChecked(false);
+            }
+        });
 
         // Sign in listener
         mEmailSignInBtn.setOnClickListener(new View.OnClickListener() {
@@ -71,13 +90,15 @@ public class EmailSignInActivity extends AppCompatActivity {
         mEmailEditText = findViewById(R.id.emailEditText);
         mPswEditText = findViewById(R.id.pswEditText);
         mEmailSignInBtn = findViewById(R.id.email_sign_in_btn);
+        mUserCheckBbox = findViewById(R.id.user_checkbox);
+        mCompanyCheckBox = findViewById(R.id.company_checkbox);
     }
 
     private void userLogin() {
         final String email = mEmailEditText.getText().toString().trim();
         final String password = mPswEditText.getText().toString().trim();
 
-        if (!email.isEmpty() && !password.isEmpty()) {
+        if (!email.isEmpty() && !password.isEmpty() && (mUserCheckBbox.isChecked() || mCompanyCheckBox.isChecked())) {
             mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -92,13 +113,14 @@ public class EmailSignInActivity extends AppCompatActivity {
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                                 String userType = dataSnapshot.child("type").getValue().toString();
-                                if (userType.equals("simple_user")) {
-                                    Toast.makeText(EmailSignInActivity.this, "Simple user signed in", Toast.LENGTH_SHORT).show();
-                                    // Start User Activity
+                                if (userType.equals("user") && mUserCheckBbox.isChecked()) {
+                                    Toast.makeText(EmailSignInActivity.this, "User signed in", Toast.LENGTH_SHORT).show();
                                     finish();
-
-                                } else if (userType.equals("company")) {
+                                    startActivity(new Intent(EmailSignInActivity.this, NavActivity.class));
+                                } else if (userType.equals("company") && mCompanyCheckBox.isChecked()) {
                                     Toast.makeText(EmailSignInActivity.this, "Company signed in!", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    startActivity(new Intent(EmailSignInActivity.this, CompanyNavActivity.class));
                                 }
                             }
 

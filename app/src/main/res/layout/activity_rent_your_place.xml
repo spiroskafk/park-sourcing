@@ -22,12 +22,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:fontFamily="@font/dancing"
-            android:text="Add Vehicle"
+            android:text="Rent your place"
             android:textSize="18sp" />
     </android.support.v7.widget.Toolbar>
 
-
-    <RelativeLayout
+   <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="340dp">
 

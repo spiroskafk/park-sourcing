@@ -48,6 +48,25 @@
         android:padding="3dp"
         android:text="Password" />
 
+    <CheckBox
+        android:id="@+id/user_checkbox"
+        android:layout_width="100dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/pswEditText"
+        android:layout_toStartOf="@+id/company_checkbox"
+        android:text="User" />
+
+    <CheckBox
+        android:id="@+id/company_checkbox"
+        android:layout_width="100dp"
+        android:layout_height="80dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/pswEditText"
+        android:layout_marginEnd="102dp"
+        android:text="Company" />
+
+
+
 
     <Button
         android:id="@+id/email_sign_in_btn"

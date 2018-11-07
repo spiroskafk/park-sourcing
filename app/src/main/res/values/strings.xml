@@ -18,4 +18,5 @@
     <string name="rent_your_place_text">Fill in a few quick details and then sit back to
 watch the money roll in!</string>
     <string name="access_instructions_text">These details are only sent to drivers after they have booked your space!</string>
+    <string name="title_activity_company_nav">CompanyNavActivity</string>
 </resources>

@@ -30,28 +30,33 @@
         <activity
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".NavActivity"
-            android:label="@string/title_activity_nav"/>
+            android:label="@string/title_activity_nav" />
         <activity android:name=".LeaveSpotActivity" />
         <activity android:name=".SignInActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-        <activity android:name=".EmailSignInActivity"/>
-        <activity android:name=".MyProfileActivity"/>
-        <activity android:name=".VehicleActivity"/>
-        <activity android:name=".RentYourPlace"></activity>
+        <activity android:name=".EmailSignInActivity" />
+        <activity android:name=".MyProfileActivity" />
+        <activity android:name=".VehicleActivity" />
+        <activity android:name=".RentYourPlace" />
+        <activity
+            android:name=".CompanyNavActivity"
+            android:label="@string/title_activity_company_nav"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

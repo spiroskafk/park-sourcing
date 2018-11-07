@@ -71,6 +71,23 @@
         android:padding="3dp"
         android:text="Password" />
 
+    <CheckBox
+        android:id="@+id/user_checkbox"
+        android:layout_width="100dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/reg_password"
+        android:layout_toStartOf="@+id/company_checkbox"
+        android:text="User" />
+
+    <CheckBox
+        android:id="@+id/company_checkbox"
+        android:layout_width="100dp"
+        android:layout_height="80dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/reg_password"
+        android:layout_marginEnd="97dp"
+        android:text="Company" />
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
@@ -78,7 +95,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="200dp" />
+        android:layout_marginBottom="119dp" />
 
 
     <Button
