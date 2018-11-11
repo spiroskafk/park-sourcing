@@ -1,6 +1,7 @@
 package com.spiroskafk.parking;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -26,12 +29,14 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.spiroskafk.parking.model.ParkingHouse;
 import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.model.RentData;
 import com.spiroskafk.parking.utils.Utils;
@@ -50,12 +55,15 @@ public class NavActivity extends AppCompatActivity
     private FirebaseAuth mAuth;
     // Firebase components
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mParkingSpotsDatabaseReference;
+    private DatabaseReference mParkingHouseRef;
     private DatabaseReference mRentedPlacesDatabaseReference;
     private ChildEventListener mChildEventListener;
     private ChildEventListener mChildEventListener2;
     // Auto-complete address
     private PlaceAutocompleteFragment autocompleteFragment;
+
+    // Location Service
+    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +105,10 @@ public class NavActivity extends AppCompatActivity
         autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
+        // Location Service
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+
 
         // Init Firebase
         initFirebaseComponents();
@@ -124,8 +136,8 @@ public class NavActivity extends AppCompatActivity
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                ParkingSpot spot = dataSnapshot.getValue(ParkingSpot.class);
-                updateMap(spot);
+                ParkingHouse ph = dataSnapshot.getValue(ParkingHouse.class);
+                updateMap(ph);
 
             }
 
@@ -149,8 +161,8 @@ public class NavActivity extends AppCompatActivity
         mChildEventListener2 = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                RentData rentData = dataSnapshot.getValue(RentData.class);
-                updateRentedSpots(rentData.getLatit(), rentData.getLongtit());
+//                RentData rentData = dataSnapshot.getValue(RentData.class);
+//                updateRentedSpots(rentData.getLatit(), rentData.getLongtit());
             }
 
 
@@ -172,7 +184,7 @@ public class NavActivity extends AppCompatActivity
         };
 
 
-        mParkingSpotsDatabaseReference.addChildEventListener(mChildEventListener);
+        mParkingHouseRef.addChildEventListener(mChildEventListener);
         mRentedPlacesDatabaseReference.addChildEventListener(mChildEventListener2);
     }
 
@@ -185,23 +197,30 @@ public class NavActivity extends AppCompatActivity
                 .title(address)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         mMap.addMarker(marker).showInfoWindow();
-        
+
 
 
     }
 
 
-    private void updateMap(ParkingSpot spot) {
-        String address = Utils.getStreetAddress(spot.getLatitude(), spot.getLongitude(), this);
-        LatLng coordinates = new LatLng(spot.getLatitude(), spot.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(coordinates).title(address));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15));
+    private void updateMap(ParkingHouse parkingHouse) {
+
+        // Create new marker
+        MarkerOptions marker = new MarkerOptions();
+        marker.position(new LatLng(parkingHouse.getLatit(), parkingHouse.getLongtit()))
+                .title(parkingHouse.getAddress())
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+
+        // Add marker to map
+        mMap.addMarker(marker);
+//        mMap.addMarker(new MarkerOptions().position(coordinates).title(address));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15));
     }
 
     private void initFirebaseComponents() {
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mParkingSpotsDatabaseReference = mFirebaseDatabase.getReference().child("parking_spots");
+        mParkingHouseRef = mFirebaseDatabase.getReference().child("parking_houses");
         mRentedPlacesDatabaseReference = mFirebaseDatabase.getReference().child("rented_spots");
     }
 
@@ -232,6 +251,21 @@ public class NavActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(38.23275148625371, 21.775927915056513), 20));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latit, longtit), 20));
+
+        // Get Last Known location
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
+
+                        }
+                    }
+                });
 
     }
 

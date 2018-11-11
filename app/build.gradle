@@ -44,6 +44,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.yarolegovich:lovely-dialog:1.1.0'
     implementation "com.github.skydoves:powermenu:2.0.5"
+    implementation "com.google.firebase:firebase-functions:16.0.1"
+    implementation 'com.google.maps.android:android-maps-utils:0.5+'
 }
 
 apply plugin: 'com.google.gms.google-services'
