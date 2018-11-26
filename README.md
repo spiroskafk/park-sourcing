@@ -1,3 +1,3 @@
-This is an android mobile application about Parking. It is my Master's Thesis. 
+ParkSource is an android application for my master thesis at Computer Engineering
+and Informatics department, University of Patras
 
-TODO: Write Info about the application
