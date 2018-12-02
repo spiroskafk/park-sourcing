@@ -5,15 +5,18 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -25,7 +28,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -37,11 +39,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.model.ParkingHouse;
-import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.model.RentData;
-import com.spiroskafk.parking.utils.Utils;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class NavActivity extends AppCompatActivity
@@ -64,6 +64,13 @@ public class NavActivity extends AppCompatActivity
 
     // Location Service
     private FusedLocationProviderClient mFusedLocationClient;
+
+    // ParkingHouses
+    private HashMap<String, ParkingHouse> parkingHouses;
+    private HashMap<String, RentData> rentedHouses;
+
+    private CardView mLegendView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,14 +115,33 @@ public class NavActivity extends AppCompatActivity
         // Location Service
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-
-
         // Init Firebase
         initFirebaseComponents();
+
+        // Init Parking Lists
+        parkingHouses = new HashMap<String, ParkingHouse>();
+        rentedHouses = new HashMap<String, RentData>();
+
+        // Init legend view
+        mLegendView = findViewById(R.id.legend_cardview);
+
     }
 
 
     private void setupListeners() {
+        // Legend View
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mLegendView.getVisibility() == View.INVISIBLE) {
+                    mLegendView.setVisibility(View.VISIBLE);
+                } else {
+                    mLegendView.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
         // Setup AutoComplete listener
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -132,12 +158,14 @@ public class NavActivity extends AppCompatActivity
             }
         });
 
+
         // Setup Firebase Database listener
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 ParkingHouse ph = dataSnapshot.getValue(ParkingHouse.class);
-                updateMap(ph);
+                parkingHouses.put(dataSnapshot.getKey(), ph);
+                updateMap();
 
             }
 
@@ -147,6 +175,8 @@ public class NavActivity extends AppCompatActivity
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                parkingHouses.remove(dataSnapshot.getKey());
+                updateMap();
             }
 
             @Override
@@ -161,10 +191,10 @@ public class NavActivity extends AppCompatActivity
         mChildEventListener2 = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                RentData rentData = dataSnapshot.getValue(RentData.class);
-//                updateRentedSpots(rentData.getLatit(), rentData.getLongtit());
+                RentData rentData = dataSnapshot.getValue(RentData.class);
+                rentedHouses.put(dataSnapshot.getKey(), rentData);
+                updateMap();
             }
-
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -172,6 +202,8 @@ public class NavActivity extends AppCompatActivity
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                rentedHouses.remove(dataSnapshot.getKey());
+                updateMap();
             }
 
             @Override
@@ -189,32 +221,24 @@ public class NavActivity extends AppCompatActivity
     }
 
 
-    private void updateRentedSpots(float latit, float longtit) {
-        String address = Utils.getStreetAddress(latit, longtit, this);
-        LatLng coordinates = new LatLng(latit, longtit);
-        MarkerOptions marker = new MarkerOptions();
-        marker.position(coordinates)
-                .title(address)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-        mMap.addMarker(marker).showInfoWindow();
+    private void updateMap() {
+        mMap.clear();
 
+        for (HashMap.Entry<String, RentData> entry : rentedHouses.entrySet()) {
+            MarkerOptions marker = new MarkerOptions();
+            marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
+                    .title(entry.getValue().getAddress())
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            mMap.addMarker(marker);
+        }
 
-
-    }
-
-
-    private void updateMap(ParkingHouse parkingHouse) {
-
-        // Create new marker
-        MarkerOptions marker = new MarkerOptions();
-        marker.position(new LatLng(parkingHouse.getLatit(), parkingHouse.getLongtit()))
-                .title(parkingHouse.getAddress())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-
-        // Add marker to map
-        mMap.addMarker(marker);
-//        mMap.addMarker(new MarkerOptions().position(coordinates).title(address));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15));
+        for (HashMap.Entry<String, ParkingHouse> entry : parkingHouses.entrySet()) {
+            MarkerOptions marker = new MarkerOptions();
+            marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
+                    .title(entry.getValue().getAddress())
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+            mMap.addMarker(marker);
+        }
     }
 
     private void initFirebaseComponents() {
@@ -251,8 +275,6 @@ public class NavActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(38.23275148625371, 21.775927915056513), 20));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latit, longtit), 20));
 
         // Get Last Known location
         mFusedLocationClient.getLastLocation()
@@ -279,7 +301,9 @@ public class NavActivity extends AppCompatActivity
         }
     }
 
-    /** Not needed for now */
+    /**
+     * Not needed for now
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
