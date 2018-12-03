@@ -128,6 +128,7 @@ public class NavActivity extends AppCompatActivity
     }
 
 
+
     private void setupListeners() {
         // Legend View
         FloatingActionButton fab = findViewById(R.id.fab);
