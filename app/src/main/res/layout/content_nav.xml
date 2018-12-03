@@ -58,7 +58,6 @@
             android:id="@+id/legend_cardview"
             android:layout_width="140dp"
             android:layout_height="80dp"
-            android:background="@drawable/cardview_border"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_marginBottom="182dp"

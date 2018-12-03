@@ -204,7 +204,7 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
         mMap.addMarker(new MarkerOptions()
                 .position(coordinates)
                 .title(address)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.car_marker)));
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15));
 
 
