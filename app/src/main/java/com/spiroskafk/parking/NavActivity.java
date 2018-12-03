@@ -1,5 +1,6 @@
 package com.spiroskafk.parking;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
@@ -18,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,6 +42,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.model.ParkingHouse;
@@ -51,7 +54,7 @@ import java.util.HashMap;
 
 
 public class NavActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     // Log TAG
     public final String TAG = "NavActivityLog";
@@ -74,6 +77,7 @@ public class NavActivity extends AppCompatActivity
     // ParkingHouses
     private HashMap<String, ParkingHouse> parkingHouses;
     private HashMap<String, RentData> rentedHouses;
+    private HashMap<String, String> markerToDBkeys;
 
     private CardView mLegendView;
 
@@ -127,6 +131,7 @@ public class NavActivity extends AppCompatActivity
         // Init Parking Lists
         parkingHouses = new HashMap<String, ParkingHouse>();
         rentedHouses = new HashMap<String, RentData>();
+        markerToDBkeys = new HashMap<String, String>();
 
         // Init legend view
         mLegendView = findViewById(R.id.legend_cardview);
@@ -268,6 +273,8 @@ public class NavActivity extends AppCompatActivity
             Marker m = mMap.addMarker(marker);
             m.setTag(info);
 
+            markerToDBkeys.put(m.getId(), entry.getKey());
+
         }
 
         // Populate Parking Houses
@@ -307,9 +314,45 @@ public class NavActivity extends AppCompatActivity
 
             Marker m = mMap.addMarker(marker);
             m.setTag(info);
+
+            markerToDBkeys.put(m.getId(), entry.getKey());
         }
 
     }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Toast.makeText(this, "Info window clicked", Toast.LENGTH_SHORT).show();
+
+        final String id = markerToDBkeys.get(marker.getId());
+        final ParkingHouse house = parkingHouses.get(id);
+        if (house != null) {
+            // belong to parking house
+            // Update it's value
+            mParkingHouseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    // NOTE: This listener will only called once when the info window is clicked. And will be called again every time the data changes
+                    // TODO: don't change anything when something comes up
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("parking_houses").child(id);
+                    HashMap<String, Object> data = new HashMap<>();
+                    data.put("capacity", house.getCapacity() - 1);
+                    data.put("occupied", house.getOccupied() + 1);
+                    ref.updateChildren(data);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        } else {
+            // do nothing
+            return;
+
+        }
+    }
+
 
     private void initFirebaseComponents() {
         mAuth = FirebaseAuth.getInstance();
@@ -345,6 +388,7 @@ public class NavActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnInfoWindowClickListener(this);
 
         // Get Last Known location
         mFusedLocationClient.getLastLocation()
@@ -354,7 +398,6 @@ public class NavActivity extends AppCompatActivity
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
-
                         }
                     }
                 });
