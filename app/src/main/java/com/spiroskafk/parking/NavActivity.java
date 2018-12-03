@@ -2,6 +2,7 @@ package com.spiroskafk.parking;
 
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,6 +31,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,8 +40,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.maps.android.SphericalUtil;
+import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.model.ParkingHouse;
 import com.spiroskafk.parking.model.RentData;
+import com.spiroskafk.parking.utils.CustomInfoWindowAdapter;
+import com.spiroskafk.parking.utils.Utils;
 
 import java.util.HashMap;
 
@@ -225,21 +231,84 @@ public class NavActivity extends AppCompatActivity
     private void updateMap() {
         mMap.clear();
 
-        for (HashMap.Entry<String, RentData> entry : rentedHouses.entrySet()) {
+        // Populate Rented Houses
+        for (final HashMap.Entry<String, RentData> entry : rentedHouses.entrySet()) {
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-            mMap.addMarker(marker);
+
+            final InfoWindowData info = new InfoWindowData();
+            info.setTitle("Rented Spot");
+            info.setAddress(entry.getValue().getAddress());
+            info.setSpaces(entry.getValue().getNos());
+
+            // Get current location
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(final Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                LatLng spotLocation = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
+                                // Calculate distance
+                                Double meters = SphericalUtil.computeDistanceBetween(currentLocation, spotLocation);
+                                Log.i(TAG, "Meters: " + meters);
+                                double m = Utils.round(meters/1000, 2);
+                                info.setDistance(m + " km");
+                            }
+                        }
+                    });
+
+            //Set Custom InfoWindow Adapter
+            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
+            mMap.setInfoWindowAdapter(adapter);
+
+            Marker m = mMap.addMarker(marker);
+            m.setTag(info);
+
         }
 
-        for (HashMap.Entry<String, ParkingHouse> entry : parkingHouses.entrySet()) {
+        // Populate Parking Houses
+        for (final HashMap.Entry<String, ParkingHouse> entry : parkingHouses.entrySet()) {
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-            mMap.addMarker(marker);
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+            Integer freeSpaces = entry.getValue().getCapacity() - entry.getValue().getOccupied();
+            final InfoWindowData info = new InfoWindowData();
+            info.setTitle("Parking House");
+            info.setAddress(entry.getValue().getAddress());
+            info.setSpaces(freeSpaces.toString());
+
+            // Get current location
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(final Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                LatLng spotLocation = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
+                                // Calculate distance
+                                Double meters = SphericalUtil.computeDistanceBetween(currentLocation, spotLocation);
+                                Log.i(TAG, "Meters: " + meters);
+                                double m = Utils.round(meters/1000, 2);
+                                info.setDistance(m + " km");
+                            }
+                        }
+                    });
+
+            //Set Custom InfoWindow Adapter
+            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
+            mMap.setInfoWindowAdapter(adapter);
+
+            Marker m = mMap.addMarker(marker);
+            m.setTag(info);
         }
+
     }
 
     private void initFirebaseComponents() {
