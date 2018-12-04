@@ -183,6 +183,9 @@ public class NavActivity extends AppCompatActivity
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                ParkingHouse ph = dataSnapshot.getValue(ParkingHouse.class);
+                parkingHouses.put(dataSnapshot.getKey(), ph);
+                updateMap();
             }
 
             @Override
@@ -210,6 +213,9 @@ public class NavActivity extends AppCompatActivity
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                RentData rentData = dataSnapshot.getValue(RentData.class);
+                rentedHouses.put(dataSnapshot.getKey(), rentData);
+                updateMap();
             }
 
             @Override
