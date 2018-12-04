@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,6 +22,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +35,7 @@ import com.skydoves.powermenu.OnMenuItemClickListener;
 import com.skydoves.powermenu.PowerMenu;
 import com.skydoves.powermenu.PowerMenuItem;
 import com.spiroskafk.parking.model.ParkingHouse;
+import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.utils.Permissions;
 import com.spiroskafk.parking.utils.Utils;
 
@@ -50,6 +55,9 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
     // Firebase components
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDbRef;
+    private DatabaseReference mParkingSpotDBRef;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
 
     // UI elements
     private Button mLeaveBtn;
@@ -61,8 +69,16 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
     private static float latit;
     private static float longtit;
 
-    // ParkingHouses
+    // Parking Houses
     private HashMap<String, ParkingHouse> houses;
+    // Parking Spots
+    private HashMap<String, ParkingSpot> parkingSpots;
+
+    // Holds the userID that reports the current position as free
+    private String userID;
+
+    // Holds the ParkingHouse that this position will be assigned to
+    private String parkingHouseID;
 
     PowerMenu powerMenu;
 
@@ -112,42 +128,55 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
             powerMenu.setSelectedPosition(position);
             powerMenu.dismiss();
 
-
             // Update database entry
             updateDatabase(item.getTitle());
-            //createParkingHouse(item.getTitle());
-
-
         }
     };
 
+    /**
+     * This method gets called when you hit the leave (parkHere) button
+     *
+     * @param title: The type of the position that is released
+     */
     private void updateDatabase(String title) {
-//        String address = Utils.getStreetAddress(latit, longtit, this);
-//        String id = UUID.randomUUID().toString();
-//        ParkingSpot newSpot = new ParkingSpot(id, title, address, latit, longtit);
-//        mDbRef.push().setValue(newSpot);
-//        Toast.makeText(LeaveSpotActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(final Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            // Query database for all the parking houses
+
+                            // Update Parking Houses table
                             mDbRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    // Update parking houses
                                     houses = collectParkingHouses(dataSnapshot);
                                     LatLng currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
                                     HashMap<String, ParkingHouse> shortestHouse = calculateDistance(currentLoc);
                                     updateShortestHouseData(shortestHouse);
+
+                                    // Update parking spots with new entry
+                                    parkingHouseID = shortestHouse.keySet().toArray()[0].toString();
+                                    Log.i(TAG, "ParkingHouseID: " + parkingHouseID);
+
+                                    // Get Timestamp
+                                    long epoch = System.currentTimeMillis();
+                                    epoch = epoch / 1000;
+
+                                    // Add new entry
+                                    ParkingSpot spot = new ParkingSpot(location.getLatitude(), location.getLongitude(),
+                                            5, epoch, parkingHouseID, userID);
+
+                                    String key = mParkingSpotDBRef.push().getKey();
+                                    mParkingSpotDBRef.push().setValue(spot);
+                                    parkingSpots.put(key, spot);
                                 }
 
                                 @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
+                                public void onCancelled(@NonNull DatabaseError databaseError) { }
                             });
+
                         }
                     }
                 });
@@ -259,11 +288,18 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
         // Init Firebase
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDbRef = mFirebaseDatabase.getReference().child("parking_houses");
+        mParkingSpotDBRef = mFirebaseDatabase.getReference().child("parking_spots");
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        userID = mUser.getUid();
+
 
         // Init google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        parkingSpots = new HashMap<String, ParkingSpot>();
     }
 
     /**

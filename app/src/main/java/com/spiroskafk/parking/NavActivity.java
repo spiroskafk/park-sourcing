@@ -81,6 +81,12 @@ public class NavActivity extends AppCompatActivity
 
     private CardView mLegendView;
 
+    // Variable to check whether user is parked or not
+    private boolean isParked;
+
+    // Parked street
+    private String parkedStreet;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +141,8 @@ public class NavActivity extends AppCompatActivity
 
         // Init legend view
         mLegendView = findViewById(R.id.legend_cardview);
+
+        isParked = false;
 
     }
 
@@ -328,30 +336,35 @@ public class NavActivity extends AppCompatActivity
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(this, "Info window clicked", Toast.LENGTH_SHORT).show();
 
         final String id = markerToDBkeys.get(marker.getId());
         final ParkingHouse house = parkingHouses.get(id);
         if (house != null) {
-            // belong to parking house
-            // Update it's value
-            mParkingHouseRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    // NOTE: This listener will only called once when the info window is clicked. And will be called again every time the data changes
-                    // TODO: don't change anything when something comes up
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("parking_houses").child(id);
-                    HashMap<String, Object> data = new HashMap<>();
-                    data.put("capacity", house.getCapacity() - 1);
-                    data.put("occupied", house.getOccupied() + 1);
-                    ref.updateChildren(data);
-                }
+            // If user is not parked, park his car here!
+            if (!isParked) {
+                mParkingHouseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        // NOTE: This listener will only called once when the info window is clicked. And will be called again every time the data changes
+                        // Park user here, update db values
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("parking_houses").child(id);
+                        HashMap<String, Object> data = new HashMap<>();
+                        data.put("capacity", house.getCapacity() - 1);
+                        data.put("occupied", house.getOccupied() + 1);
+                        ref.updateChildren(data);
+                        isParked = true;
+                        parkedStreet = house.getAddress();
+                        Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+                    }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {}
+                });
+            } else {
+                // Popup message that he is already parked
+                Toast.makeText(NavActivity.this, "Your car is already parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
 
-                }
-            });
+            }
         } else {
             // do nothing
             return;
