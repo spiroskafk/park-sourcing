@@ -182,12 +182,15 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                 });
     }
 
+    /**
+     * User is leaving the parking so we are updating the free spots
+     * @param house
+     */
     private void updateShortestHouseData(HashMap<String, ParkingHouse> house) {
         for (HashMap.Entry<String, ParkingHouse> entry : house.entrySet()) {
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("parking_houses").child(entry.getKey());
             HashMap<String, Object> data = new HashMap<>();
-            data.put("capacity", entry.getValue().getCapacity() - 1);
-            data.put("occupied", entry.getValue().getOccupied() + 1);
+            data.put("occupied", entry.getValue().getOccupied() - 1);
             ref.updateChildren(data);
         }
 

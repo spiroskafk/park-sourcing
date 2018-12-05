@@ -348,12 +348,20 @@ public class NavActivity extends AppCompatActivity
                         // Park user here, update db values
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("parking_houses").child(id);
                         HashMap<String, Object> data = new HashMap<>();
-                        data.put("capacity", house.getCapacity() - 1);
-                        data.put("occupied", house.getOccupied() + 1);
-                        ref.updateChildren(data);
-                        isParked = true;
-                        parkedStreet = house.getAddress();
-                        Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+
+                        // Check available capacity of the parking house
+                        if ((house.getCapacity() - house.getOccupied()) == 0) {
+                            // TODO: If this ParkingHouse is full, then we should not present it in the map!!
+                            Toast.makeText(NavActivity.this, "You cannot park here! It's full", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // It has available capacity, so we just update "occupied" in the table of parking house
+                            data.put("occupied", house.getOccupied() + 1);
+                            ref.updateChildren(data);
+                            isParked = true;
+                            parkedStreet = house.getAddress();
+                            Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+                        }
+
                     }
 
                     @Override
