@@ -1,16 +1,13 @@
-package com.spiroskafk.parking;
+package com.spiroskafk.parking.activities;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -23,6 +20,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.firebase.auth.FirebaseAuth;
+import com.spiroskafk.parking.R;
 
 public class CompanyNavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -101,7 +99,7 @@ public class CompanyNavActivity extends AppCompatActivity
         if (id == R.id.nav_sign_out) {
             FirebaseAuth.getInstance().signOut();
             finish();
-    }
+        }
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -126,7 +124,9 @@ public class CompanyNavActivity extends AppCompatActivity
     }
 
 
-    /** Not needed for now */
+    /**
+     * Not needed for now
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;

@@ -1,4 +1,4 @@
-package com.spiroskafk.parking;
+package com.spiroskafk.parking.activities;
 
 import android.content.Intent;
 import android.os.Handler;

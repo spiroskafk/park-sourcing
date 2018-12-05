@@ -1,4 +1,4 @@
-package com.spiroskafk.parking;
+package com.spiroskafk.parking.activities;
 
 import android.app.DatePickerDialog;
 import android.location.Location;
@@ -20,12 +20,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.model.RentData;
 import com.spiroskafk.parking.utils.Permissions;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
 

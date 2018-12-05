@@ -13,7 +13,6 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -26,9 +25,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".RegisterUserActivity" />
+        <activity android:name=".activities.RegisterUserActivity" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".activities.SplashActivity"
             android:theme="@style/SplashTheme">
 
             <!-- <intent-filter> -->
@@ -39,22 +38,22 @@
             <!-- </intent-filter> -->
         </activity>
         <activity
-            android:name=".NavActivity"
+            android:name=".activities.NavActivity"
             android:label="@string/title_activity_nav" />
-        <activity android:name=".LeaveSpotActivity" />
-        <activity android:name=".SignInActivity">
+        <activity android:name=".activities.LeaveSpotActivity" />
+        <activity android:name=".activities.SignInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EmailSignInActivity" />
-        <activity android:name=".MyProfileActivity" />
-        <activity android:name=".VehicleActivity" />
-        <activity android:name=".RentYourPlace" />
+        <activity android:name=".activities.EmailSignInActivity" />
+        <activity android:name=".activities.MyProfileActivity" />
+        <activity android:name=".activities.VehicleActivity" />
+        <activity android:name=".activities.RentYourPlace" />
         <activity
-            android:name=".CompanyNavActivity"
+            android:name=".activities.CompanyNavActivity"
             android:label="@string/title_activity_company_nav"
             android:theme="@style/AppTheme"></activity>
     </application>

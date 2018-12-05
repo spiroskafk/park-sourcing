@@ -1,4 +1,4 @@
-package com.spiroskafk.parking;
+package com.spiroskafk.parking.activities;
 
 import android.graphics.Color;
 import android.location.Location;
@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.firebase.client.Firebase;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,6 +33,7 @@ import com.skydoves.powermenu.MenuAnimation;
 import com.skydoves.powermenu.OnMenuItemClickListener;
 import com.skydoves.powermenu.PowerMenu;
 import com.skydoves.powermenu.PowerMenuItem;
+import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.model.ParkingHouse;
 import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.utils.Permissions;

@@ -1,9 +1,7 @@
-package com.spiroskafk.parking;
+package com.spiroskafk.parking.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,6 +42,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
+import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.model.ParkingHouse;
 import com.spiroskafk.parking.model.RentData;
