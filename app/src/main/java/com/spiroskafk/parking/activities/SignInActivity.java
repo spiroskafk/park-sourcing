@@ -27,7 +27,7 @@ import com.spiroskafk.parking.R;
 public class SignInActivity extends AppCompatActivity {
 
     // Log TAG
-    private static final String TAG = "SignInActivity";
+    private static final String TAG = SignInActivity.class.getSimpleName();
     // Rest
     private static final int RC_SIGN_IN = 1;
     // Firebase

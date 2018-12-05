@@ -12,7 +12,7 @@ import com.spiroskafk.parking.R;
 public class MyProfileActivity extends AppCompatActivity {
 
     // Log TAG
-    public final String TAG = "MyProfileActivity";
+    private static final String TAG = MyProfileActivity.class.getSimpleName();
 
     // UI components
     private Button mAddVehicle;

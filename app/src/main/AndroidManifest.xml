@@ -40,7 +40,7 @@
         <activity
             android:name=".activities.NavActivity"
             android:label="@string/title_activity_nav" />
-        <activity android:name=".activities.LeaveSpotActivity" />
+        <activity android:name=".activities.ReportSpotActivity" />
         <activity android:name=".activities.SignInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

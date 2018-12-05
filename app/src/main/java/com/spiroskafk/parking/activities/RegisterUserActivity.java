@@ -25,7 +25,7 @@ import com.spiroskafk.parking.model.User;
 public class RegisterUserActivity extends AppCompatActivity {
 
     // Log TAG
-    private static final String TAG = "RegisterUserActivity";
+    private static final String TAG = RegisterUserActivity.class.getSimpleName();
 
     // UI elements
     private EditText mNameEditText;

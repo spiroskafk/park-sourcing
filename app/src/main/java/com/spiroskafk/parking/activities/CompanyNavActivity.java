@@ -26,7 +26,7 @@ public class CompanyNavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     // Log TAG
-    public final String TAG = "CompanyNavActivityLog";
+    private static final String TAG = CompanyNavActivity.class.getSimpleName();
 
     // Google map
     private GoogleMap mMap;

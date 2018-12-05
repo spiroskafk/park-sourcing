@@ -9,7 +9,7 @@ import com.spiroskafk.parking.R;
 public class VehicleActivity extends AppCompatActivity {
 
     // Log TAG
-    public final String TAG = "VehicleActivity";
+    private static final String TAG = VehicleActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

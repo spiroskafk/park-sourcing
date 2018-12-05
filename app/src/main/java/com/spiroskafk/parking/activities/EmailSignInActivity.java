@@ -27,7 +27,7 @@ import com.spiroskafk.parking.R;
 public class EmailSignInActivity extends AppCompatActivity {
 
     // Log TAG
-    private static final String TAG = "EmailSignInActivity";
+    private static final String TAG = EmailSignInActivity.class.getSimpleName();
 
     // UI elements
     private EditText mEmailEditText;

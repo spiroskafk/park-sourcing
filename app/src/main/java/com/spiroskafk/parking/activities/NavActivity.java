@@ -56,7 +56,7 @@ public class NavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     // Log TAG
-    public final String TAG = "NavActivityLog";
+    private static final String TAG = NavActivity.class.getSimpleName();
     // Google map
     private GoogleMap mMap;
     // Firebase
@@ -387,7 +387,7 @@ public class NavActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_report_spot) {
-            startActivity(new Intent(NavActivity.this, LeaveSpotActivity.class));
+            startActivity(new Intent(NavActivity.this, ReportSpotActivity.class));
         } else if (id == R.id.nav_myprofile) {
             startActivity(new Intent(NavActivity.this, MyProfileActivity.class));
         } else if (id == R.id.nav_rent_your_space) {

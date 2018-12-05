@@ -32,7 +32,7 @@ import java.util.UUID;
 public class RentYourPlace extends AppCompatActivity {
 
     // Log TAG
-    public final String TAG = "RentYourPlace";
+    private static final String TAG = RentYourPlace.class.getSimpleName();
 
     // Firebase
     private FirebaseAuth mAuth;

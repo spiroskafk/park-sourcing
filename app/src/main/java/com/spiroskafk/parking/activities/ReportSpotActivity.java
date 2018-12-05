@@ -44,10 +44,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     // Log TAG
-    public final String TAG = "LeaveSpotActivity";
+    private static final String TAG = ReportSpotActivity.class.getSimpleName();
 
     // GMap
     private GoogleMap mMap;
@@ -250,9 +250,9 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
 
     private void getCurrentLocation() {
         // Get current location
-        if (!Permissions.Check_FINE_LOCATION(LeaveSpotActivity.this)) {
+        if (!Permissions.Check_FINE_LOCATION(ReportSpotActivity.this)) {
             //if not permisson granted so request permisson with request code
-            Permissions.Request_FINE_LOCATION(LeaveSpotActivity.this, 22);
+            Permissions.Request_FINE_LOCATION(ReportSpotActivity.this, 22);
         } else {
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -316,7 +316,7 @@ public class LeaveSpotActivity extends AppCompatActivity implements OnMapReadyCa
 
         //Push to db
         mDbRef.push().setValue(ph);
-        Toast.makeText(LeaveSpotActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
+        Toast.makeText(ReportSpotActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
     }
 
 
