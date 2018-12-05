@@ -91,7 +91,9 @@ public class RegisterUserActivity extends AppCompatActivity {
                                 } else {
                                     type = "company";
                                 }
-                                User user = new User(name, email, type);
+
+                                // Register new user
+                                User user = new User(name, email, type, "Not Rated Yet", 0, 0);
                                 FirebaseDatabase.getInstance().getReference("users")
                                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                         .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {

@@ -2,12 +2,25 @@ package com.spiroskafk.parking.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.model.User;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -16,6 +29,20 @@ public class ProfileActivity extends AppCompatActivity {
 
     // UI components
     private Button mAddVehicle;
+    private TextView mDisplayName;
+    private TextView mEmail;
+    private TextView mReports;
+    private TextView mPoints;
+    private TextView mRating;
+
+    // Firebase
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+    private DatabaseReference mFirebaseRef;
+    private FirebaseDatabase mFirebaseDatabase;
+
+    // UserId
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +59,13 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(new Intent(ProfileActivity.this, VehicleActivity.class));
             }
         });
+
+
+        // Update user Profile
+        userId = mAuth.getInstance().getCurrentUser().getUid();
+        if (userId != null) {
+            updateProfile();
+        }
     }
 
     private void init() {
@@ -44,7 +78,33 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Init UI
         mAddVehicle = findViewById(R.id.button_add_vehicle);
+        mDisplayName = findViewById(R.id.text_display_name);
+        mEmail = findViewById(R.id.text_email);
+        mReports = findViewById(R.id.text_reports);
+        mPoints = findViewById(R.id.text_points);
+        mRating = findViewById(R.id.text_rating);
 
+        // Init Firebase
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mFirebaseRef = mFirebaseDatabase.getReference().child("users");
+
+    }
+
+    private void updateProfile() {
+        mFirebaseRef.child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                Log.i(TAG, "User Name: " + user.getEmail());
+                mDisplayName.setText(user.getName());
+                mEmail.setText(user.getEmail().toString());
+                mReports.setText(String.valueOf(user.getReports()));
+                mPoints.setText(String.valueOf(user.getRewardPoints()));
+                mRating.setText(user.getRating());
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
+        });
     }
 
     @Override
