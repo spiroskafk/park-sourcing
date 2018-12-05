@@ -166,9 +166,9 @@ public class SignInActivity extends AppCompatActivity {
 
 
     private void initUIComponents() {
-        mGSignInButton = findViewById(R.id.google_sign_in_btn);
-        mEmailSignInButton = findViewById(R.id.email_sign_in_btn);
-        mRegisterButton = findViewById(R.id.register_btn);
+        mGSignInButton = findViewById(R.id.button_google_sign_in);
+        mEmailSignInButton = findViewById(R.id.button_email_sign_in);
+        mRegisterButton = findViewById(R.id.button_register_new_user);
 
     }
 

@@ -92,13 +92,13 @@ public class RentYourPlace extends AppCompatActivity {
 
     private void initUI() {
         // Init all UI components here
-        mRentBtn = findViewById(R.id.rent_btn);
-        mAddressEditText = findViewById(R.id.address_edit_text);
-        mCityEditText = findViewById(R.id.city_edit_text);
-        mNOSEditText = findViewById(R.id.nos_edit_text);
-        mCommentsEditText = findViewById(R.id.comments_edit_text);
-        mFromEditText = findViewById(R.id.rent_from);
-        mUntilEditText = findViewById(R.id.rent_until);
+        mRentBtn = findViewById(R.id.button_rent_place);
+        mAddressEditText = findViewById(R.id.edittext_address);
+        mCityEditText = findViewById(R.id.edittext_city);
+        mNOSEditText = findViewById(R.id.edittext_no_spaces);
+        mCommentsEditText = findViewById(R.id.edittext_comments);
+        mFromEditText = findViewById(R.id.edittext_rent_from);
+        mUntilEditText = findViewById(R.id.edittext_rent_until);
         mRadioGroup = findViewById(R.id.radio_group);
 
     }

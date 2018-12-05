@@ -140,14 +140,14 @@ public class RegisterUserActivity extends AppCompatActivity {
     }
 
     private void initUIComponents() {
-        mNameEditText = findViewById(R.id.reg_display_name);
-        mEmailEditText = findViewById(R.id.reg_email);
-        mPasswordEditText = findViewById(R.id.reg_password);
-        mRegisterButton = findViewById(R.id.reg_btn);
+        mNameEditText = findViewById(R.id.edittext_register_name);
+        mEmailEditText = findViewById(R.id.edittext_register_email);
+        mPasswordEditText = findViewById(R.id.edittext_register_password);
+        mRegisterButton = findViewById(R.id.button_register);
         mProgressBar = findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.GONE);
-        mUserCheckBbox = findViewById(R.id.user_checkbox);
-        mCompanyCheckBox = findViewById(R.id.company_checkbox);
+        mUserCheckBbox = findViewById(R.id.checkbox_register_user);
+        mCompanyCheckBox = findViewById(R.id.checkbox_register_company);
     }
 
     private void initFirebaseComponents() {

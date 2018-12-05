@@ -389,7 +389,7 @@ public class NavActivity extends AppCompatActivity
         if (id == R.id.nav_report_spot) {
             startActivity(new Intent(NavActivity.this, ReportSpotActivity.class));
         } else if (id == R.id.nav_myprofile) {
-            startActivity(new Intent(NavActivity.this, MyProfileActivity.class));
+            startActivity(new Intent(NavActivity.this, ProfileActivity.class));
         } else if (id == R.id.nav_rent_your_space) {
             startActivity(new Intent(NavActivity.this, RentYourPlace.class));
         } else if (id == R.id.nav_sign_out) {

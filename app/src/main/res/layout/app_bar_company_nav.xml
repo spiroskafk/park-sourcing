@@ -26,7 +26,8 @@
                 android:layout_gravity="center"
                 android:fontFamily="@font/dancing"
                 android:text="ParkSource"
-                android:textSize="17sp" />
+                android:textColor="@color/white"
+                android:textSize="20sp" />
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

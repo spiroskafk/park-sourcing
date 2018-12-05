@@ -86,7 +86,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_leave_spot);
+        setContentView(R.layout.activity_report_spot);
 
         // Initialize phase
         init();
@@ -283,7 +283,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Init UI elements
-        mLeaveBtn = findViewById(R.id.leave_btn);
+        mLeaveBtn = findViewById(R.id.button_leave);
 
         // Init Firebase
         mFirebaseDatabase = FirebaseDatabase.getInstance();

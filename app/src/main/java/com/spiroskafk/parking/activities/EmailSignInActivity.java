@@ -88,11 +88,11 @@ public class EmailSignInActivity extends AppCompatActivity {
     }
 
     private void initUIComponents() {
-        mEmailEditText = findViewById(R.id.emailEditText);
-        mPswEditText = findViewById(R.id.pswEditText);
-        mEmailSignInBtn = findViewById(R.id.email_sign_in_btn);
-        mUserCheckBbox = findViewById(R.id.user_checkbox);
-        mCompanyCheckBox = findViewById(R.id.company_checkbox);
+        mEmailEditText = findViewById(R.id.edittext_email);
+        mPswEditText = findViewById(R.id.edittext_password);
+        mEmailSignInBtn = findViewById(R.id.button_sign_in);
+        mUserCheckBbox = findViewById(R.id.checkbox_user);
+        mCompanyCheckBox = findViewById(R.id.checkbox_company);
     }
 
     private void userLogin() {

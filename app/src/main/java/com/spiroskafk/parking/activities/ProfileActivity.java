@@ -9,10 +9,10 @@ import android.widget.Button;
 
 import com.spiroskafk.parking.R;
 
-public class MyProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity {
 
     // Log TAG
-    private static final String TAG = MyProfileActivity.class.getSimpleName();
+    private static final String TAG = ProfileActivity.class.getSimpleName();
 
     // UI components
     private Button mAddVehicle;
@@ -29,7 +29,7 @@ public class MyProfileActivity extends AppCompatActivity {
         mAddVehicle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MyProfileActivity.this, VehicleActivity.class));
+                startActivity(new Intent(ProfileActivity.this, VehicleActivity.class));
             }
         });
     }
@@ -43,7 +43,7 @@ public class MyProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Init UI
-        mAddVehicle = findViewById(R.id.add_vehicle_btn);
+        mAddVehicle = findViewById(R.id.button_add_vehicle);
 
     }
 
