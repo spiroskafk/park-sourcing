@@ -193,7 +193,6 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             data.put("occupied", entry.getValue().getOccupied() - 1);
             ref.updateChildren(data);
         }
-
     }
 
     /**

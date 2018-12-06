@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
@@ -89,12 +90,16 @@ public class NavActivity extends AppCompatActivity
     private HashMap<String, ParkingSpot> parkingSpots;
 
     private CardView mLegendView;
+    private Button mUnPark;
 
     // Variable to check whether user is parked or not
     private boolean isParked;
 
     // Parked street
     private String parkedStreet;
+
+    // ParkingHouse id
+    private String parkingHouseId;
 
 
     @Override
@@ -151,7 +156,7 @@ public class NavActivity extends AppCompatActivity
 
         // Init legend view
         mLegendView = findViewById(R.id.legend_cardview);
-
+        mUnPark = findViewById(R.id.button_unpark);
         isParked = false;
 
     }
@@ -168,6 +173,18 @@ public class NavActivity extends AppCompatActivity
                     mLegendView.setVisibility(View.VISIBLE);
                 } else {
                     mLegendView.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        // Unpark
+        mUnPark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isParked) {
+                    isParked = false;
+                    mUnPark.setVisibility(View.INVISIBLE);
+                    updateParkingHouse();
                 }
             }
         });
@@ -285,6 +302,18 @@ public class NavActivity extends AppCompatActivity
     }
 
 
+    private void updateParkingHouse() {
+
+        if (parkingHouseId != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("parking_houses").child(parkingHouseId);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("occupied", parkingHouses.get(parkingHouseId).getOccupied() - 1);
+            ref.updateChildren(data);
+        }
+    }
+
+
+
     private void updateMap() {
         mMap.clear();
 
@@ -398,10 +427,14 @@ public class NavActivity extends AppCompatActivity
                             ref.updateChildren(data);
                             parkedStreet = house.getAddress();
 
+                            // Update ParkingHouseId;
+                            parkingHouseId = id;
+
                             // Find the user that has reported this position and update his points
                             String userId = findUserReportedSpot(id);
                             if (userId != null) updateUserData(userId);
                             isParked = true;
+                            mUnPark.setVisibility(View.VISIBLE);
                             Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
                         }
                     }

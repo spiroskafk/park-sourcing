@@ -157,6 +157,20 @@
 
         </android.support.v7.widget.CardView>
 
+        <Button
+            android:id="@+id/button_unpark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="25dp"
+            android:background="@drawable/buttonstyle"
+            android:text="Unpark"
+            android:textAllCaps="false"
+            android:textColor="#fff"
+            android:visibility="invisible" />
+
 
 
 
