@@ -46,7 +46,7 @@ import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.model.ParkingHouse;
 import com.spiroskafk.parking.model.RentData;
-import com.spiroskafk.parking.utils.CustomInfoWindowAdapter;
+import com.spiroskafk.parking.adapters.CustomInfoWindowAdapter;
 import com.spiroskafk.parking.utils.Utils;
 
 import java.util.HashMap;

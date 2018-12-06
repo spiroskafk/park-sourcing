@@ -1,10 +1,9 @@
-package com.spiroskafk.parking.utils;
+package com.spiroskafk.parking.adapters;
 
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
@@ -15,7 +14,7 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     private Context context;
 
-    public CustomInfoWindowAdapter(Activity context){
+    public CustomInfoWindowAdapter(Activity context) {
         this.context = context;
     }
 
@@ -26,7 +25,7 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoContents(Marker marker) {
-        View view = ((Activity)context).getLayoutInflater().inflate(R.layout.custom_info_window, null);
+        View view = ((Activity) context).getLayoutInflater().inflate(R.layout.custom_info_window, null);
 
         TextView mAddressTv = view.findViewById(R.id.street_tv);
         TextView mSpacesTv = view.findViewById(R.id.spaces_tv);
@@ -42,6 +41,4 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
         return view;
     }
-
-
 }
