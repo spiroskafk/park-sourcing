@@ -39,6 +39,7 @@ import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.utils.Permissions;
 import com.spiroskafk.parking.utils.Utils;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -161,8 +162,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                                     Log.i(TAG, "ParkingHouseID: " + parkingHouseID);
 
                                     // Get Timestamp
-                                    long epoch = System.currentTimeMillis();
-                                    epoch = epoch / 1000;
+                                    long epoch = Instant.now().toEpochMilli();
 
                                     // Add new entry
                                     ParkingSpot spot = new ParkingSpot(location.getLatitude(), location.getLongitude(),

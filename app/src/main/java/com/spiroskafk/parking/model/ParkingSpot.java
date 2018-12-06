@@ -1,11 +1,14 @@
 package com.spiroskafk.parking.model;
 
+import java.util.Date;
+
 public class ParkingSpot {
     private String userID;
     private double latit;
     private double longtit;
     private int reward;
     private long timestamp;
+    private Date date;
     private String parkingHouseID;
 
 

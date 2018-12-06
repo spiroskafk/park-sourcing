@@ -5,8 +5,10 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.util.Log;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import static com.firebase.ui.auth.AuthUI.TAG;
 
@@ -42,6 +44,11 @@ public class Utils {
         value = value * factor;
         long tmp = Math.round(value);
         return (double) tmp / factor;
+    }
+
+    public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+        long diffInMillies = date2.getTime() - date1.getTime();
+        return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
     }
 
 

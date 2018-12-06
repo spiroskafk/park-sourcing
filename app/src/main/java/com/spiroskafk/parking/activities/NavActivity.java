@@ -45,11 +45,17 @@ import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.model.ParkingHouse;
+import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.model.RentData;
 import com.spiroskafk.parking.adapters.CustomInfoWindowAdapter;
+import com.spiroskafk.parking.model.User;
 import com.spiroskafk.parking.utils.Utils;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 
 public class NavActivity extends AppCompatActivity
@@ -65,8 +71,11 @@ public class NavActivity extends AppCompatActivity
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mParkingHouseRef;
     private DatabaseReference mRentedPlacesDatabaseReference;
+    private DatabaseReference mParkingSpotRef;
+    private DatabaseReference mUsersRef;
     private ChildEventListener mChildEventListener;
     private ChildEventListener mChildEventListener2;
+    private ChildEventListener mChildEventListener3;
     // Auto-complete address
     private PlaceAutocompleteFragment autocompleteFragment;
 
@@ -77,6 +86,7 @@ public class NavActivity extends AppCompatActivity
     private HashMap<String, ParkingHouse> parkingHouses;
     private HashMap<String, RentData> rentedHouses;
     private HashMap<String, String> markerToDBkeys;
+    private HashMap<String, ParkingSpot> parkingSpots;
 
     private CardView mLegendView;
 
@@ -137,6 +147,7 @@ public class NavActivity extends AppCompatActivity
         parkingHouses = new HashMap<String, ParkingHouse>();
         rentedHouses = new HashMap<String, RentData>();
         markerToDBkeys = new HashMap<String, String>();
+        parkingSpots = new HashMap<String, ParkingSpot>();
 
         // Init legend view
         mLegendView = findViewById(R.id.legend_cardview);
@@ -240,9 +251,37 @@ public class NavActivity extends AppCompatActivity
             }
         };
 
+        mChildEventListener3 = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                ParkingSpot spot = dataSnapshot.getValue(ParkingSpot.class);
+                parkingSpots.put(dataSnapshot.getKey(), spot);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                ParkingSpot spot = dataSnapshot.getValue(ParkingSpot.class);
+                parkingSpots.put(dataSnapshot.getKey(), spot);
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                parkingSpots.remove(dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        };
+
 
         mParkingHouseRef.addChildEventListener(mChildEventListener);
         mRentedPlacesDatabaseReference.addChildEventListener(mChildEventListener2);
+        mParkingSpotRef.addChildEventListener(mChildEventListener3);
     }
 
 
@@ -272,7 +311,7 @@ public class NavActivity extends AppCompatActivity
                                 LatLng spotLocation = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
                                 // Calculate distance
                                 Double meters = SphericalUtil.computeDistanceBetween(currentLocation, spotLocation);
-                                Log.i(TAG, "Meters: " + meters);
+                                //Log.i(TAG, "Meters: " + meters);
                                 double m = Utils.round(meters/1000, 2);
                                 info.setDistance(m + " km");
                             }
@@ -357,20 +396,21 @@ public class NavActivity extends AppCompatActivity
                             // It has available capacity, so we just update "occupied" in the table of parking house
                             data.put("occupied", house.getOccupied() + 1);
                             ref.updateChildren(data);
-                            isParked = true;
                             parkedStreet = house.getAddress();
+
+                            // Find the user that has reported this position and update his points
+                            String userId = findUserReportedSpot(id);
+                            if (userId != null) updateUserData(userId);
+                            isParked = true;
                             Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
                         }
-
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {}
                 });
             } else {
                 // Popup message that he is already parked
                 Toast.makeText(NavActivity.this, "Your car is already parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
-
             }
         } else {
             // do nothing
@@ -380,11 +420,71 @@ public class NavActivity extends AppCompatActivity
     }
 
 
+
+    /**
+     * Find the user that reported this particular parking spot
+     * @param houseId
+     * @return userId
+     */
+    private String findUserReportedSpot(String houseId) {
+        String userId = null;
+        for (HashMap.Entry<String, ParkingSpot> entry : parkingSpots.entrySet()) {
+            if (entry.getValue().getParkingHouseID().equals(houseId)) {
+                // Found him
+                // Check if it's valid
+                long reportedTimestamp = entry.getValue().getTimestamp();
+                long currentTimestamp = Instant.now().toEpochMilli();
+                Date reportedDate = new Date(reportedTimestamp);
+                Date currentDate = new Date(currentTimestamp);
+                long minutesDiff = Utils.getDateDiff(reportedDate, currentDate, TimeUnit.MINUTES);
+                Log.i(TAG, "MINUTES DIFFERENCE:" + minutesDiff);
+
+                // Only return userId if the time passed is less than 5 minutes
+                if (minutesDiff <= 5) {
+                    userId = entry.getValue().getUserID();
+                    return userId;
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Updates user report points
+     * @param userId
+     */
+    private void updateUserData(final String userId) {
+        // First get user data
+        if (userId != null) {
+            mUsersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User userData = dataSnapshot.getValue(User.class);
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
+                    HashMap<String, Object> data = new HashMap<>();
+                    data.put("reports", userData.getReports() + 1);
+                    ref.updateChildren(data);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+    }
+
+
     private void initFirebaseComponents() {
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mParkingHouseRef = mFirebaseDatabase.getReference().child("parking_houses");
         mRentedPlacesDatabaseReference = mFirebaseDatabase.getReference().child("rented_spots");
+        mParkingSpotRef = mFirebaseDatabase.getReference().child("parking_spots");
+        mUsersRef = mFirebaseDatabase.getReference().child("users");
     }
 
 
