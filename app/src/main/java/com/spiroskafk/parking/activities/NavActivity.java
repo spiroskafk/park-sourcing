@@ -419,6 +419,7 @@ public class NavActivity extends AppCompatActivity
 
                         // Check available capacity of the parking house
                         if ((house.getCapacity() - house.getOccupied()) == 0) {
+                            // IMPORTANT
                             // TODO: If this ParkingHouse is full, then we should not present it in the map!!
                             Toast.makeText(NavActivity.this, "You cannot park here! It's full", Toast.LENGTH_SHORT).show();
                         } else {
@@ -432,7 +433,10 @@ public class NavActivity extends AppCompatActivity
 
                             // Find the user that has reported this position and update his points
                             String userId = findUserReportedSpot(id);
-                            if (userId != null) updateUserData(userId);
+
+                            // Handle: If the same user reported this position and parks here, don't away him points
+                            if (!mAuth.getCurrentUser().getUid().equals(userId))
+                                if (userId != null) updateUserData(userId);
 
                             isParked = true;
                             mUnPark.setVisibility(View.VISIBLE);
