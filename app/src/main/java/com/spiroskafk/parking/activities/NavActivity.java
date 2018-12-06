@@ -212,6 +212,14 @@ public class NavActivity extends AppCompatActivity
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 ParkingHouse ph = dataSnapshot.getValue(ParkingHouse.class);
                 parkingHouses.put(dataSnapshot.getKey(), ph);
+
+                // If ParkingHouse is full, don't present it on map
+                if (ph.getCapacity() == ph.getOccupied()) {
+                    parkingHouses.remove(dataSnapshot.getKey());
+                } else {
+                    parkingHouses.put(dataSnapshot.getKey(), ph);
+                }
+
                 updateMap();
 
             }
@@ -219,7 +227,13 @@ public class NavActivity extends AppCompatActivity
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 ParkingHouse ph = dataSnapshot.getValue(ParkingHouse.class);
-                parkingHouses.put(dataSnapshot.getKey(), ph);
+
+                // If ParkingHouse is full, don't present it on map
+                if (ph.getCapacity() == ph.getOccupied()) {
+                    parkingHouses.remove(dataSnapshot.getKey());
+                } else {
+                    parkingHouses.put(dataSnapshot.getKey(), ph);
+                }
                 updateMap();
             }
 
@@ -311,7 +325,6 @@ public class NavActivity extends AppCompatActivity
             ref.updateChildren(data);
         }
     }
-
 
 
     private void updateMap() {
@@ -436,7 +449,7 @@ public class NavActivity extends AppCompatActivity
 
                             // Handle: If the same user reported this position and parks here, don't away him points
                             if (!mAuth.getCurrentUser().getUid().equals(userId))
-                                if (userId != null) updateUserData(userId);
+                                if  (userId != null) updateUserData(userId);
 
                             isParked = true;
                             mUnPark.setVisibility(View.VISIBLE);
