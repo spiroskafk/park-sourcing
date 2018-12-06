@@ -433,9 +433,12 @@ public class NavActivity extends AppCompatActivity
                             // Find the user that has reported this position and update his points
                             String userId = findUserReportedSpot(id);
                             if (userId != null) updateUserData(userId);
+
                             isParked = true;
                             mUnPark.setVisibility(View.VISIBLE);
                             Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+
+
                         }
                     }
                     @Override
@@ -475,6 +478,10 @@ public class NavActivity extends AppCompatActivity
                 // Only return userId if the time passed is less than 5 minutes
                 if (minutesDiff <= 5) {
                     userId = entry.getValue().getUserID();
+
+                    // Delete from database
+                    mParkingSpotRef.child(entry.getKey()).removeValue();
+
                     return userId;
                 } else {
                     return null;
