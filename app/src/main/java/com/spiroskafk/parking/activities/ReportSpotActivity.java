@@ -20,7 +20,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +31,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.FirebaseFunctionsException;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.google.maps.android.SphericalUtil;
 import com.skydoves.powermenu.MenuAnimation;
 import com.skydoves.powermenu.OnMenuItemClickListener;
@@ -36,6 +42,7 @@ import com.skydoves.powermenu.PowerMenuItem;
 import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.model.ParkingHouse;
 import com.spiroskafk.parking.model.ParkingSpot;
+import com.spiroskafk.parking.model.User;
 import com.spiroskafk.parking.utils.Permissions;
 import com.spiroskafk.parking.utils.Utils;
 
@@ -43,6 +50,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -59,6 +67,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     private DatabaseReference mParkingSpotDBRef;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
+    private FirebaseFunctions mFunctions;
 
     // UI elements
     private Button mLeaveBtn;
@@ -83,6 +92,8 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
     PowerMenu powerMenu;
 
+    private User user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +102,8 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
         // Initialize phase
         init();
+
+        mFunctions = FirebaseFunctions.getInstance();
 
         final List<PowerMenuItem> list = new ArrayList<PowerMenuItem>();
         list.add(new PowerMenuItem("Θέση ΑΜΕΑ", false));
@@ -119,6 +132,22 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
             }
         });
+
+
+        // Get Current User
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+                Log.i(TAG, "onFirstGet: " + user.isParked());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
@@ -130,9 +159,12 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             powerMenu.dismiss();
 
             // Update database entry
-            updateDatabase(item.getTitle());
+            if (user.isParked()) updateDatabase(item.getTitle());
+
         }
     };
+
+
 
     /**
      * This method gets called when you hit the leave (parkHere) button
@@ -151,6 +183,9 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                             mDbRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                    // TODO: Check if current user has already Reported the same parking spot
+
                                     // Update parking houses
                                     houses = collectParkingHouses(dataSnapshot);
                                     LatLng currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
@@ -171,6 +206,14 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                                     String key = mParkingSpotDBRef.push().getKey();
                                     mParkingSpotDBRef.push().setValue(spot);
                                     parkingSpots.put(key, spot);
+                                    user.setParked(true);
+                                    // Update User entry
+                                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+                                    HashMap<String, Object> data = new HashMap<>();
+                                    data.put("parked", false);
+                                    ref.updateChildren(data);
+
+                                    Log.i(TAG, "After parking status: " + user.isParked());
                                 }
 
                                 @Override

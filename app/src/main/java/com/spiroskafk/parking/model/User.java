@@ -7,14 +7,24 @@ public class User {
     public String rating;
     public int rewardPoints;
     public int reports;
+    private boolean isParked;
 
-    public User(String name, String email, String type, String rating, int rewardPoints, int reports) {
+    public boolean isParked() {
+        return isParked;
+    }
+
+    public void setParked(boolean parked) {
+        isParked = parked;
+    }
+
+    public User(String name, String email, String type, String rating, int rewardPoints, int reports, boolean isParked) {
         this.name = name;
         this.email = email;
         this.type = type;
         this.rating = rating;
         this.rewardPoints = rewardPoints;
         this.reports = reports;
+        this.isParked = isParked;
     }
 
     public User() {}

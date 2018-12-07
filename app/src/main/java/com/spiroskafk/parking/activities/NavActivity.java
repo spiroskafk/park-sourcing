@@ -101,6 +101,9 @@ public class NavActivity extends AppCompatActivity
     // ParkingHouse id
     private String parkingHouseId;
 
+    // CurrentUser
+    private User user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +162,7 @@ public class NavActivity extends AppCompatActivity
         mUnPark = findViewById(R.id.button_unpark);
         isParked = false;
 
+
     }
 
 
@@ -177,12 +181,38 @@ public class NavActivity extends AppCompatActivity
             }
         });
 
+        // Get Current User
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+                if (user.isParked())
+                    mUnPark.setVisibility(View.VISIBLE);
+                else {
+                    mUnPark.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
         // Unpark
         mUnPark.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isParked) {
-                    isParked = false;
+                if (user.isParked()) {
+                    user.setParked(false);
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+                    HashMap<String, Object> data = new HashMap<>();
+                    data.put("parked", false);
+                    ref.updateChildren(data);
                     mUnPark.setVisibility(View.INVISIBLE);
                     updateParkingHouse();
                 }
@@ -395,7 +425,6 @@ public class NavActivity extends AppCompatActivity
                                 LatLng spotLocation = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
                                 // Calculate distance
                                 Double meters = SphericalUtil.computeDistanceBetween(currentLocation, spotLocation);
-                                Log.i(TAG, "Meters: " + meters);
                                 double m = Utils.round(meters/1000, 2);
                                 info.setDistance(m + " km");
                             }
@@ -421,7 +450,7 @@ public class NavActivity extends AppCompatActivity
         final ParkingHouse house = parkingHouses.get(id);
         if (house != null) {
             // If user is not parked, park his car here!
-            if (!isParked) {
+            if (!user.isParked()) {
                 mParkingHouseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -441,6 +470,16 @@ public class NavActivity extends AppCompatActivity
                             ref.updateChildren(data);
                             parkedStreet = house.getAddress();
 
+                            // Change parked status
+                            // Update User entry
+                            Log.i(TAG, "What Is Happening?!");
+                            DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+                            HashMap<String, Object> data2 = new HashMap<>();
+                            data2.put("parked", true);
+                            ref2.updateChildren(data2);
+                            user.setParked(true);
+                            Log.i(TAG, "UserParkedStatus: " + user.isParked());
+
                             // Update ParkingHouseId;
                             parkingHouseId = id;
 
@@ -451,7 +490,7 @@ public class NavActivity extends AppCompatActivity
                             if (!mAuth.getCurrentUser().getUid().equals(userId))
                                 if  (userId != null) updateUserData(userId);
 
-                            isParked = true;
+                            user.setParked(true);
                             mUnPark.setVisibility(View.VISIBLE);
                             Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
 
