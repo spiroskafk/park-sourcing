@@ -48,10 +48,12 @@ import com.spiroskafk.parking.utils.Utils;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -157,10 +159,18 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             powerMenu.setSelectedPosition(position);
             powerMenu.dismiss();
 
-            // Update database entry
             Log.i(TAG, "Status: " + user.isParked());
-            if (user.isParked())
+            long lastReportedTimestamp = user.getLastReportTimestamp();
+            long currentTimestamp = Instant.now().toEpochMilli();
+            Date reportedDate = new Date(lastReportedTimestamp);
+            Date currentDate = new Date(currentTimestamp);
+            long minutesDiff = Utils.getDateDiff(reportedDate, currentDate, TimeUnit.MINUTES);
+
+            // Don't let user Report again a spot, unless 2 minutes has passed
+            if (minutesDiff > 2) {
+                //if (user.isParked())
                 reportParkingSpot(item.getTitle());
+            }
         }
     };
 
@@ -183,6 +193,9 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                                    // Get current timestamp
+                                    long timestamp = Instant.now().toEpochMilli();
+
                                     // User location
                                     LatLng currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -199,13 +212,10 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                                     updateShortestHouseData(shortestHouse);
 
                                     // Create ParkingSpot (Associated with the closest ParkingHouse)
-                                    createParkingSpot(location, parkingHouseID);
-
-                                    // Create new entry in ParkingSpots
-                                    createParkingSpot(location, parkingHouseID);
+                                    createParkingSpot(location, parkingHouseID, timestamp);
 
                                     // Update User status
-                                    updateUserData(parkingHouseID);
+                                    updateUserData(timestamp);
                                 }
 
                                 @Override
@@ -222,21 +232,19 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
      * @param location
      * @param parkingHouseID
      */
-    private void createParkingSpot(Location location, String parkingHouseID) {
+    private void createParkingSpot(Location location, String parkingHouseID, long timestamp) {
 
         // NPE Check for user
         if (userID != null) {
-            // Get current timestamp
-            long timestamp = Instant.now().toEpochMilli();
 
-            ParkingSpot spot = new ParkingSpot(location.getLatitude(), location.getLongitude(),
-                    5, timestamp, parkingHouseID, userID);
+            ParkingSpot spot = new ParkingSpot(location.getLatitude(),
+                    location.getLongitude(), 5, timestamp, parkingHouseID, userID);
 
-            // Push spot to databbase
+            // Push spot to database
             String key = mParkingSpotDBRef.push().getKey();
             mParkingSpotDBRef.push().setValue(spot);
 
-            // Update ParkingSpots HashMapp
+            // Update ParkingSpots HashMap
             parkingSpots.put(key, spot);
         }
     }
@@ -244,9 +252,8 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
     /**
      * Updates User status (Parked)
-     * @param parkingHouseId
      */
-    private void updateUserData(String parkingHouseId) {
+    private void updateUserData(long timestamp) {
 
         // NPE Check for user
         if (userID != null) {
@@ -257,6 +264,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
             HashMap<String, Object> data = new HashMap<>();
             data.put("parked", false);
+            data.put("lastReportTimestamp", timestamp);
             ref.updateChildren(data);
         }
     }

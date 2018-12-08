@@ -8,6 +8,15 @@ public class User {
     public int rewardPoints;
     public int reports;
     private boolean isParked;
+    private long lastReportTimestamp;
+
+    public long getLastReportTimestamp() {
+        return lastReportTimestamp;
+    }
+
+    public void setLastReportTimestamp(long lastReportTimestamp) {
+        this.lastReportTimestamp = lastReportTimestamp;
+    }
 
     public boolean isParked() {
         return isParked;
@@ -17,7 +26,7 @@ public class User {
         isParked = parked;
     }
 
-    public User(String name, String email, String type, String rating, int rewardPoints, int reports, boolean isParked) {
+    public User(String name, String email, String type, String rating, int rewardPoints, int reports, boolean isParked, long lastReportTimestamp) {
         this.name = name;
         this.email = email;
         this.type = type;
@@ -25,6 +34,7 @@ public class User {
         this.rewardPoints = rewardPoints;
         this.reports = reports;
         this.isParked = isParked;
+        this.lastReportTimestamp = lastReportTimestamp;
     }
 
     public User() {}

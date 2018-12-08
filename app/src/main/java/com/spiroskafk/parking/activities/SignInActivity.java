@@ -22,6 +22,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
 
 public class SignInActivity extends AppCompatActivity {
@@ -39,6 +41,8 @@ public class SignInActivity extends AppCompatActivity {
     private Button mRegisterButton;
     private GoogleSignInClient mGoogleSignInClient;
     private Boolean exit = false;
+
+    private FirebaseDatabase mFirebaseDatabase;
 
 
     @Override
@@ -87,6 +91,7 @@ public class SignInActivity extends AppCompatActivity {
 
         // Init firebase
         mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
     }
 
     private void isSignedIn() {
