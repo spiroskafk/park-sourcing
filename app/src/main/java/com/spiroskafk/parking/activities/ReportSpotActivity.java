@@ -87,9 +87,6 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     // Holds the userID that reports the current position as free
     private String userID;
 
-    // Holds the ParkingHouse that this position will be assigned to
-    private String parkingHouseID;
-
     PowerMenu powerMenu;
 
     private User user;
@@ -103,14 +100,15 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         // Initialize phase
         init();
 
-        mFunctions = FirebaseFunctions.getInstance();
+        setupListeners();
+    }
 
+    private void setupListeners() {
         final List<PowerMenuItem> list = new ArrayList<PowerMenuItem>();
         list.add(new PowerMenuItem("Θέση ΑΜΕΑ", false));
         list.add(new PowerMenuItem("Θέση Επισκεπτών", false));
         list.add(new PowerMenuItem("Δημοτικό Πάρκινγκ", false));
         list.add(new PowerMenuItem("Θέση Μόνιμης Κατοικίας", false));
-
 
         // Popup window list
         mLeaveBtn.setOnClickListener(new View.OnClickListener() {
@@ -133,14 +131,12 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             }
         });
 
-
-        // Get Current User
+        // onActivity initialize we get the current user
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(User.class);
-                Log.i(TAG, "onFirstGet: " + user.isParked());
             }
 
             @Override
@@ -150,7 +146,10 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         });
     }
 
-
+    /**
+     * Callback method that gets fired up when the user clicks on the
+     * popup window and selects the type of spot he is reporting
+     */
     private OnMenuItemClickListener<PowerMenuItem> onMenuItemClickListener = new OnMenuItemClickListener<PowerMenuItem>() {
         @Override
         public void onItemClick(int position, PowerMenuItem item) {
@@ -159,11 +158,11 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             powerMenu.dismiss();
 
             // Update database entry
-            if (user.isParked()) updateDatabase(item.getTitle());
-
+            Log.i(TAG, "Status: " + user.isParked());
+            if (user.isParked())
+                reportParkingSpot(item.getTitle());
         }
     };
-
 
 
     /**
@@ -171,59 +170,97 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
      *
      * @param title: The type of the position that is released
      */
-    private void updateDatabase(String title) {
+    private void reportParkingSpot(String title) {
+        // First we get the User's last known position
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(final Location location) {
-                        // Got last known location. In some rare situations this can be null.
                         if (location != null) {
 
-                            // Update Parking Houses table
+                            // ParkingHouse callback
                             mDbRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                    // TODO: Check if current user has already Reported the same parking spot
-
-                                    // Update parking houses
-                                    houses = collectParkingHouses(dataSnapshot);
+                                    // User location
                                     LatLng currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
+
+                                    // Collect all ParkingHouses
+                                    houses = collectParkingHouses(dataSnapshot);
+
+                                    // Check which one is closest to the User
                                     HashMap<String, ParkingHouse> shortestHouse = calculateDistance(currentLoc);
+
+                                    // The id of the ParkingHouse that is closest to the User
+                                    String parkingHouseID = shortestHouse.keySet().toArray()[0].toString();
+
+                                    // Reduce free spots on this particular ParkingHouse
                                     updateShortestHouseData(shortestHouse);
 
-                                    // Update parking spots with new entry
-                                    parkingHouseID = shortestHouse.keySet().toArray()[0].toString();
-                                    Log.i(TAG, "ParkingHouseID: " + parkingHouseID);
+                                    // Create ParkingSpot (Associated with the closest ParkingHouse)
+                                    createParkingSpot(location, parkingHouseID);
 
-                                    // Get Timestamp
-                                    long epoch = Instant.now().toEpochMilli();
+                                    // Create new entry in ParkingSpots
+                                    createParkingSpot(location, parkingHouseID);
 
-                                    // Add new entry
-                                    ParkingSpot spot = new ParkingSpot(location.getLatitude(), location.getLongitude(),
-                                            5, epoch, parkingHouseID, userID);
-
-                                    String key = mParkingSpotDBRef.push().getKey();
-                                    mParkingSpotDBRef.push().setValue(spot);
-                                    parkingSpots.put(key, spot);
-                                    user.setParked(true);
-                                    // Update User entry
-                                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
-                                    HashMap<String, Object> data = new HashMap<>();
-                                    data.put("parked", false);
-                                    ref.updateChildren(data);
-
-                                    Log.i(TAG, "After parking status: " + user.isParked());
+                                    // Update User status
+                                    updateUserData(parkingHouseID);
                                 }
 
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) { }
                             });
-
                         }
                     }
                 });
     }
+
+
+    /**
+     * Creates a new ParkingSpot
+     * @param location
+     * @param parkingHouseID
+     */
+    private void createParkingSpot(Location location, String parkingHouseID) {
+
+        // NPE Check for user
+        if (userID != null) {
+            // Get current timestamp
+            long timestamp = Instant.now().toEpochMilli();
+
+            ParkingSpot spot = new ParkingSpot(location.getLatitude(), location.getLongitude(),
+                    5, timestamp, parkingHouseID, userID);
+
+            // Push spot to databbase
+            String key = mParkingSpotDBRef.push().getKey();
+            mParkingSpotDBRef.push().setValue(spot);
+
+            // Update ParkingSpots HashMapp
+            parkingSpots.put(key, spot);
+        }
+    }
+
+
+    /**
+     * Updates User status (Parked)
+     * @param parkingHouseId
+     */
+    private void updateUserData(String parkingHouseId) {
+
+        // NPE Check for user
+        if (userID != null) {
+            // User is now Parked
+            user.setParked(true);
+
+            // Update user table
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("parked", false);
+            ref.updateChildren(data);
+        }
+    }
+
 
     /**
      * User is leaving the parking so we are updating the free spots
@@ -238,8 +275,9 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         }
     }
 
+
     /**
-     * @return house with the shortest distance
+     * @return HashMap<parkingHouseKey, ParkingHouseObject> with the shortest distance
      */
     private HashMap<String, ParkingHouse> calculateDistance(LatLng currentLoc) {
         double shortestDist = 100000;
@@ -262,6 +300,9 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         return house;
     }
 
+    /**
+     * Stores in a HashMap all ParkingHouses
+     */
     private HashMap<String, ParkingHouse> collectParkingHouses(@NonNull DataSnapshot dataSnapshot) {
         HashMap<String, ParkingHouse> houses = new HashMap<>();
         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
@@ -334,6 +375,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDbRef = mFirebaseDatabase.getReference().child("parking_houses");
         mParkingSpotDBRef = mFirebaseDatabase.getReference().child("parking_spots");
+        mFunctions = FirebaseFunctions.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         userID = mUser.getUid();
