@@ -166,8 +166,13 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             Date currentDate = new Date(currentTimestamp);
             long minutesDiff = Utils.getDateDiff(reportedDate, currentDate, TimeUnit.MINUTES);
 
+            // We have two cases
+            // 1. User is leaving a parking spot in database
+            // 2. User is reporting a new position
+
+
             // Don't let user Report again a spot, unless 2 minutes has passed
-            if (minutesDiff > 2) {
+            if (minutesDiff > 2 || user.isParked()) {
                 //if (user.isParked())
                 reportParkingSpot(item.getTitle());
             }
@@ -198,6 +203,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
                                     // User location
                                     LatLng currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
+
 
                                     // Collect all ParkingHouses
                                     houses = collectParkingHouses(dataSnapshot);
