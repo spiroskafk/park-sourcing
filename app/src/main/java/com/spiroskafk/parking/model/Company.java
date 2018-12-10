@@ -5,15 +5,61 @@ public class Company
     public String name;
     public String address;
     public String email;
-    public String type;
+    private float hourlyCharge;
+    private double latit;
+    private int capacity;
+    private int occupied;
 
-    public Company() {}
-    public Company(String name, String address, String email, String type) {
+    public Company(String name, String address, String email, float hourlyCharge, int capacity, int occupied, double latit, double longtit) {
         this.name = name;
         this.address = address;
         this.email = email;
-        this.type = type;
+        this.hourlyCharge = hourlyCharge;
+        this.latit = latit;
+        this.capacity = capacity;
+        this.occupied = occupied;
+        this.longtit = longtit;
     }
+
+    public int getCapacity() {
+
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public int getOccupied() {
+        return occupied;
+    }
+
+    public void setOccupied(int occupied) {
+        this.occupied = occupied;
+    }
+
+    public Company(String name, String address, String email, float hourlyCharge, double latit, double longtit) {
+        this.name = name;
+
+        this.address = address;
+        this.email = email;
+        this.hourlyCharge = hourlyCharge;
+        this.latit = latit;
+        this.longtit = longtit;
+    }
+
+    public float getHourlyCharge() {
+
+        return hourlyCharge;
+    }
+
+    public void setHourlyCharge(float hourlyCharge) {
+        this.hourlyCharge = hourlyCharge;
+    }
+
+    private double longtit;
+
+    public Company() {}
 
     public String getName() {
         return name;
@@ -23,11 +69,10 @@ public class Company
         this.name = name;
     }
 
+
     public String getAddress() {
         return address;
     }
-
-    public String getType() { return type; }
 
     public void setAddress(String address) {
         this.address = address;
@@ -41,5 +86,19 @@ public class Company
         this.email = email;
     }
 
-    public void setType(String type) { this.type = type; }
+    public double getLatit() {
+        return latit;
+    }
+
+    public void setLatit(double latit) {
+        this.latit = latit;
+    }
+
+    public double getLongtit() {
+        return longtit;
+    }
+
+    public void setLongtit(double longtit) {
+        this.longtit = longtit;
+    }
 }

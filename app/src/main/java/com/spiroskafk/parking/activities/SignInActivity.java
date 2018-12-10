@@ -53,8 +53,13 @@ public class SignInActivity extends AppCompatActivity {
         // Initialize phase
         init();
 
+        // ATTENTION
+        //startActivity(new Intent(SignInActivity.this, InventoryActivity.class));
+
         // Check if user is signed in, then proceed
         isSignedIn();
+
+
 
         // GSign in
         mGSignInButton.setOnClickListener(new View.OnClickListener() {

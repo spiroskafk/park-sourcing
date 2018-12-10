@@ -1,44 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activities.CompanyNavActivity"
     tools:showIn="@layout/app_bar_company_nav">
 
-    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/card_view"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        card_view:cardCornerRadius="30dp"
-        card_view:cardElevation="30dp">
+        android:layout_height="match_parent">
 
-
-        <android.support.v7.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <fragment
-                android:id="@+id/place_autocomplete_fragment"
-                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+                android:id="@+id/map"
+                android:layout_gravity="center_horizontal"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="45dp" />
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
+                tools:layout_editor_absoluteX="16dp"
+                tools:layout_editor_absoluteY="196dp" />
 
+        </LinearLayout>
 
-        </android.support.v7.widget.CardView>
+    </RelativeLayout>
 
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="196dp" />
-
-    </android.support.v7.widget.CardView>
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

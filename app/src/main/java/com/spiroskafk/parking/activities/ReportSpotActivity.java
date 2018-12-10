@@ -204,7 +204,6 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                                     // User location
                                     LatLng currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
 
-
                                     // Collect all ParkingHouses
                                     houses = collectParkingHouses(dataSnapshot);
 

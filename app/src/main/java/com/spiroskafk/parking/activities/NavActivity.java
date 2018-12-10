@@ -44,6 +44,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.model.Company;
 import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.model.ParkingHouse;
 import com.spiroskafk.parking.model.ParkingSpot;
@@ -55,7 +56,6 @@ import com.spiroskafk.parking.utils.Utils;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 
@@ -74,10 +74,12 @@ public class NavActivity extends AppCompatActivity
     private DatabaseReference mParkingHouseRef;
     private DatabaseReference mRentedPlacesDatabaseReference;
     private DatabaseReference mParkingSpotRef;
+    private DatabaseReference mPrivateHouseRef;
     private DatabaseReference mUsersRef;
     private ChildEventListener mChildEventListener;
     private ChildEventListener mChildEventListener2;
     private ChildEventListener mChildEventListener3;
+    private ChildEventListener mChildEventListener4;
 
     // Auto-complete address
     private PlaceAutocompleteFragment autocompleteFragment;
@@ -90,6 +92,7 @@ public class NavActivity extends AppCompatActivity
     private HashMap<String, RentData> rentedHouses;
     private HashMap<String, String> markerToDBkeys;
     private HashMap<String, ParkingSpot> parkingSpots;
+    private HashMap<String, Company> privateHouses;
 
     // UI Components
 
@@ -156,6 +159,7 @@ public class NavActivity extends AppCompatActivity
         rentedHouses = new HashMap<String, RentData>();
         markerToDBkeys = new HashMap<String, String>();
         parkingSpots = new HashMap<String, ParkingSpot>();
+        privateHouses = new HashMap<String, Company>();
 
         // Init UI
         mLegendView = findViewById(R.id.legend_cardview);
@@ -196,6 +200,7 @@ public class NavActivity extends AppCompatActivity
 
             }
         });
+
 
 
         // Unpark
@@ -334,10 +339,41 @@ public class NavActivity extends AppCompatActivity
             }
         };
 
+        mChildEventListener4 = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Company comp = dataSnapshot.getValue(Company.class);
+                privateHouses.put(dataSnapshot.getKey(), comp);
+                updateMap();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Company comp = dataSnapshot.getValue(Company.class);
+                privateHouses.put(dataSnapshot.getKey(), comp);
+                updateMap();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                privateHouses.remove(dataSnapshot.getKey());
+                updateMap();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        };
+
 
         mParkingHouseRef.addChildEventListener(mChildEventListener);
         mRentedPlacesDatabaseReference.addChildEventListener(mChildEventListener2);
         mParkingSpotRef.addChildEventListener(mChildEventListener3);
+        mPrivateHouseRef.addChildEventListener(mChildEventListener4);
     }
 
 
@@ -395,12 +431,14 @@ public class NavActivity extends AppCompatActivity
 
             Marker m = mMap.addMarker(marker);
             m.setTag(info);
+            m.setSnippet("other");
 
             markerToDBkeys.put(m.getId(), entry.getKey());
 
         }
 
         // Populate Parking Houses
+        Log.i(TAG, "PrivateHouses: " + privateHouses.toString());
         for (final HashMap.Entry<String, ParkingHouse> entry : parkingHouses.entrySet()) {
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
@@ -434,11 +472,57 @@ public class NavActivity extends AppCompatActivity
             CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
             mMap.setInfoWindowAdapter(adapter);
 
+
             Marker m = mMap.addMarker(marker);
+            m.setTag(info);
+            m.setSnippet("other");
+
+            markerToDBkeys.put(m.getId(), entry.getKey());
+        }
+
+
+        // Populate PrivateHouses
+        for (final HashMap.Entry<String, Company> entry : privateHouses.entrySet()) {
+            MarkerOptions marker = new MarkerOptions();
+            marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
+                    .title(entry.getValue().getAddress())
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+
+            final InfoWindowData info = new InfoWindowData();
+            info.setAddress(entry.getValue().getAddress());
+            info.setCapacity(entry.getValue().getCapacity());
+            info.setOccupied(entry.getValue().getOccupied());
+            info.setHourlyCharge(entry.getValue().getHourlyCharge());
+
+            // Get current location
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(final Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                LatLng spotLocation = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
+                                // Calculate distance
+                                Double meters = SphericalUtil.computeDistanceBetween(currentLocation, spotLocation);
+                                double m = Utils.round(meters/1000, 2);
+                                info.setDistance(m + " km");
+                            }
+                        }
+                    });
+
+            //Set Custom InfoWindow Adapter
+            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
+            mMap.setInfoWindowAdapter(adapter);
+
+            Marker m = mMap.addMarker(marker);
+            m.setSnippet("Private");
             m.setTag(info);
 
             markerToDBkeys.put(m.getId(), entry.getKey());
         }
+
+
 
     }
 
@@ -566,6 +650,7 @@ public class NavActivity extends AppCompatActivity
         mParkingHouseRef = mFirebaseDatabase.getReference().child("parking_houses");
         mRentedPlacesDatabaseReference = mFirebaseDatabase.getReference().child("rented_spots");
         mParkingSpotRef = mFirebaseDatabase.getReference().child("parking_spots");
+        mPrivateHouseRef = mFirebaseDatabase.getReference().child("private_houses");
         mUsersRef = mFirebaseDatabase.getReference().child("users");
     }
 

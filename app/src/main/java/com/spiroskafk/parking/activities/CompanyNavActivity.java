@@ -1,6 +1,9 @@
 package com.spiroskafk.parking.activities;
 
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,6 +15,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -19,8 +24,23 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.model.Company;
+import com.spiroskafk.parking.utils.Permissions;
+import com.spiroskafk.parking.utils.Utils;
+
+import java.util.HashMap;
 
 public class CompanyNavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -31,8 +51,19 @@ public class CompanyNavActivity extends AppCompatActivity
     // Google map
     private GoogleMap mMap;
 
-    // Auto-complete address
-    private PlaceAutocompleteFragment autocompleteFragment;
+    private static double latit;
+    private static double longtit;
+
+    // Firebase
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDbRef;
+
+    // LocationClient
+    private FusedLocationProviderClient mFusedLocationClient;
+
+    private HashMap<String, Company> privateHouses;
+    private String houseId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +73,10 @@ public class CompanyNavActivity extends AppCompatActivity
         // Initialize phase
         init();
 
+        createPrivateHouse();
+
         // Setup listeners
-        setupListeners();
+        //setupListeners();
     }
 
     private void init() {
@@ -51,6 +84,9 @@ public class CompanyNavActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        // Init Location Services
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Init navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -62,33 +98,111 @@ public class CompanyNavActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        privateHouses = new HashMap<String, Company>();
+
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDbRef = mFirebaseDatabase.getReference().child("private_houses");
+
         // Init google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // Init auto-complete address
-        autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
     }
 
     private void setupListeners() {
-        // Setup AutoComplete listener
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+//        mDbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                Company comp = dataSnapshot.getValue(Company.class);
+//                Log.i(TAG, "Latit: " + comp.getLatit());
+//                Log.i(TAG, "mail: " + comp.getEmail());
+//                privateHouses.put(dataSnapshot.getKey(), comp);
+//                houseId = dataSnapshot.getKey();
+//                updateMap();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+
+        mDbRef.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onPlaceSelected(Place place) {
-                // TODO: Get info about the selected place.
-                Log.i(TAG, "Place: " + place.getName());
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 15));
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Company comp = dataSnapshot.getValue(Company.class);
+                Log.i(TAG, "Latit: " + comp.getLatit());
+                Log.i(TAG, "mail: " + comp.getEmail());
+                privateHouses.put(dataSnapshot.getKey(), comp);
+                houseId = dataSnapshot.getKey();
+                updateMap();
             }
 
             @Override
-            public void onError(Status status) {
-                // TODO: Handle the error.
-                Log.i(TAG, "An error occurred: " + status);
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
+
+
+
+
+
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+
+
+    }
+
+    private void updateMap() {
+        // Update map
+        Log.i(TAG, "houseID: " + houseId);
+        if (houseId != null) {
+            Log.i(TAG, "LATIT: " + privateHouses.get(houseId).getLatit());
+            LatLng coordinates = new LatLng(privateHouses.get(houseId).getLatit(), privateHouses.get(houseId).getLongtit());
+            mMap.addMarker(new MarkerOptions()
+                    .position(coordinates)
+                    .title(privateHouses.get(houseId).getAddress())
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
+        }
+
+    }
+
+    private void createPrivateHouse() {
+        // Create new company
+        String address = Utils.getStreetAddress(38.211891, 21.730654, this);
+        Company comp = new Company("Argyros Parking", address, "comp@gmail.com", 4, 15, 5, 38.211891, 21.730654);
+
+        // add to firebase
+        mDbRef.push().setValue(comp);
+    }
+
+
+
+
+
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -107,11 +221,6 @@ public class CompanyNavActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-    }
 
     @Override
     public void onBackPressed() {

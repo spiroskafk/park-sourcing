@@ -13,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -55,7 +56,8 @@
         <activity
             android:name=".activities.CompanyNavActivity"
             android:label="@string/title_activity_company_nav"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+        <activity android:name=".activities.InventoryActivity"></activity>
     </application>
 
 </manifest>

@@ -5,6 +5,33 @@ public class InfoWindowData {
     private String spaces;
     private String distance;
     private String title;
+    private int capacity;
+    private int occupied;
+    private float hourlyCharge;
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public int getOccupied() {
+        return occupied;
+    }
+
+    public void setOccupied(int occupied) {
+        this.occupied = occupied;
+    }
+
+    public float getHourlyCharge() {
+        return hourlyCharge;
+    }
+
+    public void setHourlyCharge(float hourlyCharge) {
+        this.hourlyCharge = hourlyCharge;
+    }
 
     public String getTitle() {
         return title;
