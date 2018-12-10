@@ -407,12 +407,12 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
      */
     private void createParkingHouse(String type) {
         // Create ParkingHouse - Mikinon
-        latit = 38.214244f;
-        longtit = 21.740157f;
+        latit = 38.297509f;
+        longtit = 21.796780f;
 
         String address = Utils.getStreetAddress(latit, longtit, this);
         String id = UUID.randomUUID().toString();
-        ParkingHouse ph = new ParkingHouse(latit, longtit, address, id, type, 30, 5, 10);
+        ParkingHouse ph = new ParkingHouse(latit, longtit, address, id, type, 7, 5, 10);
 
         //Push to db
         mDbRef.push().setValue(ph);

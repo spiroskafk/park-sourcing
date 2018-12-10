@@ -242,14 +242,6 @@ public class NavActivity extends AppCompatActivity
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 ParkingHouse ph = dataSnapshot.getValue(ParkingHouse.class);
                 parkingHouses.put(dataSnapshot.getKey(), ph);
-
-                // If ParkingHouse is full, don't present it on map
-                if (ph.getCapacity() == ph.getOccupied()) {
-                    parkingHouses.remove(dataSnapshot.getKey());
-                } else {
-                    parkingHouses.put(dataSnapshot.getKey(), ph);
-                }
-
                 updateMap();
 
             }
@@ -257,20 +249,14 @@ public class NavActivity extends AppCompatActivity
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 ParkingHouse ph = dataSnapshot.getValue(ParkingHouse.class);
-
-                // If ParkingHouse is full, don't present it on map
-                if (ph.getCapacity() == ph.getOccupied()) {
-                    parkingHouses.remove(dataSnapshot.getKey());
-                } else {
-                    parkingHouses.put(dataSnapshot.getKey(), ph);
-                }
+                parkingHouses.put(dataSnapshot.getKey(), ph);
                 updateMap();
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                parkingHouses.remove(dataSnapshot.getKey());
-                updateMap();
+//                parkingHouses.remove(dataSnapshot.getKey());
+//                updateMap();
             }
 
             @Override
@@ -356,8 +342,8 @@ public class NavActivity extends AppCompatActivity
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                privateHouses.remove(dataSnapshot.getKey());
-                updateMap();
+                //privateHouses.remove(dataSnapshot.getKey());
+                //updateMap();
             }
 
             @Override
@@ -382,10 +368,20 @@ public class NavActivity extends AppCompatActivity
      * @param value
      */
     private void updateParkingHouse(int value) {
+        Log.i(TAG, "ParkingHouseId: " + parkingHouseId);
+
+        // Print HashMap
+        for (HashMap.Entry<String, ParkingHouse> entry : parkingHouses.entrySet()) {
+            Log.i(TAG, "Key = " + entry.getKey() + " Value = " + entry.getValue().getAddress());
+        }
+
+
+
 
         if (parkingHouseId != null) {
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("parking_houses").child(parkingHouseId);
             HashMap<String, Object> data = new HashMap<>();
+            Log.i(TAG, "ParkingHouse: " + parkingHouses.get(parkingHouseId).getAddress());
             data.put("occupied", parkingHouses.get(parkingHouseId).getOccupied() + value);
             ref.updateChildren(data);
         }
@@ -440,6 +436,10 @@ public class NavActivity extends AppCompatActivity
         // Populate Parking Houses
         Log.i(TAG, "PrivateHouses: " + privateHouses.toString());
         for (final HashMap.Entry<String, ParkingHouse> entry : parkingHouses.entrySet()) {
+            // BUG: When freespots=1 and user parks, marker dissapears (parkinghouse removed from HashMap)
+            // When user unparks, crashes
+            // TEMP SOLUTION
+            if (entry.getValue().getCapacity() == entry.getValue().getOccupied()) continue;
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
@@ -541,6 +541,10 @@ public class NavActivity extends AppCompatActivity
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                    Log.i(TAG, "updateParkingHouse");
+                    // Update ParkingHouseId
+                    parkingHouseId = id;
+
                     // Update ParkingHouse stats
                     updateParkingHouse(1);
 
@@ -548,9 +552,6 @@ public class NavActivity extends AppCompatActivity
 
                     // Updates User status
                     updateUserStatus();
-
-                    // Update ParkingHouseId
-                    parkingHouseId = id;
 
                     // Find the user that has reported this position and update his points
                     String reportedSpotUserId = findUserReportedSpot(id);
@@ -667,6 +668,8 @@ public class NavActivity extends AppCompatActivity
             startActivity(new Intent(NavActivity.this, ProfileActivity.class));
         } else if (id == R.id.nav_rent_your_space) {
             startActivity(new Intent(NavActivity.this, RentYourPlace.class));
+        } else if (id == R.id.nav_reward) {
+            startActivity(new Intent(NavActivity.this, RewardsActivity.class));
         } else if (id == R.id.nav_sign_out) {
             FirebaseAuth.getInstance().signOut();
             finish();

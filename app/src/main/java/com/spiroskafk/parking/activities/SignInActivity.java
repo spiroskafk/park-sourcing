@@ -54,7 +54,7 @@ public class SignInActivity extends AppCompatActivity {
         init();
 
         // ATTENTION
-        //startActivity(new Intent(SignInActivity.this, InventoryActivity.class));
+        //startActivity(new Intent(SignInActivity.this, RewardsActivity.class));
 
         // Check if user is signed in, then proceed
         isSignedIn();

@@ -13,7 +13,7 @@
             android:icon="@drawable/ic_menu_rent_your_place"
             android:title="Rent your place" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_reward"
             android:icon="@drawable/ic_menu_reward"
             android:title="Rewards" />
         <item
