@@ -1,5 +1,6 @@
 package com.spiroskafk.parking.activities;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,8 +37,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.adapters.CustomInfoWindowAdapter;
 import com.spiroskafk.parking.model.Company;
+import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.utils.Permissions;
 import com.spiroskafk.parking.utils.Utils;
 
@@ -73,10 +78,10 @@ public class CompanyNavActivity extends AppCompatActivity
         // Initialize phase
         init();
 
-        createPrivateHouse();
+        //createPrivateHouse();
 
         // Setup listeners
-        //setupListeners();
+        setupListeners();
     }
 
     private void init() {
@@ -180,11 +185,42 @@ public class CompanyNavActivity extends AppCompatActivity
         if (houseId != null) {
             Log.i(TAG, "LATIT: " + privateHouses.get(houseId).getLatit());
             LatLng coordinates = new LatLng(privateHouses.get(houseId).getLatit(), privateHouses.get(houseId).getLongtit());
-            mMap.addMarker(new MarkerOptions()
-                    .position(coordinates)
+            MarkerOptions marker = new MarkerOptions();
+            marker.position(new LatLng(privateHouses.get(houseId).getLatit(), privateHouses.get(houseId).getLongtit()))
                     .title(privateHouses.get(houseId).getAddress())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+
+            final InfoWindowData info = new InfoWindowData();
+            info.setAddress(privateHouses.get(houseId).getAddress());
+            info.setCapacity(privateHouses.get(houseId).getCapacity());
+            info.setOccupied(privateHouses.get(houseId).getOccupied());
+            info.setHourlyCharge(privateHouses.get(houseId).getHourlyCharge());
+
+            // Get current location
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(final Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                LatLng spotLocation = new LatLng(privateHouses.get(houseId).getLatit(), privateHouses.get(houseId).getLongtit());
+                                // Calculate distance
+                                Double meters = SphericalUtil.computeDistanceBetween(currentLocation, spotLocation);
+                                double m = Utils.round(meters/1000, 2);
+                                info.setDistance(m + " km");
+                            }
+                        }
+                    });
+
+            //Set Custom InfoWindow Adapter
+            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(CompanyNavActivity.this);
+            mMap.setInfoWindowAdapter(adapter);
+
+            Marker m = mMap.addMarker(marker);
+            m.setSnippet("Private");
+            m.setTag(info);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(privateHouses.get(houseId).getLatit(), privateHouses.get(houseId).getLongtit()), 14));
         }
 
     }
@@ -210,7 +246,9 @@ public class CompanyNavActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_sign_out) {
+        if (item.getItemId() == R.id.menu_update) {
+            startActivity(new Intent(CompanyNavActivity.this, InventoryActivity.class));
+        } else if (id == R.id.nav_sign_out) {
             FirebaseAuth.getInstance().signOut();
             finish();
         }
