@@ -187,7 +187,6 @@
             </LinearLayout>
 
             <EditText
-                android:id="@+id/edittext_address"
                 android:layout_width="180dp"
                 android:text="Enter new value"
                 android:layout_height="wrap_content"

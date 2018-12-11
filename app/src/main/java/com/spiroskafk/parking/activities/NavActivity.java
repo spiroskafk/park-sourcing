@@ -391,7 +391,7 @@ public class NavActivity extends AppCompatActivity
     private void updateMap() {
         mMap.clear();
 
-        // Populate Rented Houses
+        // Space to Rent - Blue
         for (final HashMap.Entry<String, RentData> entry : rentedHouses.entrySet()) {
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
@@ -433,8 +433,7 @@ public class NavActivity extends AppCompatActivity
 
         }
 
-        // Populate Parking Houses
-        Log.i(TAG, "PrivateHouses: " + privateHouses.toString());
+        // Street Parking
         for (final HashMap.Entry<String, ParkingHouse> entry : parkingHouses.entrySet()) {
             // BUG: When freespots=1 and user parks, marker dissapears (parkinghouse removed from HashMap)
             // When user unparks, crashes
@@ -443,7 +442,7 @@ public class NavActivity extends AppCompatActivity
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
 
             Integer freeSpaces = entry.getValue().getCapacity() - entry.getValue().getOccupied();
             final InfoWindowData info = new InfoWindowData();
@@ -481,12 +480,12 @@ public class NavActivity extends AppCompatActivity
         }
 
 
-        // Populate PrivateHouses
+        // PrivateHouses - ParkingHouses
         for (final HashMap.Entry<String, Company> entry : privateHouses.entrySet()) {
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
             final InfoWindowData info = new InfoWindowData();
             info.setAddress(entry.getValue().getAddress());
