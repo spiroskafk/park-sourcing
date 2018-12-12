@@ -1,6 +1,6 @@
 package com.spiroskafk.parking.model;
 
-public class RentData {
+public class RentParking {
 
     private String address;
     private String id;
@@ -13,7 +13,7 @@ public class RentData {
     private String type;
     private Float latit;
 
-    public RentData() {
+    public RentParking() {
     }
 
     public String getAddress() {
@@ -104,7 +104,7 @@ public class RentData {
         this.longtit = longtit;
     }
 
-    public RentData(String address, String userId, String id, String city, String fromDate, String untilDate, String nos, String comments, String type, Float latit, Float longtit) {
+    public RentParking(String address, String userId, String id, String city, String fromDate, String untilDate, String nos, String comments, String type, Float latit, Float longtit) {
 
         this.address = address;
         this.id = id;

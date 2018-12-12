@@ -1,6 +1,6 @@
 package com.spiroskafk.parking.model;
 
-public class Company
+public class PrivateParking
 {
     public String name;
     public String address;
@@ -10,7 +10,7 @@ public class Company
     private int capacity;
     private int occupied;
 
-    public Company(String name, String address, String email, float hourlyCharge, int capacity, int occupied, double latit, double longtit) {
+    public PrivateParking(String name, String address, String email, float hourlyCharge, int capacity, int occupied, double latit, double longtit) {
         this.name = name;
         this.address = address;
         this.email = email;
@@ -38,7 +38,7 @@ public class Company
         this.occupied = occupied;
     }
 
-    public Company(String name, String address, String email, float hourlyCharge, double latit, double longtit) {
+    public PrivateParking(String name, String address, String email, float hourlyCharge, double latit, double longtit) {
         this.name = name;
 
         this.address = address;
@@ -59,7 +59,7 @@ public class Company
 
     private double longtit;
 
-    public Company() {}
+    public PrivateParking() {}
 
     public String getName() {
         return name;

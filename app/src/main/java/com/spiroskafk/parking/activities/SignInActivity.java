@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -22,7 +23,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
 
@@ -35,6 +35,8 @@ public class SignInActivity extends AppCompatActivity {
     // Firebase
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private Firebase ref;
+
     // UI components
     private Button mGSignInButton;
     private Button mEmailSignInButton;
@@ -53,8 +55,6 @@ public class SignInActivity extends AppCompatActivity {
         // Initialize phase
         init();
 
-        // ATTENTION
-        //startActivity(new Intent(SignInActivity.this, RewardsActivity.class));
 
         // Check if user is signed in, then proceed
         isSignedIn();
@@ -65,7 +65,8 @@ public class SignInActivity extends AppCompatActivity {
         mGSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                signInWithGoogle();
+                Toast.makeText(SignInActivity.this, "Needs fixing. Don't use it for now", Toast.LENGTH_SHORT).show();
+                //signInWithGoogle();
             }
         });
 
@@ -94,6 +95,11 @@ public class SignInActivity extends AppCompatActivity {
         // Init UI
         initUIComponents();
 
+//        Firebase.setAndroidContext(this.getApplicationContext());
+//        ref = new Firebase("https://parking-application-e04ff.firebaseio.com/");
+//
+//        ref.unauth();
+
         // Init firebase
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -104,6 +110,7 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = mAuth.getCurrentUser();
+                //Log.i(TAG, "User:: " + user.toString());
                 if (user != null) {
                     Log.i(TAG, "USER IS SIGNED IN");
                     // Launch sign in activity
@@ -124,6 +131,7 @@ public class SignInActivity extends AppCompatActivity {
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        //Log.i(TAG, gso.getAccount().toString());
 
         // Start sign in
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();

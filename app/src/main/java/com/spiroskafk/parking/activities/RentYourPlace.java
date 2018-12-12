@@ -21,7 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.model.RentData;
+import com.spiroskafk.parking.model.RentParking;
 import com.spiroskafk.parking.utils.Permissions;
 
 import java.text.SimpleDateFormat;
@@ -159,11 +159,11 @@ public class RentYourPlace extends AppCompatActivity {
                     String id = UUID.randomUUID().toString();
 
                     // Create RentData
-                    RentData rentData = new RentData(address, userID, id, city, fromDate, untilDate, nos, comments, String.valueOf(radioGroupInput), latit, longtit);
+                    RentParking rentParking = new RentParking(address, userID, id, city, fromDate, untilDate, nos, comments, String.valueOf(radioGroupInput), latit, longtit);
 
 
                     // Add to firebase
-                    mRentedSpotDatabaseReference.push().setValue(rentData);
+                    mRentedSpotDatabaseReference.push().setValue(rentParking);
                     Toast.makeText(RentYourPlace.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
                 }
 

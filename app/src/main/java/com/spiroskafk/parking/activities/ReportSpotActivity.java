@@ -20,10 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,15 +29,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.FirebaseFunctionsException;
-import com.google.firebase.functions.HttpsCallableResult;
 import com.google.maps.android.SphericalUtil;
 import com.skydoves.powermenu.MenuAnimation;
 import com.skydoves.powermenu.OnMenuItemClickListener;
 import com.skydoves.powermenu.PowerMenu;
 import com.skydoves.powermenu.PowerMenuItem;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.model.ParkingHouse;
+import com.spiroskafk.parking.model.StreetParking;
 import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.model.User;
 import com.spiroskafk.parking.utils.Permissions;
@@ -51,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -82,7 +76,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     private static float longtit;
 
     // Parking Houses
-    private HashMap<String, ParkingHouse> houses;
+    private HashMap<String, StreetParking> houses;
     // Parking Spots
     private HashMap<String, ParkingSpot> parkingSpots;
 
@@ -208,7 +202,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                                     houses = collectParkingHouses(dataSnapshot);
 
                                     // Check which one is closest to the User
-                                    HashMap<String, ParkingHouse> shortestHouse = calculateDistance(currentLoc);
+                                    HashMap<String, StreetParking> shortestHouse = calculateDistance(currentLoc);
 
                                     // The id of the ParkingHouse that is closest to the User
                                     String parkingHouseID = shortestHouse.keySet().toArray()[0].toString();
@@ -279,8 +273,8 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
      * User is leaving the parking so we are updating the free spots
      * @param house
      */
-    private void updateShortestHouseData(HashMap<String, ParkingHouse> house) {
-        for (HashMap.Entry<String, ParkingHouse> entry : house.entrySet()) {
+    private void updateShortestHouseData(HashMap<String, StreetParking> house) {
+        for (HashMap.Entry<String, StreetParking> entry : house.entrySet()) {
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("parking_houses").child(entry.getKey());
             HashMap<String, Object> data = new HashMap<>();
             data.put("occupied", entry.getValue().getOccupied() - 1);
@@ -292,14 +286,14 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     /**
      * @return HashMap<parkingHouseKey, ParkingHouseObject> with the shortest distance
      */
-    private HashMap<String, ParkingHouse> calculateDistance(LatLng currentLoc) {
+    private HashMap<String, StreetParking> calculateDistance(LatLng currentLoc) {
         double shortestDist = 100000;
         String nodeId = "";
-        ParkingHouse shortestHouse = new ParkingHouse();
+        StreetParking shortestHouse = new StreetParking();
         double meters;
-        HashMap<String, ParkingHouse> house = new HashMap<>();
+        HashMap<String, StreetParking> house = new HashMap<>();
 
-        for (HashMap.Entry<String, ParkingHouse> entry : houses.entrySet()) {
+        for (HashMap.Entry<String, StreetParking> entry : houses.entrySet()) {
             LatLng houseLoc = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
             meters = SphericalUtil.computeDistanceBetween(currentLoc, houseLoc);
             if (meters < shortestDist) {
@@ -316,10 +310,10 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     /**
      * Stores in a HashMap all ParkingHouses
      */
-    private HashMap<String, ParkingHouse> collectParkingHouses(@NonNull DataSnapshot dataSnapshot) {
-        HashMap<String, ParkingHouse> houses = new HashMap<>();
+    private HashMap<String, StreetParking> collectParkingHouses(@NonNull DataSnapshot dataSnapshot) {
+        HashMap<String, StreetParking> houses = new HashMap<>();
         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-            houses.put(postSnapshot.getKey(), postSnapshot.getValue(ParkingHouse.class));
+            houses.put(postSnapshot.getKey(), postSnapshot.getValue(StreetParking.class));
         }
 
         return houses;
@@ -412,7 +406,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
         String address = Utils.getStreetAddress(latit, longtit, this);
         String id = UUID.randomUUID().toString();
-        ParkingHouse ph = new ParkingHouse(latit, longtit, address, id, type, 7, 5, 10);
+        StreetParking ph = new StreetParking(latit, longtit, address, id, type, 7, 5, 10);
 
         //Push to db
         mDbRef.push().setValue(ph);

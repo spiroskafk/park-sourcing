@@ -1,6 +1,6 @@
 package com.spiroskafk.parking.model;
 
-public class ParkingHouse {
+public class StreetParking {
 
     private float latit;
     private float longtit;
@@ -8,7 +8,7 @@ public class ParkingHouse {
     private String id;
     private String type;
 
-    public ParkingHouse(float latit, float longtit, String address, String id, String type, int capacity, int occupied, int points) {
+    public StreetParking(float latit, float longtit, String address, String id, String type, int capacity, int occupied, int points) {
         this.latit = latit;
         this.longtit = longtit;
         this.address = address;
@@ -88,6 +88,6 @@ public class ParkingHouse {
     private int points;
 
 
-    public ParkingHouse() {
+    public StreetParking() {
     }
 }
