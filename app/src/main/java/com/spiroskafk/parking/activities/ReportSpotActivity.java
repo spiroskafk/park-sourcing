@@ -100,16 +100,44 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private void setupListeners() {
-        final List<PowerMenuItem> list = new ArrayList<PowerMenuItem>();
-        list.add(new PowerMenuItem("Θέση ΑΜΕΑ", false));
-        list.add(new PowerMenuItem("Θέση Επισκεπτών", false));
-        list.add(new PowerMenuItem("Δημοτικό Πάρκινγκ", false));
-        list.add(new PowerMenuItem("Θέση Μόνιμης Κατοικίας", false));
+//        final List<PowerMenuItem> list = new ArrayList<PowerMenuItem>();
+//        list.add(new PowerMenuItem("Θέση ΑΜΕΑ", false));
+//        list.add(new PowerMenuItem("Θέση Επισκεπτών", false));
+//        list.add(new PowerMenuItem("Δημοτικό Πάρκινγκ", false));
+//        list.add(new PowerMenuItem("Θέση Μόνιμης Κατοικίας", false));
 
         // Popup window list
         mLeaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                powerMenu = new PowerMenu.Builder(getApplicationContext())
+//                        .addItemList(list)
+//                        .setAnimation(MenuAnimation.SHOW_UP_CENTER)
+//                        .setMenuRadius(10f)
+//                        .setMenuShadow(10f)
+//                        .setTextColor(getApplicationContext().getResources().getColor(R.color.black))
+//                        .setSelectedTextColor(Color.WHITE)
+//                        .setMenuColor(Color.WHITE)
+//                        .setSelectedMenuColor(getApplicationContext().getResources().getColor(R.color.colorPrimary))
+//                        .setOnMenuItemClickListener(onMenuItemClickListener)
+//                        .build();
+//
+//                powerMenu.showAtCenter(view);
+
+
+                // Show him the closest StreetParking houses
+                // Check which one is closest to the User
+                Log.i(TAG, "LATIT : " + latit + " longtit: " + longtit);;
+                HashMap<String, StreetParking> shortestHouse = calculateUpTwoFour(new LatLng(latit, longtit));
+
+                Log.i(TAG, "shortesthouses:" + shortestHouse.toString());
+
+                final List<PowerMenuItem> list = new ArrayList<PowerMenuItem>();
+
+                for (HashMap.Entry<String, StreetParking> entry : shortestHouse.entrySet()) {
+                    list.add(new PowerMenuItem(entry.getValue().getAddress(), false));
+                }
+
                 powerMenu = new PowerMenu.Builder(getApplicationContext())
                         .addItemList(list)
                         .setAnimation(MenuAnimation.SHOW_UP_CENTER)
@@ -123,6 +151,9 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                         .build();
 
                 powerMenu.showAtCenter(view);
+
+                // The id of the ParkingHouse that is closest to the User
+                //String parkingHouseID = shortestHouse.keySet().toArray()[0].toString();
 
             }
         });
@@ -275,7 +306,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
      */
     private void updateShortestHouseData(HashMap<String, StreetParking> house) {
         for (HashMap.Entry<String, StreetParking> entry : house.entrySet()) {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("parking_houses").child(entry.getKey());
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("street_parking").child(entry.getKey());
             HashMap<String, Object> data = new HashMap<>();
             data.put("occupied", entry.getValue().getOccupied() - 1);
             ref.updateChildren(data);
@@ -304,6 +335,33 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         }
 
         house.put(nodeId, shortestHouse);
+        return house;
+    }
+
+
+    /**
+     * @return HashMap<parkingHouseKey, ParkingHouseObject> with the shortest distance
+     */
+    private HashMap<String, StreetParking> calculateUpTwoFour(LatLng currentLoc) {
+        String nodeId = "";
+        StreetParking shortestHouse = new StreetParking();
+        double meters;
+        HashMap<String, StreetParking> house = new HashMap<>();
+
+        Log.i(TAG, "houses:: " + houses.toString());;
+
+        for (HashMap.Entry<String, StreetParking> entry : houses.entrySet()) {
+            LatLng houseLoc = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
+            meters = SphericalUtil.computeDistanceBetween(currentLoc, houseLoc);
+            Log.i(TAG, "meters : " + meters);
+            if (meters < 3000) {
+                nodeId = entry.getKey();
+                shortestHouse = entry.getValue();
+                house.put(nodeId, shortestHouse);
+            }
+        }
+
+
         return house;
     }
 
@@ -380,7 +438,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
         // Init Firebase
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mDbRef = mFirebaseDatabase.getReference().child("parking_houses");
+        mDbRef = mFirebaseDatabase.getReference().child("street_parking");
         mParkingSpotDBRef = mFirebaseDatabase.getReference().child("parking_spots");
         mFunctions = FirebaseFunctions.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -394,6 +452,20 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         mapFragment.getMapAsync(this);
 
         parkingSpots = new HashMap<String, ParkingSpot>();
+
+        // Collect all ParkingHouses
+        mDbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                houses = collectParkingHouses(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     /**
