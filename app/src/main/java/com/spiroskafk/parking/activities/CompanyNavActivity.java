@@ -222,7 +222,7 @@ public class CompanyNavActivity extends AppCompatActivity
     private void createPrivateHouse() {
         // Create new company
         String address = Utils.getStreetAddress(38.211891, 21.730654, this);
-        PrivateParking comp = new PrivateParking("Argyros Parking", address, "comp@gmail.com", 4, 15, 5, 38.211891, 21.730654);
+        PrivateParking comp = new PrivateParking("Argyros Parking", address, "comp@gmail.com", "4", 38.211891, 21.730654, 20, 12,  "4");
 
         // add to firebase
         mDbRef.push().setValue(comp);

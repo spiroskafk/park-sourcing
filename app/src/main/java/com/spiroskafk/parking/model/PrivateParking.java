@@ -5,12 +5,13 @@ public class PrivateParking
     public String name;
     public String address;
     public String email;
-    private float hourlyCharge;
+    private String hourlyCharge;
     private double latit;
     private int capacity;
     private int occupied;
+    private String entrance;
 
-    public PrivateParking(String name, String address, String email, float hourlyCharge, int capacity, int occupied, double latit, double longtit) {
+    public PrivateParking(String name, String address, String email, String hourlyCharge, double latit, double longtit, int capacity, int occupied, String entrance) {
         this.name = name;
         this.address = address;
         this.email = email;
@@ -18,6 +19,7 @@ public class PrivateParking
         this.latit = latit;
         this.capacity = capacity;
         this.occupied = occupied;
+        this.entrance = entrance;
         this.longtit = longtit;
     }
 
@@ -38,23 +40,27 @@ public class PrivateParking
         this.occupied = occupied;
     }
 
-    public PrivateParking(String name, String address, String email, float hourlyCharge, double latit, double longtit) {
-        this.name = name;
 
-        this.address = address;
-        this.email = email;
-        this.hourlyCharge = hourlyCharge;
-        this.latit = latit;
-        this.longtit = longtit;
+    public PrivateParking(String name) {
+        this.name = name;
     }
 
-    public float getHourlyCharge() {
+
+    public String getHourlyCharge() {
 
         return hourlyCharge;
     }
 
-    public void setHourlyCharge(float hourlyCharge) {
+    public void setHourlyCharge(String hourlyCharge) {
         this.hourlyCharge = hourlyCharge;
+    }
+
+    public String getEntrance() {
+        return entrance;
+    }
+
+    public void setEntrance(String entrance) {
+        this.entrance = entrance;
     }
 
     private double longtit;

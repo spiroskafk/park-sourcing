@@ -35,16 +35,16 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             View view = ((Activity) context).getLayoutInflater().inflate(R.layout.private_parking_info_window, null);
 
             TextView mAddressTv = view.findViewById(R.id.street_private_tv);
-            TextView mCapacityTv = view.findViewById(R.id.capacity_tv);
-            TextView mOccupiedTv = view.findViewById(R.id.occupied_tv);
+            TextView mEntrance = view.findViewById(R.id.entrance_tv);
+            TextView mSpaces = view.findViewById(R.id.spaces_private_tv);
             TextView mHourlyChargeTv = view.findViewById(R.id.hourly_charge_tv);
             TextView mDistanceTv = view.findViewById(R.id.distance_private_tv);
 
             InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
 
             mAddressTv.setText(infoWindowData.getAddress());
-            mCapacityTv.setText(String.valueOf(infoWindowData.getCapacity()));
-            mOccupiedTv.setText(String.valueOf(infoWindowData.getOccupied()));
+            mSpaces.setText(String.valueOf(infoWindowData.getCapacity() - infoWindowData.getOccupied()));
+            mEntrance.setText(String.valueOf(infoWindowData.getEntrance()));
             mHourlyChargeTv.setText(String.valueOf(infoWindowData.getHourlyCharge()));
             mDistanceTv.setText(String.valueOf(infoWindowData.getDistance()));
 

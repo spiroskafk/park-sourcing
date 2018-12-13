@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TimingLogger;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,6 +52,7 @@ import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.model.RentParking;
 import com.spiroskafk.parking.adapters.CustomInfoWindowAdapter;
 import com.spiroskafk.parking.model.User;
+import com.spiroskafk.parking.utils.Permissions;
 import com.spiroskafk.parking.utils.Utils;
 
 import java.time.Instant;
@@ -236,6 +238,7 @@ public class NavActivity extends AppCompatActivity
         });
 
 
+
         // Setup Firebase Database listener
         mStreetParkingRef.addChildEventListener(new ChildEventListener() {
             @Override
@@ -255,8 +258,8 @@ public class NavActivity extends AppCompatActivity
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//                parkingHouses.remove(dataSnapshot.getKey());
-//                updateMap();
+                parkingHouses.remove(dataSnapshot.getKey());
+                updateMap();
             }
 
             @Override
@@ -327,13 +330,6 @@ public class NavActivity extends AppCompatActivity
             }
         });
 
-//        // Create new company
-//        String address = Utils.getStreetAddress(38.211891, 21.730654, this);
-//        PrivateParking comp = new PrivateParking("Argyros Parking", address, "comp@gmail.com", 4, 15, 5, 38.211891, 21.730654);
-//
-//        // add to firebase
-//        mPrivateHouseRef.push().setValue(comp);
-
 
         mPrivateHouseRef.addChildEventListener(new ChildEventListener() {
             @Override
@@ -373,15 +369,6 @@ public class NavActivity extends AppCompatActivity
      * @param value
      */
     private void updateParkingHouse(int value) {
-        Log.i(TAG, "ParkingHouseId: " + parkingHouseId);
-
-        // Print HashMap
-        for (HashMap.Entry<String, StreetParking> entry : parkingHouses.entrySet()) {
-            Log.i(TAG, "Key = " + entry.getKey() + " Value = " + entry.getValue().getAddress());
-        }
-
-
-
 
         if (parkingHouseId != null) {
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("street_parking").child(parkingHouseId);
@@ -394,7 +381,31 @@ public class NavActivity extends AppCompatActivity
 
 
     private void updateMap() {
+        long l1 = System.nanoTime();
         mMap.clear();
+
+        // Get current location
+        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+            //if not permisson granted so request permisson with request code
+            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+        } else {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                                        .title("You are here!")
+                                        .snippet("Population: 4,627,300")
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon)));
+                            } else {
+
+                            }
+                        }
+                    });
+        }
 
         // Space to Rent - Blue
         for (final HashMap.Entry<String, RentParking> entry : rentedHouses.entrySet()) {
@@ -496,7 +507,8 @@ public class NavActivity extends AppCompatActivity
             info.setAddress(entry.getValue().getAddress());
             info.setCapacity(entry.getValue().getCapacity());
             info.setOccupied(entry.getValue().getOccupied());
-            info.setHourlyCharge(entry.getValue().getHourlyCharge());
+            info.setHourlyCharge(entry.getValue().getHourlyCharge() + "€");
+            info.setEntrance(entry.getValue().getEntrance() + "€");
 
             // Get current location
             mFusedLocationClient.getLastLocation()
@@ -527,6 +539,9 @@ public class NavActivity extends AppCompatActivity
         }
 
 
+        long l2 = System.nanoTime();
+        Log.i(TAG, "l1-l2: " + (l2 - l1));
+
 
     }
 
@@ -545,7 +560,6 @@ public class NavActivity extends AppCompatActivity
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    Log.i(TAG, "updateParkingHouse");
                     // Update ParkingHouseId
                     parkingHouseId = id;
 
@@ -567,6 +581,7 @@ public class NavActivity extends AppCompatActivity
 
                     mUnPark.setVisibility(View.VISIBLE);
                     Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {}
@@ -582,11 +597,19 @@ public class NavActivity extends AppCompatActivity
      * Updates User status on database
      */
     private void updateUserStatus() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
-        HashMap<String, Object> data = new HashMap<>();
-        data.put("parked", true);
-        ref.updateChildren(data);
-        user.setParked(true);
+
+        if (parkingHouseId != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("parked", true);
+            data.put("latit", parkingHouses.get(parkingHouseId).getLatit());
+            data.put("longtit", parkingHouses.get(parkingHouseId).getLongtit());
+            ref.updateChildren(data);
+            user.setParked(true);
+
+            // Erase marker from map
+
+        }
     }
 
 

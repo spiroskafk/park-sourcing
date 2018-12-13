@@ -7,7 +7,17 @@ public class InfoWindowData {
     private String title;
     private int capacity;
     private int occupied;
-    private float hourlyCharge;
+    private String entrance;
+
+    public String getEntrance() {
+        return entrance;
+    }
+
+    public void setEntrance(String entrance) {
+        this.entrance = entrance;
+    }
+
+    private String hourlyCharge;
 
     public int getCapacity() {
         return capacity;
@@ -25,11 +35,11 @@ public class InfoWindowData {
         this.occupied = occupied;
     }
 
-    public float getHourlyCharge() {
+    public String getHourlyCharge() {
         return hourlyCharge;
     }
 
-    public void setHourlyCharge(float hourlyCharge) {
+    public void setHourlyCharge(String hourlyCharge) {
         this.hourlyCharge = hourlyCharge;
     }
 
