@@ -221,6 +221,11 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             // Calculate closest houses
             HashMap<String, StreetParking> closestHouses = calculateUpTwoFour(new LatLng(latit, longtit));
 
+            if (closestHouses.size() == 0) {
+                Toast.makeText(ReportSpotActivity.this, "There isn't any StreetHouse close to you, in order to report a free spot!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             for (HashMap.Entry<String, StreetParking> entry : closestHouses.entrySet()) {
                 arrayAdapter.add(entry.getValue().getAddress());
                 addressToKey.put(entry.getValue().getAddress(), entry.getKey());
@@ -322,7 +327,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             LatLng houseLoc = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
             meters = SphericalUtil.computeDistanceBetween(currentLoc, houseLoc);
             Log.i(TAG, "meters : " + meters);
-            if (meters < 2000) {
+            if (meters < 2) {
                 nodeId = entry.getKey();
                 shortestHouse = entry.getValue();
                 house.put(nodeId, shortestHouse);
