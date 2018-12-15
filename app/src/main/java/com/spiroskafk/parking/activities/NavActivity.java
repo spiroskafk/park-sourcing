@@ -70,6 +70,10 @@ public class NavActivity extends AppCompatActivity
     // Google map
     private GoogleMap mMap;
 
+    // UI Components
+    private CardView mLegendView;
+    private Button mUnPark;
+
     // Firebase components
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
@@ -85,16 +89,12 @@ public class NavActivity extends AppCompatActivity
     // Location Service
     private FusedLocationProviderClient mFusedLocationClient;
 
-    // ParkingHouses
-    private HashMap<String, StreetParking> parkingHouses;
+    // HashMaps
+    private HashMap<String, StreetParking> streetHouses;
     private HashMap<String, RentParking> rentedHouses;
     private HashMap<String, String> markerToDBkeys;
     private HashMap<String, ParkingSpot> parkingSpots;
     private HashMap<String, PrivateParking> privateHouses;
-
-    // UI Components
-    private CardView mLegendView;
-    private Button mUnPark;
 
     // Parked street
     private String parkedStreet;
@@ -145,64 +145,63 @@ public class NavActivity extends AppCompatActivity
         autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
+        // Init HashMaps
+        streetHouses = new HashMap<String, StreetParking>();
+        rentedHouses = new HashMap<String, RentParking>();
+        markerToDBkeys = new HashMap<String, String>();
+        parkingSpots = new HashMap<String, ParkingSpot>();
+        privateHouses = new HashMap<String, PrivateParking>();
+
         // Location Service
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Init Firebase
         initFirebaseComponents();
 
-        // Init HashMaps
-        parkingHouses = new HashMap<String, StreetParking>();
-        rentedHouses = new HashMap<String, RentParking>();
-        markerToDBkeys = new HashMap<String, String>();
-        parkingSpots = new HashMap<String, ParkingSpot>();
-        privateHouses = new HashMap<String, PrivateParking>();
+
 
         // Init UI
         mLegendView = findViewById(R.id.legend_cardview);
         mUnPark = findViewById(R.id.button_unpark);
 
 
-//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("rented_parking");
-//        HashMap<String, Object> data = new HashMap<>();
-//        data.put("parked", false);
-//        ref.updateChildren(data);
+
 
     }
 
     private void setupListeners() {
+
         // Legend View
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mLegendView.getVisibility() == View.INVISIBLE) {
-                    mLegendView.setVisibility(View.VISIBLE);
-                } else {
-                    mLegendView.setVisibility(View.INVISIBLE);
-                }
+                if (mLegendView.getVisibility() == View.INVISIBLE) mLegendView.setVisibility(View.VISIBLE);
+                else mLegendView.setVisibility(View.INVISIBLE);
             }
         });
 
-        // Get Current User
+
+
+        // TODO: Unpark button will be removed, so this will not be necessary any more
+        // This is used to show / hide the unpark button
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(User.class);
-                if (user.isParked())
-                    mUnPark.setVisibility(View.VISIBLE);
-                else {
-                    mUnPark.setVisibility(View.INVISIBLE);
+                if (user != null) {
+                    if (user.isParked())
+                        mUnPark.setVisibility(View.VISIBLE);
+                    else
+                        mUnPark.setVisibility(View.INVISIBLE);
+                    }
                 }
-            }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
-
 
 
         // Unpark
@@ -238,28 +237,34 @@ public class NavActivity extends AppCompatActivity
         });
 
 
-
-        // Setup Firebase Database listener
+        // Listener For StreetHouses
         mStreetParkingRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                StreetParking ph = dataSnapshot.getValue(StreetParking.class);
-                parkingHouses.put(dataSnapshot.getKey(), ph);
-                updateMap();
+                StreetParking streetHouse = dataSnapshot.getValue(StreetParking.class);
+                if (streetHouse != null) {
+                    streetHouses.put(dataSnapshot.getKey(), streetHouse);
+                    updateMap();
+                }
 
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                StreetParking ph = dataSnapshot.getValue(StreetParking.class);
-                parkingHouses.put(dataSnapshot.getKey(), ph);
-                updateMap();
+                StreetParking streetHouse = dataSnapshot.getValue(StreetParking.class);
+                if (streetHouse != null) {
+                    streetHouses.put(dataSnapshot.getKey(), streetHouse);
+                    updateMap();
+                }
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                parkingHouses.remove(dataSnapshot.getKey());
-                updateMap();
+                StreetParking streetHouse = dataSnapshot.getValue(StreetParking.class);
+                if (streetHouse != null) {
+                    streetHouses.remove(dataSnapshot.getKey());
+                    updateMap();
+                }
             }
 
             @Override
@@ -272,19 +277,25 @@ public class NavActivity extends AppCompatActivity
         });
 
 
+        // Listener For RentedHouses
         mRentedParkingRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                RentParking rentParking = dataSnapshot.getValue(RentParking.class);
-                rentedHouses.put(dataSnapshot.getKey(), rentParking);
-                updateMap();
+                RentParking rentHouse = dataSnapshot.getValue(RentParking.class);
+                if (rentHouse != null) {
+                    rentedHouses.put(dataSnapshot.getKey(), rentHouse);
+                    updateMap();
+                }
+
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                RentParking rentParking = dataSnapshot.getValue(RentParking.class);
-                rentedHouses.put(dataSnapshot.getKey(), rentParking);
-                updateMap();
+                RentParking rentHouse = dataSnapshot.getValue(RentParking.class);
+                if (rentHouse != null) {
+                    rentedHouses.put(dataSnapshot.getKey(), rentHouse);
+                    updateMap();
+                }
             }
 
             @Override
@@ -295,6 +306,11 @@ public class NavActivity extends AppCompatActivity
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                RentParking rentHouse = dataSnapshot.getValue(RentParking.class);
+                if (rentHouse != null) {
+                    rentedHouses.remove(dataSnapshot.getKey());
+                    updateMap();
+                }
             }
 
             @Override
@@ -303,22 +319,27 @@ public class NavActivity extends AppCompatActivity
         });
 
 
+        // Listener For ParkingSpots
         mParkingSpotRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 ParkingSpot spot = dataSnapshot.getValue(ParkingSpot.class);
-                parkingSpots.put(dataSnapshot.getKey(), spot);
+                if (spot != null)
+                    parkingSpots.put(dataSnapshot.getKey(), spot);
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 ParkingSpot spot = dataSnapshot.getValue(ParkingSpot.class);
-                parkingSpots.put(dataSnapshot.getKey(), spot);
+                if (spot != null)
+                    parkingSpots.put(dataSnapshot.getKey(), spot);
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                parkingSpots.remove(dataSnapshot.getKey());
+                ParkingSpot spot = dataSnapshot.getValue(ParkingSpot.class);
+                if (spot != null)
+                    parkingSpots.remove(dataSnapshot.getKey());
             }
 
             @Override
@@ -331,25 +352,34 @@ public class NavActivity extends AppCompatActivity
         });
 
 
+        // Listener For PrivateParking
         mPrivateHouseRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                PrivateParking comp = dataSnapshot.getValue(PrivateParking.class);
-                privateHouses.put(dataSnapshot.getKey(), comp);
-                updateMap();
+                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
+                if (privateHouse != null) {
+                    privateHouses.put(dataSnapshot.getKey(), privateHouse);
+                    updateMap();
+                }
+
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                PrivateParking comp = dataSnapshot.getValue(PrivateParking.class);
-                privateHouses.put(dataSnapshot.getKey(), comp);
-                updateMap();
+                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
+                if (privateHouse != null) {
+                    privateHouses.put(dataSnapshot.getKey(), privateHouse);
+                    updateMap();
+                }
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                //privateHouses.remove(dataSnapshot.getKey());
-                //updateMap();
+                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
+                if (privateHouse != null) {
+                    privateHouses.remove(dataSnapshot.getKey());
+                    updateMap();
+                }
             }
 
             @Override
@@ -373,8 +403,8 @@ public class NavActivity extends AppCompatActivity
         if (parkingHouseId != null) {
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("street_parking").child(parkingHouseId);
             HashMap<String, Object> data = new HashMap<>();
-            Log.i(TAG, "ParkingHouse: " + parkingHouses.get(parkingHouseId).getAddress());
-            data.put("occupied", parkingHouses.get(parkingHouseId).getOccupied() + value);
+            Log.i(TAG, "ParkingHouse: " + streetHouses.get(parkingHouseId).getAddress());
+            data.put("occupied", streetHouses.get(parkingHouseId).getOccupied() + value);
             ref.updateChildren(data);
         }
     }
@@ -450,7 +480,7 @@ public class NavActivity extends AppCompatActivity
         }
 
         // Street Parking
-        for (final HashMap.Entry<String, StreetParking> entry : parkingHouses.entrySet()) {
+        for (final HashMap.Entry<String, StreetParking> entry : streetHouses.entrySet()) {
             // BUG: When freespots=1 and user parks, marker dissapears (parkinghouse removed from HashMap)
             // When user unparks, crashes
             // TEMP SOLUTION
@@ -552,7 +582,7 @@ public class NavActivity extends AppCompatActivity
         final String id = markerToDBkeys.get(marker.getId());
 
         // Get the ParkingHouse that the User has pressed
-        final StreetParking house = parkingHouses.get(id);
+        final StreetParking house = streetHouses.get(id);
 
         // If user is not parked, park his car here!
         if (house != null && !user.isParked()) {
@@ -602,8 +632,7 @@ public class NavActivity extends AppCompatActivity
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
             HashMap<String, Object> data = new HashMap<>();
             data.put("parked", true);
-            data.put("latit", parkingHouses.get(parkingHouseId).getLatit());
-            data.put("longtit", parkingHouses.get(parkingHouseId).getLongtit());
+            data.put("parkingHouseId", parkingHouseId);
             ref.updateChildren(data);
             user.setParked(true);
 

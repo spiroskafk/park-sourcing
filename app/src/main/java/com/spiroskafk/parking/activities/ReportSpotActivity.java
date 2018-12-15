@@ -1,13 +1,18 @@
 package com.spiroskafk.parking.activities;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -23,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,10 +63,15 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     // GMap
     private GoogleMap mMap;
 
+    // HashMaps
+    private HashMap<String, StreetParking> streetHouses;
+    private HashMap<String, ParkingSpot> parkingSpots;
+
     // Firebase components
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mDbRef;
+    private DatabaseReference mStreetParkingRef;
     private DatabaseReference mParkingSpotDBRef;
+    private DatabaseReference mUsersRef;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private FirebaseFunctions mFunctions;
@@ -77,13 +88,14 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
     // Parking Houses
     private HashMap<String, StreetParking> houses;
-    // Parking Spots
-    private HashMap<String, ParkingSpot> parkingSpots;
+
 
     // Holds the userID that reports the current position as free
     private String userID;
 
     PowerMenu powerMenu;
+
+    private ArrayList<String> items;
 
     private User user;
 
@@ -100,243 +112,199 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private void setupListeners() {
-//        final List<PowerMenuItem> list = new ArrayList<PowerMenuItem>();
-//        list.add(new PowerMenuItem("Θέση ΑΜΕΑ", false));
-//        list.add(new PowerMenuItem("Θέση Επισκεπτών", false));
-//        list.add(new PowerMenuItem("Δημοτικό Πάρκινγκ", false));
-//        list.add(new PowerMenuItem("Θέση Μόνιμης Κατοικίας", false));
 
-        // Popup window list
-        mLeaveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                powerMenu = new PowerMenu.Builder(getApplicationContext())
-//                        .addItemList(list)
-//                        .setAnimation(MenuAnimation.SHOW_UP_CENTER)
-//                        .setMenuRadius(10f)
-//                        .setMenuShadow(10f)
-//                        .setTextColor(getApplicationContext().getResources().getColor(R.color.black))
-//                        .setSelectedTextColor(Color.WHITE)
-//                        .setMenuColor(Color.WHITE)
-//                        .setSelectedMenuColor(getApplicationContext().getResources().getColor(R.color.colorPrimary))
-//                        .setOnMenuItemClickListener(onMenuItemClickListener)
-//                        .build();
-//
-//                powerMenu.showAtCenter(view);
-
-
-                // Show him the closest StreetParking houses
-                // Check which one is closest to the User
-                Log.i(TAG, "LATIT : " + latit + " longtit: " + longtit);;
-                HashMap<String, StreetParking> shortestHouse = calculateUpTwoFour(new LatLng(latit, longtit));
-
-                Log.i(TAG, "shortesthouses:" + shortestHouse.toString());
-
-                final List<PowerMenuItem> list = new ArrayList<PowerMenuItem>();
-
-                for (HashMap.Entry<String, StreetParking> entry : shortestHouse.entrySet()) {
-                    list.add(new PowerMenuItem(entry.getValue().getAddress(), false));
-                }
-
-                powerMenu = new PowerMenu.Builder(getApplicationContext())
-                        .addItemList(list)
-                        .setAnimation(MenuAnimation.SHOW_UP_CENTER)
-                        .setMenuRadius(10f)
-                        .setMenuShadow(10f)
-                        .setTextColor(getApplicationContext().getResources().getColor(R.color.black))
-                        .setSelectedTextColor(Color.WHITE)
-                        .setMenuColor(Color.WHITE)
-                        .setSelectedMenuColor(getApplicationContext().getResources().getColor(R.color.colorPrimary))
-                        .setOnMenuItemClickListener(onMenuItemClickListener)
-                        .build();
-
-                powerMenu.showAtCenter(view);
-
-                // The id of the ParkingHouse that is closest to the User
-                //String parkingHouseID = shortestHouse.keySet().toArray()[0].toString();
-
-            }
-        });
-
-        // onActivity initialize we get the current user
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
-        ref.addValueEventListener(new ValueEventListener() {
+        // Get User current state from database
+        mUsersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(User.class);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
+        });
 
+        // Listener For StreetHouses
+        mStreetParkingRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                StreetParking streetHouse = dataSnapshot.getValue(StreetParking.class);
+                if (streetHouse != null) {
+                    streetHouses.put(dataSnapshot.getKey(), streetHouse);
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                StreetParking streetHouse = dataSnapshot.getValue(StreetParking.class);
+                if (streetHouse != null) {
+                    streetHouses.put(dataSnapshot.getKey(), streetHouse);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                StreetParking streetHouse = dataSnapshot.getValue(StreetParking.class);
+                if (streetHouse != null) {
+                    streetHouses.remove(dataSnapshot.getKey());
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+
+        // Report Free Spot
+        mLeaveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // Get elapsed time since lastReportedTimestamp
+                long lastReportedTimestamp = user.getLastReportTimestamp();
+                final long currentTimestamp = Instant.now().toEpochMilli();
+                Date reportedDate = new Date(lastReportedTimestamp);
+                Date currentDate = new Date(currentTimestamp);
+                long minutesDiff = Utils.getDateDiff(reportedDate, currentDate, TimeUnit.MINUTES);
+
+                // Don't allow user to continually report positions
+                if (minutesDiff < 2) {
+                    Toast.makeText(ReportSpotActivity.this, "You have already reported a parking spot. You can't report so soon again!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                reportParkingSpot(currentTimestamp);
             }
         });
     }
 
+
     /**
-     * Callback method that gets fired up when the user clicks on the
-     * popup window and selects the type of spot he is reporting
+     * Report a parking spot
+     * @param currentTimestamp
      */
-    private OnMenuItemClickListener<PowerMenuItem> onMenuItemClickListener = new OnMenuItemClickListener<PowerMenuItem>() {
-        @Override
-        public void onItemClick(int position, PowerMenuItem item) {
-            Toast.makeText(getBaseContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
-            powerMenu.setSelectedPosition(position);
-            powerMenu.dismiss();
+    private void reportParkingSpot(final long currentTimestamp) {
 
-            Log.i(TAG, "Status: " + user.isParked());
-            long lastReportedTimestamp = user.getLastReportTimestamp();
-            long currentTimestamp = Instant.now().toEpochMilli();
-            Date reportedDate = new Date(lastReportedTimestamp);
-            Date currentDate = new Date(currentTimestamp);
-            long minutesDiff = Utils.getDateDiff(reportedDate, currentDate, TimeUnit.MINUTES);
+        if (!user.getParkingHouseId().equals("0")) {
+            String parkingHouseId = user.getParkingHouseId();
 
-            // We have two cases
-            // 1. User is leaving a parking spot in database
-            // 2. User is reporting a new position
+            // Update parkinghouse data
+            updateParkingHouse(parkingHouseId);
 
+            // Update user data
+            updateUserData(currentTimestamp, parkingHouseId);
 
-            // Don't let user Report again a spot, unless 2 minutes has passed
-            if (minutesDiff > 2 || user.isParked()) {
-                //if (user.isParked())
-                reportParkingSpot(item.getTitle());
+            // Create new entry in database
+            createParkingSpot(parkingHouseId, currentTimestamp);
+
+        } else {
+
+            // User is not parked in a parking house, so we promt a
+            // popup window with possible roads he is leaving from
+
+            // Collection that holds address, parkingHousesIds
+            final HashMap<String, String> addressToKey = new HashMap<String, String>();
+
+            // Popup user with the closest streets
+            AlertDialog.Builder builderSingle = new AlertDialog.Builder(ReportSpotActivity.this);
+            builderSingle.setIcon(R.drawable.icon_info_window);
+            builderSingle.setTitle("Choose Street");
+
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ReportSpotActivity.this, android.R.layout.select_dialog_singlechoice);
+
+            // Calculate closest houses
+            HashMap<String, StreetParking> closestHouses = calculateUpTwoFour(new LatLng(latit, longtit));
+
+            for (HashMap.Entry<String, StreetParking> entry : closestHouses.entrySet()) {
+                arrayAdapter.add(entry.getValue().getAddress());
+                addressToKey.put(entry.getValue().getAddress(), entry.getKey());
             }
-        }
-    };
 
+            builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
 
-    /**
-     * This method gets called when you hit the leave (parkHere) button
-     *
-     * @param title: The type of the position that is released
-     */
-    private void reportParkingSpot(String title) {
-        // First we get the User's last known position
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(final Location location) {
-                        if (location != null) {
+            builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    final String strName = arrayAdapter.getItem(which);
+                    AlertDialog.Builder builderInner = new AlertDialog.Builder(ReportSpotActivity.this);
+                    builderInner.setMessage(strName);
+                    builderInner.setTitle("You are leaving from street: ");
+                    builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog,int which) {
+                            // Report Free Spot
+                            Log.i(TAG, "Spot Leaving: " + addressToKey.get(strName));
 
-                            // ParkingHouse callback
-                            mDbRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            updateParkingHouse(addressToKey.get(strName));
 
-                                    // Get current timestamp
-                                    long timestamp = Instant.now().toEpochMilli();
+                            updateUserData(currentTimestamp, addressToKey.get(strName));
 
-                                    // User location
-                                    LatLng currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
+                            createParkingSpot(addressToKey.get(strName), currentTimestamp);
 
-                                    // Collect all ParkingHouses
-                                    houses = collectParkingHouses(dataSnapshot);
-
-                                    // Check which one is closest to the User
-                                    HashMap<String, StreetParking> shortestHouse = calculateDistance(currentLoc);
-
-                                    // The id of the ParkingHouse that is closest to the User
-                                    String parkingHouseID = shortestHouse.keySet().toArray()[0].toString();
-
-                                    // Reduce free spots on this particular ParkingHouse
-                                    updateShortestHouseData(shortestHouse);
-
-                                    // Create ParkingSpot (Associated with the closest ParkingHouse)
-                                    createParkingSpot(location, parkingHouseID, timestamp);
-
-                                    // Update User status
-                                    updateUserData(timestamp);
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) { }
-                            });
+                            dialog.dismiss();
                         }
-                    }
-                });
+                    });
+                    builderInner.show();
+                }
+            });
+            builderSingle.show();
+        }
+    }
+
+    private void updateParkingHouse(String parkingHouseId) {
+
+        if (parkingHouseId != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("street_parking").child(parkingHouseId);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("occupied", streetHouses.get(parkingHouseId).getOccupied() - 1);
+            ref.updateChildren(data);
+        }
     }
 
 
     /**
      * Creates a new ParkingSpot
-     * @param location
      * @param parkingHouseID
      */
-    private void createParkingSpot(Location location, String parkingHouseID, long timestamp) {
+    private void createParkingSpot(String parkingHouseID, long timestamp) {
 
-        // NPE Check for user
-        if (userID != null) {
+        ParkingSpot spot = new ParkingSpot(streetHouses.get(parkingHouseID).getLatit(),
+                streetHouses.get(parkingHouseID).getLongtit(), 5, timestamp, parkingHouseID, userID);
 
-            ParkingSpot spot = new ParkingSpot(location.getLatitude(),
-                    location.getLongitude(), 5, timestamp, parkingHouseID, userID);
+        // Push spot to database
+        String key = mParkingSpotDBRef.push().getKey();
+        mParkingSpotDBRef.push().setValue(spot);
 
-            // Push spot to database
-            String key = mParkingSpotDBRef.push().getKey();
-            mParkingSpotDBRef.push().setValue(spot);
-
-            // Update ParkingSpots HashMap
-            parkingSpots.put(key, spot);
-        }
+        // Update ParkingSpots HashMap
+        parkingSpots.put(key, spot);
     }
 
 
     /**
-     * Updates User status (Parked)
+     * Updates User status
      */
-    private void updateUserData(long timestamp) {
+    private void updateUserData(long timestamp, String parkingHouseId) {
 
-        // NPE Check for user
-        if (userID != null) {
-            // User is now Parked
-            user.setParked(true);
+        // Update user table
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("lastReportTimestamp", timestamp);
+        data.put("parkingHouseId", "0");
+        ref.updateChildren(data);
 
-            // Update user table
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
-            HashMap<String, Object> data = new HashMap<>();
-            data.put("parked", false);
-            data.put("lastReportTimestamp", timestamp);
-            ref.updateChildren(data);
-        }
     }
 
-
-    /**
-     * User is leaving the parking so we are updating the free spots
-     * @param house
-     */
-    private void updateShortestHouseData(HashMap<String, StreetParking> house) {
-        for (HashMap.Entry<String, StreetParking> entry : house.entrySet()) {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("street_parking").child(entry.getKey());
-            HashMap<String, Object> data = new HashMap<>();
-            data.put("occupied", entry.getValue().getOccupied() - 1);
-            ref.updateChildren(data);
-        }
-    }
-
-
-    /**
-     * @return HashMap<parkingHouseKey, ParkingHouseObject> with the shortest distance
-     */
-    private HashMap<String, StreetParking> calculateDistance(LatLng currentLoc) {
-        double shortestDist = 100000;
-        String nodeId = "";
-        StreetParking shortestHouse = new StreetParking();
-        double meters;
-        HashMap<String, StreetParking> house = new HashMap<>();
-
-        for (HashMap.Entry<String, StreetParking> entry : houses.entrySet()) {
-            LatLng houseLoc = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
-            meters = SphericalUtil.computeDistanceBetween(currentLoc, houseLoc);
-            if (meters < shortestDist) {
-                shortestDist = meters;
-                nodeId = entry.getKey();
-                shortestHouse = entry.getValue();
-            }
-        }
-
-        house.put(nodeId, shortestHouse);
-        return house;
-    }
 
 
     /**
@@ -348,33 +316,20 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         double meters;
         HashMap<String, StreetParking> house = new HashMap<>();
 
-        Log.i(TAG, "houses:: " + houses.toString());;
+        Log.i(TAG, "houses: " + streetHouses.toString());;
 
-        for (HashMap.Entry<String, StreetParking> entry : houses.entrySet()) {
+        for (HashMap.Entry<String, StreetParking> entry : streetHouses.entrySet()) {
             LatLng houseLoc = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
             meters = SphericalUtil.computeDistanceBetween(currentLoc, houseLoc);
             Log.i(TAG, "meters : " + meters);
-            if (meters < 3000) {
+            if (meters < 2000) {
                 nodeId = entry.getKey();
                 shortestHouse = entry.getValue();
                 house.put(nodeId, shortestHouse);
             }
         }
 
-
         return house;
-    }
-
-    /**
-     * Stores in a HashMap all ParkingHouses
-     */
-    private HashMap<String, StreetParking> collectParkingHouses(@NonNull DataSnapshot dataSnapshot) {
-        HashMap<String, StreetParking> houses = new HashMap<>();
-        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-            houses.put(postSnapshot.getKey(), postSnapshot.getValue(StreetParking.class));
-        }
-
-        return houses;
     }
 
 
@@ -436,37 +391,25 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         // Init UI elements
         mLeaveBtn = findViewById(R.id.button_leave);
 
-        // Init Firebase
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mDbRef = mFirebaseDatabase.getReference().child("street_parking");
-        mParkingSpotDBRef = mFirebaseDatabase.getReference().child("parking_spots");
-        mFunctions = FirebaseFunctions.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        userID = mUser.getUid();
+        // Init collections - HashMaps
+        streetHouses = new HashMap<String, StreetParking>();
+        parkingSpots = new HashMap<String, ParkingSpot>();
 
+        // Init Firebase
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mParkingSpotDBRef = mFirebaseDatabase.getReference().child("parking_spots");
+        mStreetParkingRef = mFirebaseDatabase.getReference().child("street_parking");
+        mUsersRef = mFirebaseDatabase.getReference().child("users").child(mAuth.getCurrentUser().getUid());
+        mFunctions = FirebaseFunctions.getInstance();
 
         // Init google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        parkingSpots = new HashMap<String, ParkingSpot>();
-
-        // Collect all ParkingHouses
-        mDbRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                houses = collectParkingHouses(dataSnapshot);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
     }
+
 
     /**
      * Helper method to create temp ParkingHouses
@@ -481,7 +424,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         StreetParking ph = new StreetParking(latit, longtit, address, id, type, 7, 5, 10);
 
         //Push to db
-        mDbRef.push().setValue(ph);
+        //mDbRef.push().setValue(ph);
         Toast.makeText(ReportSpotActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
     }
 
