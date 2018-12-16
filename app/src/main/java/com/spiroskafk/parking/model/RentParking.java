@@ -104,12 +104,11 @@ public class RentParking {
         this.longtit = longtit;
     }
 
-    public RentParking(String address, String userId, String id, String city, String fromDate, String untilDate, String nos, String comments, String type, Float latit, Float longtit) {
+    public RentParking(String address, String userId, String id, String fromDate, String untilDate, String nos, String comments, String type, Float latit, Float longtit) {
 
         this.address = address;
         this.id = id;
         this.userId = userId;
-        this.city = city;
         this.fromDate = fromDate;
         this.untilDate = untilDate;
         this.nos = nos;

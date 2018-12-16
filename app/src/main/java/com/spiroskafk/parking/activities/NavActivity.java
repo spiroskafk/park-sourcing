@@ -1,6 +1,9 @@
 package com.spiroskafk.parking.activities;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,7 +21,9 @@ import android.util.TimingLogger;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
@@ -104,6 +109,7 @@ public class NavActivity extends AppCompatActivity
 
     // CurrentUser
     private User user;
+
 
 
     @Override
@@ -428,7 +434,6 @@ public class NavActivity extends AppCompatActivity
                                 mMap.addMarker(new MarkerOptions()
                                         .position(new LatLng(location.getLatitude(), location.getLongitude()))
                                         .title("You are here!")
-                                        .snippet("Population: 4,627,300")
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon)));
                             } else {
 
@@ -445,9 +450,11 @@ public class NavActivity extends AppCompatActivity
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 
             final InfoWindowData info = new InfoWindowData();
-            info.setTitle("Space to rent");
             info.setAddress(entry.getValue().getAddress());
             info.setSpaces(entry.getValue().getNos());
+            info.setFrom(entry.getValue().getFromDate());
+            info.setUtil(entry.getValue().getUntilDate());
+            info.setType(entry.getValue().getType());
 
             // Get current location
             mFusedLocationClient.getLastLocation()
@@ -473,7 +480,7 @@ public class NavActivity extends AppCompatActivity
 
             Marker m = mMap.addMarker(marker);
             m.setTag(info);
-            m.setSnippet("other");
+            m.setSnippet("space_to_rent");
 
             markerToDBkeys.put(m.getId(), entry.getKey());
 
@@ -520,7 +527,7 @@ public class NavActivity extends AppCompatActivity
 
             Marker m = mMap.addMarker(marker);
             m.setTag(info);
-            m.setSnippet("other");
+            m.setSnippet("street_parking");
 
             markerToDBkeys.put(m.getId(), entry.getKey());
         }
@@ -563,7 +570,7 @@ public class NavActivity extends AppCompatActivity
             mMap.setInfoWindowAdapter(adapter);
 
             Marker m = mMap.addMarker(marker);
-            m.setSnippet("Private");
+            m.setSnippet("parking_house");
             m.setTag(info);
 
             markerToDBkeys.put(m.getId(), entry.getKey());
@@ -780,4 +787,28 @@ public class NavActivity extends AppCompatActivity
         int id = item.getItemId();
         return super.onOptionsItemSelected(item);
     }
+
+
+    /**
+     * Not Used For Now
+     * @param v
+     */
+    public void showPopup(View v) {
+        final Dialog myDialog = new Dialog(this);
+        myDialog.setContentView(R.layout.custom_popup);
+        TextView txtClose = myDialog.findViewById(R.id.close_tv);
+
+
+        txtClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myDialog.dismiss();
+            }
+        });
+
+        myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        myDialog.show();
+
+    }
+
 }

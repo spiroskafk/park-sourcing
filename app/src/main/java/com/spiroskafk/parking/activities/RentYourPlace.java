@@ -44,7 +44,6 @@ public class RentYourPlace extends AppCompatActivity {
     private EditText mFromEditText;
     private EditText mUntilEditText;
     private EditText mAddressEditText;
-    private EditText mCityEditText;
     private EditText mNOSEditText;
     private EditText mCommentsEditText;
     private Button mRentBtn;
@@ -94,7 +93,6 @@ public class RentYourPlace extends AppCompatActivity {
         // Init all UI components here
         mRentBtn = findViewById(R.id.button_rent_place);
         mAddressEditText = findViewById(R.id.edittext_address);
-        mCityEditText = findViewById(R.id.edittext_city);
         mNOSEditText = findViewById(R.id.edittext_no_spaces);
         mCommentsEditText = findViewById(R.id.edittext_comments);
         mFromEditText = findViewById(R.id.edittext_rent_from);
@@ -133,7 +131,6 @@ public class RentYourPlace extends AppCompatActivity {
             public void onClick(View view) {
                 // Check if all ui components are filled in with details
                 String address = mAddressEditText.getText().toString();
-                String city = mCityEditText.getText().toString();
                 String nos = mNOSEditText.getText().toString();
                 String fromDate = mFromEditText.getText().toString();
                 String untilDate = mUntilEditText.getText().toString();
@@ -142,7 +139,7 @@ public class RentYourPlace extends AppCompatActivity {
                 // RadioGroup input
                 int radioGroupInput = mRadioGroup.getCheckedRadioButtonId();
 
-                if (!address.isEmpty() && !city.isEmpty() && !nos.isEmpty()
+                if (!address.isEmpty() && !nos.isEmpty()
                         && !fromDate.isEmpty() && !untilDate.isEmpty() && !comments.isEmpty()
                         && radioGroupInput != -1) {
                     // All input fields are filled with details
@@ -158,13 +155,31 @@ public class RentYourPlace extends AppCompatActivity {
                     // Generate UID
                     String id = UUID.randomUUID().toString();
 
+                    String type = "";
+
+                    switch (radioGroupInput) {
+                        case 1:
+                            type = "Normal spot";
+                            break;
+
+                        case 2:
+                            type = "Big vehicle";
+                            break;
+
+                        case 3:
+                            type = "AMEA";
+                            break;
+                    }
+
                     // Create RentData
-                    RentParking rentParking = new RentParking(address, userID, id, city, fromDate, untilDate, nos, comments, String.valueOf(radioGroupInput), latit, longtit);
+                    RentParking rentParking = new RentParking(address, userID, id, fromDate, untilDate, nos, comments, type, latit, longtit);
 
 
                     // Add to firebase
                     mRentedSpotDatabaseReference.push().setValue(rentParking);
-                    Toast.makeText(RentYourPlace.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RentYourPlace.this, "You have successfully added you spot for rent!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(RentYourPlace.this, "You haven't filled in all the required details", Toast.LENGTH_SHORT).show();
                 }
 
             }
