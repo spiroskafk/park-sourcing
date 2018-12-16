@@ -445,7 +445,7 @@ public class NavActivity extends AppCompatActivity
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 
             final InfoWindowData info = new InfoWindowData();
-            info.setTitle("Rented Spot");
+            info.setTitle("Space to rent");
             info.setAddress(entry.getValue().getAddress());
             info.setSpaces(entry.getValue().getNos());
 
@@ -492,7 +492,7 @@ public class NavActivity extends AppCompatActivity
 
             Integer freeSpaces = entry.getValue().getCapacity() - entry.getValue().getOccupied();
             final InfoWindowData info = new InfoWindowData();
-            info.setTitle("Parking House");
+            info.setTitle("Street Parking");
             info.setAddress(entry.getValue().getAddress());
             info.setSpaces(freeSpaces.toString());
 
@@ -526,7 +526,7 @@ public class NavActivity extends AppCompatActivity
         }
 
 
-        // PrivateHouses - ParkingHouses
+        // ParkingHouses (Private Parking)
         for (final HashMap.Entry<String, PrivateParking> entry : privateHouses.entrySet()) {
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
@@ -534,6 +534,7 @@ public class NavActivity extends AppCompatActivity
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
             final InfoWindowData info = new InfoWindowData();
+            info.setTitle("Parking House");
             info.setAddress(entry.getValue().getAddress());
             info.setCapacity(entry.getValue().getCapacity());
             info.setOccupied(entry.getValue().getOccupied());

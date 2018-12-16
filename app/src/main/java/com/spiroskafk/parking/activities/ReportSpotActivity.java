@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -203,6 +204,8 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             // Create new entry in database
             createParkingSpot(parkingHouseId, currentTimestamp);
 
+            Toast.makeText(ReportSpotActivity.this, "You have just reported a free spot at: " + streetHouses.get(parkingHouseId).getAddress(), Toast.LENGTH_SHORT).show();
+
         } else {
 
             // User is not parked in a parking house, so we promt a
@@ -327,7 +330,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             LatLng houseLoc = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
             meters = SphericalUtil.computeDistanceBetween(currentLoc, houseLoc);
             Log.i(TAG, "meters : " + meters);
-            if (meters < 2) {
+            if (meters < 1000) {
                 nodeId = entry.getKey();
                 shortestHouse = entry.getValue();
                 house.put(nodeId, shortestHouse);
@@ -345,7 +348,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                 .position(coordinates)
                 .title(address)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
 
 
     }
@@ -419,18 +422,49 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     /**
      * Helper method to create temp ParkingHouses
      */
-    private void createParkingHouse(String type) {
+    private void createParkingHouse() {
         // Create ParkingHouse - Mikinon
-        latit = 38.297509f;
-        longtit = 21.796780f;
+        HashMap<Double, Double> latsLngs = new HashMap<Double, Double>();
 
-        String address = Utils.getStreetAddress(latit, longtit, this);
-        String id = UUID.randomUUID().toString();
-        StreetParking ph = new StreetParking(latit, longtit, address, id, type, 7, 5, 10);
+        latsLngs.put(38.224410, 21.721600);
+        latsLngs.put(38.231839, 21.725454);
+        latsLngs.put(38.235869, 21.746381);
+        latsLngs.put(38.238691, 21.744053);
+        latsLngs.put(38.244465, 21.732212);
+        latsLngs.put(38.248383, 21.739411);
+
+        latsLngs.put(38.245822, 21.743312);
+        latsLngs.put(38.253913, 21.737745);
+        latsLngs.put(38.255914, 21.746038);
+        latsLngs.put(38.258744, 21.742634);
+        latsLngs.put(38.261620, 21.743372);
+
+        latsLngs.put(38.261178, 21.754756);
+        latsLngs.put(38.264316, 21.754430);
+        latsLngs.put(38.274776, 21.743368);
+        latsLngs.put(38.278184, 21.751631);
+        latsLngs.put(38.286659, 21.778331);
+
+
+        latsLngs.put(38.286659, 21.778331);
+        latsLngs.put(38.286659, 21.778331);
+        latsLngs.put(38.286659, 21.778331);
+        latsLngs.put(38.286659, 21.778331);
+
+
+        for (HashMap.Entry<Double, Double> entry : latsLngs.entrySet()) {
+            String address = Utils.getStreetAddress(entry.getKey(), entry.getValue(), this);
+            String id = UUID.randomUUID().toString();
+            int capacity = (int )(Math.random() * 20 + 10);
+            int occupied = (int )(Math.random() * 5 + 5);
+            int points = (int )(Math.random() * 10 + 1);
+            StreetParking ph = new StreetParking(entry.getKey(), entry.getValue(), address, id, "Whatever", capacity, occupied, points);
+            mStreetParkingRef.push().setValue(ph);
+        }
 
         //Push to db
         //mDbRef.push().setValue(ph);
-        Toast.makeText(ReportSpotActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(ReportSpotActivity.this, "Προστέθηκε νέα εγγραφή στη βάση", Toast.LENGTH_SHORT).show();
     }
 
 

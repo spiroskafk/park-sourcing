@@ -2,13 +2,13 @@ package com.spiroskafk.parking.model;
 
 public class StreetParking {
 
-    private float latit;
-    private float longtit;
+    private double latit;
+    private double longtit;
     private String address;
     private String id;
     private String type;
 
-    public StreetParking(float latit, float longtit, String address, String id, String type, int capacity, int occupied, int points) {
+    public StreetParking(double latit, double longtit, String address, String id, String type, int capacity, int occupied, int points) {
         this.latit = latit;
         this.longtit = longtit;
         this.address = address;
@@ -19,19 +19,19 @@ public class StreetParking {
         this.points = points;
     }
 
-    public float getLatit() {
+    public double getLatit() {
         return latit;
     }
 
-    public void setLatit(float latit) {
+    public void setLatit(double latit) {
         this.latit = latit;
     }
 
-    public float getLongtit() {
+    public double getLongtit() {
         return longtit;
     }
 
-    public void setLongtit(float longtit) {
+    public void setLongtit(double longtit) {
         this.longtit = longtit;
     }
 
