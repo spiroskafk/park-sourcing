@@ -11,9 +11,24 @@ public class RentParking {
     private String nos;
     private String comments;
     private String type;
-    private Float latit;
+    private double latit;
+    private double longtit;
 
     public RentParking() {
+    }
+
+    public RentParking(String address, String userId, String id, String fromDate, String untilDate, String nos, String comments, String type, double latit, double longtit) {
+
+        this.address = address;
+        this.id = id;
+        this.userId = userId;
+        this.fromDate = fromDate;
+        this.untilDate = untilDate;
+        this.nos = nos;
+        this.comments = comments;
+        this.type = type;
+        this.latit = latit;
+        this.longtit = longtit;
     }
 
     public String getAddress() {
@@ -44,16 +59,16 @@ public class RentParking {
         return fromDate;
     }
 
+    public void setFromDate(String fromDate) {
+        this.fromDate = fromDate;
+    }
+
     public String getUserId() {
         return userId;
     }
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public void setFromDate(String fromDate) {
-        this.fromDate = fromDate;
     }
 
     public String getUntilDate() {
@@ -88,37 +103,21 @@ public class RentParking {
         this.type = type;
     }
 
-    public Float getLatit() {
+    public double getLatit() {
         return latit;
     }
 
-    public void setLatit(Float latit) {
+    public void setLatit(double latit) {
         this.latit = latit;
     }
 
-    public Float getLongtit() {
+    public double getLongtit() {
         return longtit;
     }
 
-    public void setLongtit(Float longtit) {
+    public void setLongtit(double longtit) {
         this.longtit = longtit;
     }
-
-    public RentParking(String address, String userId, String id, String fromDate, String untilDate, String nos, String comments, String type, Float latit, Float longtit) {
-
-        this.address = address;
-        this.id = id;
-        this.userId = userId;
-        this.fromDate = fromDate;
-        this.untilDate = untilDate;
-        this.nos = nos;
-        this.comments = comments;
-        this.type = type;
-        this.latit = latit;
-        this.longtit = longtit;
-    }
-
-    private Float longtit;
 
 
 }

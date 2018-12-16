@@ -1,6 +1,9 @@
 package com.spiroskafk.parking.activities;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -53,9 +56,6 @@ public class RentYourPlace extends AppCompatActivity {
 
     // Rest
     Calendar myCalendar = Calendar.getInstance();
-    private static float latit;
-    private static float longtit;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +80,7 @@ public class RentYourPlace extends AppCompatActivity {
         // Init firebase
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mRentedSpotDatabaseReference = mFirebaseDatabase.getReference().child("rented_spots");
+        mRentedSpotDatabaseReference = mFirebaseDatabase.getReference().child("rented_parking");
         // Init Location Services
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -129,61 +129,83 @@ public class RentYourPlace extends AppCompatActivity {
         mRentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Check if all ui components are filled in with details
-                String address = mAddressEditText.getText().toString();
-                String nos = mNOSEditText.getText().toString();
-                String fromDate = mFromEditText.getText().toString();
-                String untilDate = mUntilEditText.getText().toString();
-                String comments = mCommentsEditText.getText().toString();
 
-                // RadioGroup input
-                int radioGroupInput = mRadioGroup.getCheckedRadioButtonId();
+                Activity host = (Activity) view.getContext();
 
-                if (!address.isEmpty() && !nos.isEmpty()
-                        && !fromDate.isEmpty() && !untilDate.isEmpty() && !comments.isEmpty()
-                        && radioGroupInput != -1) {
-                    // All input fields are filled with details
-                    // Create new entry in database
-
-                    // Get location
-                    getCurrentLocation();
-
-                    // First, getUser ID
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    String userID = user.getUid();
-
-                    // Generate UID
-                    String id = UUID.randomUUID().toString();
-
-                    String type = "";
-
-                    switch (radioGroupInput) {
-                        case 1:
-                            type = "Normal spot";
-                            break;
-
-                        case 2:
-                            type = "Big vehicle";
-                            break;
-
-                        case 3:
-                            type = "AMEA";
-                            break;
-                    }
-
-                    // Create RentData
-                    RentParking rentParking = new RentParking(address, userID, id, fromDate, untilDate, nos, comments, type, latit, longtit);
-
-
-                    // Add to firebase
-                    mRentedSpotDatabaseReference.push().setValue(rentParking);
-                    Toast.makeText(RentYourPlace.this, "You have successfully added you spot for rent!", Toast.LENGTH_SHORT).show();
+                // Get current location
+                if (!Permissions.Check_FINE_LOCATION(RentYourPlace.this)) {
+                    //if not permisson granted so request permisson with request code
+                    Permissions.Request_FINE_LOCATION(RentYourPlace.this, 22);
                 } else {
-                    Toast.makeText(RentYourPlace.this, "You haven't filled in all the required details", Toast.LENGTH_SHORT).show();
+                    mFusedLocationClient.getLastLocation()
+                            .addOnSuccessListener(host, new OnSuccessListener<Location>() {
+                                @Override
+                                public void onSuccess(Location location) {
+                                    // Got last known location. In some rare situations this can be null.
+                                    if (location != null) {
+                                        rentSpot(location.getLatitude(), location.getLongitude());
+                                    } else {
+
+                                    }
+                                }
+                            });
                 }
 
             }
         });
+    }
+
+    private void rentSpot(double latit, double longtit) {
+        // Check if all ui components are filled in with details
+        String address = mAddressEditText.getText().toString();
+        String nos = mNOSEditText.getText().toString();
+        String fromDate = mFromEditText.getText().toString();
+        String untilDate = mUntilEditText.getText().toString();
+        String comments = mCommentsEditText.getText().toString();
+
+        // RadioGroup input
+        int radioGroupInput = mRadioGroup.getCheckedRadioButtonId();
+
+        if (!address.isEmpty() && !nos.isEmpty()
+                && !fromDate.isEmpty() && !untilDate.isEmpty() && !comments.isEmpty()
+                && radioGroupInput != -1) {
+            // All input fields are filled with details
+            // Create new entry in database
+
+
+            // First, getUser ID
+            FirebaseUser user = mAuth.getCurrentUser();
+            String userID = user.getUid();
+
+            // Generate UID
+            String id = UUID.randomUUID().toString();
+
+            String type = "";
+
+            switch (radioGroupInput) {
+                case 1:
+                    type = "Normal spot";
+                    break;
+
+                case 2:
+                    type = "Big vehicle";
+                    break;
+
+                case 3:
+                    type = "AMEA";
+                    break;
+            }
+
+            // Create RentData
+            RentParking rentParking = new RentParking(address, userID, id, fromDate, untilDate, nos, comments, type, latit, longtit);
+
+
+            // Add to firebase
+            mRentedSpotDatabaseReference.push().setValue(rentParking);
+            Toast.makeText(RentYourPlace.this, "You have successfully added you spot for rent!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(RentYourPlace.this, "You haven't filled in all the required details", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void updateDateEditText(EditText et) {
@@ -244,28 +266,5 @@ public class RentYourPlace extends AppCompatActivity {
         onBackPressed();
         return true;
     }
-
-    private void getCurrentLocation() {
-        // Get current location
-        if (!Permissions.Check_FINE_LOCATION(RentYourPlace.this)) {
-            //if not permisson granted so request permisson with request code
-            Permissions.Request_FINE_LOCATION(RentYourPlace.this, 22);
-        } else {
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                latit = (float) location.getLatitude();
-                                longtit = (float) location.getLongitude();
-                            } else {
-
-                            }
-                        }
-                    });
-        }
-    }
-
 
 }
