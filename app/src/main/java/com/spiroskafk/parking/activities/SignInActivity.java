@@ -55,6 +55,7 @@ public class SignInActivity extends AppCompatActivity {
         // Initialize phase
         init();
 
+        //startActivity(new Intent(SignInActivity.this, SplashActivity.class));
 
         // Check if user is signed in, then proceed
         isSignedIn();

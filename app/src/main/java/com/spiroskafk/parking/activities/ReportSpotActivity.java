@@ -111,7 +111,6 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         // Initialize phase
         init();
 
-
         setupListeners();
     }
 
@@ -313,7 +312,10 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
         HashMap<String, Object> data = new HashMap<>();
         data.put("lastReportTimestamp", timestamp);
+        data.put("parked", false);
         data.put("parkingHouseId", "0");
+        data.put("latit", 0);
+        data.put("longtit", 0);
         ref.updateChildren(data);
 
     }
@@ -347,13 +349,31 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
 
     private void updateMap(float latit, float longtit) {
-        String address = Utils.getStreetAddress(latit, longtit, this);
-        LatLng coordinates = new LatLng(latit, longtit);
-        mMap.addMarker(new MarkerOptions()
-                .position(coordinates)
-                .title(address)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
+
+        // First check for user coordinates
+        double userLat = user.getLatit();
+        double userLong = user.getLongtit();
+
+        if (userLat != 0 && userLong != 0) {
+            // Render User on his coordinates
+            String address = Utils.getStreetAddress(userLat, userLong, this);
+            LatLng coordinates = new LatLng(userLat, userLong);
+            mMap.addMarker(new MarkerOptions()
+                    .position(coordinates)
+                    .title(address)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
+        } else {
+            // Otherwise, get status from gps
+            String address = Utils.getStreetAddress(latit, longtit, this);
+            LatLng coordinates = new LatLng(latit, longtit);
+            mMap.addMarker(new MarkerOptions()
+                    .position(coordinates)
+                    .title(address)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
+        }
+
 
 
     }

@@ -10,9 +10,28 @@ public class User {
     public int reports;
     private boolean isParked;
     private long lastReportTimestamp;
+    private double latit;
+    private double longtit;
 
+    public double getLatit() {
+        return latit;
+    }
 
-    public User(String name, String email, String type, String rating, String parkingHouseId, int rewardPoints, int reports, boolean isParked, long lastReportTimestamp) {
+    public void setLatit(double latit) {
+        this.latit = latit;
+    }
+
+    public double getLongtit() {
+        return longtit;
+    }
+
+    public void setLongtit(double longtit) {
+        this.longtit = longtit;
+    }
+
+    public User(String name, String email, String type, String rating, String parkingHouseId,
+                int rewardPoints, int reports, boolean isParked, long lastReportTimestamp,
+                double latit, double longtit) {
         this.name = name;
         this.email = email;
         this.type = type;
@@ -22,6 +41,8 @@ public class User {
         this.reports = reports;
         this.isParked = isParked;
         this.lastReportTimestamp = lastReportTimestamp;
+        this.latit = latit;
+        this.longtit = longtit;
     }
 
     public String getParkingHouseId() {

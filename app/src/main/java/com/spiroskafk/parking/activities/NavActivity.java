@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -79,6 +81,8 @@ public class NavActivity extends AppCompatActivity
     private CardView mLegendView;
     private Button mUnPark;
 
+    private long elapsedTime = 0;
+
     // Firebase components
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
@@ -116,6 +120,7 @@ public class NavActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav);
+
 
         // Initialize phase
         init();
@@ -197,6 +202,13 @@ public class NavActivity extends AppCompatActivity
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(User.class);
                 if (user != null) {
+
+                    // Render user position
+                    if (user.isParked() && user.getLatit() != 0 && user.getLongtit() != 0) {
+                        renderUserOnMap();
+                    }
+
+
                     if (user.isParked())
                         mUnPark.setVisibility(View.VISIBLE);
                     else
@@ -397,6 +409,14 @@ public class NavActivity extends AppCompatActivity
             }
         });
 
+
+    }
+
+    private void renderUserOnMap() {
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(user.getLatit(), user.getLongtit()))
+                .title("You are here!")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon)));
     }
 
 
@@ -487,6 +507,7 @@ public class NavActivity extends AppCompatActivity
         }
 
         // Street Parking
+
         for (final HashMap.Entry<String, StreetParking> entry : streetHouses.entrySet()) {
             // BUG: When freespots=1 and user parks, marker dissapears (parkinghouse removed from HashMap)
             // When user unparks, crashes
@@ -533,6 +554,7 @@ public class NavActivity extends AppCompatActivity
         }
 
 
+
         // ParkingHouses (Private Parking)
         for (final HashMap.Entry<String, PrivateParking> entry : privateHouses.entrySet()) {
             MarkerOptions marker = new MarkerOptions();
@@ -576,13 +598,14 @@ public class NavActivity extends AppCompatActivity
             markerToDBkeys.put(m.getId(), entry.getKey());
         }
 
-
         long l2 = System.nanoTime();
         Log.i(TAG, "l1-l2: " + (l2 - l1));
-
+        elapsedTime += (l2-l1);
+        Log.i(TAG, "ELAPSED: " + elapsedTime);
 
     }
 
+    
     @Override
     public void onInfoWindowClick(Marker marker) {
 
@@ -641,6 +664,8 @@ public class NavActivity extends AppCompatActivity
             HashMap<String, Object> data = new HashMap<>();
             data.put("parked", true);
             data.put("parkingHouseId", parkingHouseId);
+            data.put("latit", streetHouses.get(parkingHouseId).getLatit());
+            data.put("longtit", streetHouses.get(parkingHouseId).getLongtit());
             ref.updateChildren(data);
             user.setParked(true);
 
@@ -757,7 +782,7 @@ public class NavActivity extends AppCompatActivity
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
                         }
                     }
                 });

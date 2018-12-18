@@ -96,11 +96,22 @@ public class ProfileActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 Log.i(TAG, "User Name: " + user.getEmail());
+
+                // Trustworthyness system
+                if (user.getReports() < 10) {
+                    mRating.setText("Haven't prove himself yet");
+                } else if (user.getReports() < 20) {
+                    mRating.setText("He has build quite a name!");
+                } else if (user.getReports() < 30){
+                    mRating.setText("Trustworthy");
+                } else {
+                    mRating.setText("Totally trusted user");
+                }
+
                 mDisplayName.setText(user.getName());
                 mEmail.setText(user.getEmail().toString());
                 mReports.setText(String.valueOf(user.getReports()));
                 mPoints.setText(String.valueOf(user.getRewardPoints()));
-                mRating.setText(user.getRating());
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) { }
