@@ -170,13 +170,9 @@ public class NavActivity extends AppCompatActivity
         initFirebaseComponents();
 
 
-
         // Init UI
         mLegendView = findViewById(R.id.legend_cardview);
         mUnPark = findViewById(R.id.button_unpark);
-
-
-
 
     }
 
@@ -200,16 +196,18 @@ public class NavActivity extends AppCompatActivity
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-                if (user != null) {
+                User currentUser = dataSnapshot.getValue(User.class);
+                if (currentUser != null) {
+                    user = currentUser;
+
+                    Log.i(TAG, "User info changed!");
 
                     // Render user position
-                    if (user.isParked() && user.getLatit() != 0 && user.getLongtit() != 0) {
-                        renderUserOnMap();
-                    }
+//                    if (user.isParked() && user.getLatit() != 0 && user.getLongtit() != 0) {
+//                        renderUserOnMap();
+//                    }
 
-
-                    if (user.isParked())
+                    if (currentUser.isParked())
                         mUnPark.setVisibility(View.VISIBLE);
                     else
                         mUnPark.setVisibility(View.INVISIBLE);
@@ -409,10 +407,11 @@ public class NavActivity extends AppCompatActivity
             }
         });
 
-
     }
 
+
     private void renderUserOnMap() {
+        Log.i(TAG, "renderUseOnMap");
         mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(user.getLatit(), user.getLongtit()))
                 .title("You are here!")
@@ -441,26 +440,26 @@ public class NavActivity extends AppCompatActivity
         mMap.clear();
 
         // Get current location
-        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
-            //if not permisson granted so request permisson with request code
-            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
-        } else {
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                mMap.addMarker(new MarkerOptions()
-                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                                        .title("You are here!")
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon)));
-                            } else {
-
-                            }
-                        }
-                    });
-        }
+//        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+//            //if not permisson granted so request permisson with request code
+//            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+//        } else {
+//            mFusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            // Got last known location. In some rare situations this can be null.
+//                            if (location != null) {
+//                                mMap.addMarker(new MarkerOptions()
+//                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
+//                                        .title("You are here!")
+//                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon)));
+//                            } else {
+//
+//                            }
+//                        }
+//                    });
+//        }
 
         // Space to Rent - Blue
         for (final HashMap.Entry<String, RentParking> entry : rentedHouses.entrySet()) {
@@ -507,7 +506,6 @@ public class NavActivity extends AppCompatActivity
         }
 
         // Street Parking
-
         for (final HashMap.Entry<String, StreetParking> entry : streetHouses.entrySet()) {
             // BUG: When freespots=1 and user parks, marker dissapears (parkinghouse removed from HashMap)
             // When user unparks, crashes
@@ -554,7 +552,6 @@ public class NavActivity extends AppCompatActivity
         }
 
 
-
         // ParkingHouses (Private Parking)
         for (final HashMap.Entry<String, PrivateParking> entry : privateHouses.entrySet()) {
             MarkerOptions marker = new MarkerOptions();
@@ -598,10 +595,18 @@ public class NavActivity extends AppCompatActivity
             markerToDBkeys.put(m.getId(), entry.getKey());
         }
 
-        long l2 = System.nanoTime();
-        Log.i(TAG, "l1-l2: " + (l2 - l1));
-        elapsedTime += (l2-l1);
-        Log.i(TAG, "ELAPSED: " + elapsedTime);
+        // render user
+        if (user != null) {
+            if (user.isParked() && user.getLatit() != 0 && user.getLongtit() != 0) {
+                renderUserOnMap();
+            }
+        }
+
+//
+//        long l2 = System.nanoTime();
+//        Log.i(TAG, "l1-l2: " + (l2 - l1));
+//        elapsedTime += (l2-l1);
+//        Log.i(TAG, "ELAPSED: " + elapsedTime);
 
     }
 

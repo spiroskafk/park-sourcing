@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.utils.Permissions;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -51,6 +52,7 @@ public class SignInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
 
         // Initialize phase
         init();

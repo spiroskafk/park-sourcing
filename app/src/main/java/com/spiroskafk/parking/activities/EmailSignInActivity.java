@@ -45,6 +45,7 @@ public class EmailSignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_email_sign_in);
 
+
         init();
 
         // Checkbox listener
