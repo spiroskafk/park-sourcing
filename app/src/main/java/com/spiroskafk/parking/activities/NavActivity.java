@@ -654,7 +654,7 @@ public class NavActivity extends AppCompatActivity
             });
         } else {
             // Popup message that he is already parked
-            Toast.makeText(NavActivity.this, "Your car is already parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+            Toast.makeText(NavActivity.this, "Your car is already parked at:  " + house.getAddress(), Toast.LENGTH_SHORT).show();
         }
     }
 
