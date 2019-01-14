@@ -780,17 +780,24 @@ public class NavActivity extends AppCompatActivity
         mMap = googleMap;
         mMap.setOnInfoWindowClickListener(this);
 
-        // Get Last Known location
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+
+        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+            //if not permisson granted so request permisson with request code
+            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+        } else {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+                            } else {
+
+                            }
                         }
-                    }
-                });
+                    });
+        }
 
     }
 
