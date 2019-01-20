@@ -27,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,6 +45,10 @@ import com.skydoves.powermenu.OnMenuItemClickListener;
 import com.skydoves.powermenu.PowerMenu;
 import com.skydoves.powermenu.PowerMenuItem;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.adapters.CustomInfoWindowAdapter;
+import com.spiroskafk.parking.model.InfoWindowData;
+import com.spiroskafk.parking.model.PrivateParking;
+import com.spiroskafk.parking.model.RentParking;
 import com.spiroskafk.parking.model.StreetParking;
 import com.spiroskafk.parking.model.ParkingSpot;
 import com.spiroskafk.parking.model.User;
@@ -73,6 +78,8 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     // Firebase components
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mStreetParkingRef;
+    private DatabaseReference mPrivateParkingRef;
+    private DatabaseReference mRentedParkingRef;
     private DatabaseReference mParkingSpotDBRef;
     private DatabaseReference mUsersRef;
     private FirebaseAuth mAuth;
@@ -91,6 +98,12 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
     // Parking Houses
     private HashMap<String, StreetParking> houses;
+
+    // Private Houses
+    private HashMap<String, PrivateParking> privateHouses;
+
+    // Rent Houses
+    private HashMap<String, RentParking> rentHouses;
 
 
     // Holds the userID that reports the current position as free
@@ -165,6 +178,76 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             }
         });
 
+        mPrivateParkingRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
+                if (privateHouse != null) {
+                    privateHouses.put(dataSnapshot.getKey(), privateHouse);
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
+                if (privateHouse != null) {
+                    privateHouses.put(dataSnapshot.getKey(), privateHouse);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
+                if (privateHouse != null) {
+                    privateHouses.remove(dataSnapshot.getKey());
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+        mRentedParkingRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                RentParking rentHouse = dataSnapshot.getValue(RentParking.class);
+                if (rentHouse != null) {
+                    rentHouses.put(dataSnapshot.getKey(), rentHouse);
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                RentParking rentHouse = dataSnapshot.getValue(RentParking.class);
+                if (rentHouse != null) {
+                    rentHouses.put(dataSnapshot.getKey(), rentHouse);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                RentParking rentHouse = dataSnapshot.getValue(RentParking.class);
+                if (rentHouse != null) {
+                    rentHouses.remove(dataSnapshot.getKey());
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
 
         // Report Free Spot
         mLeaveBtn.setOnClickListener(new View.OnClickListener() {
@@ -196,24 +279,44 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
      */
     private void reportParkingSpot(final long currentTimestamp) {
 
-        if (!user.getParkingHouseId().equals("0")) {
-            String parkingHouseId = user.getParkingHouseId();
+        // TODO: Check first if user is parked in private_parking
+        final String parkingHouseId = user.getParkingHouseId();
 
+        if (privateHouses.containsKey(parkingHouseId)) {
+            // update parking house
+            updateUserData(0, parkingHouseId);
+
+            // User is reporting spot from private_house
+            updateParkingHouse(parkingHouseId, "private_parking", privateHouses.get(parkingHouseId).getOccupied() - 1);
+
+
+
+            Toast.makeText(ReportSpotActivity.this, "You have just left the Parking House", Toast.LENGTH_SHORT).show();
+
+            // update user data
+        } else if (rentHouses.containsKey(parkingHouseId)) {
+            // update parking house
+
+            // update user data
+            updateUserData(0, parkingHouseId);
+
+            //updateParkingHouse(parkingHouseId, "rented_parking", rentHouses.get(parkingHouseId).getOccupied() - 1);
+            Toast.makeText(ReportSpotActivity.this, "You have just left the Rented Spot", Toast.LENGTH_SHORT).show();
+
+
+
+        } else if (streetHouses.containsKey(parkingHouseId)) {
             // Update user data
             updateUserData(currentTimestamp, parkingHouseId);
 
             // Update parkinghouse data
-            updateParkingHouse(parkingHouseId);
-
-
+            updateParkingHouse(parkingHouseId, "street_parking", streetHouses.get(parkingHouseId).getOccupied() - 1);
 
             // Create new entry in database
             createParkingSpot(parkingHouseId, currentTimestamp);
 
             Toast.makeText(ReportSpotActivity.this, "You have just reported a free spot at: " + streetHouses.get(parkingHouseId).getAddress(), Toast.LENGTH_SHORT).show();
-
         } else {
-
             // User is not parked in a parking house, so we promt a
             // popup window with possible roads he is leaving from
 
@@ -256,11 +359,11 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                     builderInner.setTitle("You are leaving from street: ");
                     builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog,int which) {
+                        public void onClick(DialogInterface dialog, int which) {
                             // Report Free Spot
                             Log.i(TAG, "Spot Leaving: " + addressToKey.get(strName));
 
-                            updateParkingHouse(addressToKey.get(strName));
+                            updateParkingHouse(addressToKey.get(strName), "street_parking", streetHouses.get(addressToKey.get(strName)).getOccupied() - 1);
 
                             updateUserData(currentTimestamp, addressToKey.get(strName));
 
@@ -276,14 +379,33 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         }
     }
 
-    private void updateParkingHouse(String parkingHouseId) {
+    private void updateParkingHouse(String parkingHouseId, String typeOfHouse, int newOccupied) {
 
         if (parkingHouseId != null) {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("street_parking").child(parkingHouseId);
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(typeOfHouse).child(parkingHouseId);
             HashMap<String, Object> data = new HashMap<>();
-            data.put("occupied", streetHouses.get(parkingHouseId).getOccupied() - 1);
+            data.put("occupied", newOccupied);
             ref.updateChildren(data);
         }
+    }
+
+
+    /**
+     * Updates User status
+     */
+    private void updateUserData(long timestamp, String parkingHouseId) {
+
+        // Update user table
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+        HashMap<String, Object> data = new HashMap<>();
+        if (timestamp != 0)
+            data.put("lastReportTimestamp", timestamp);
+        data.put("parked", false);
+        data.put("parkingHouseId", "0");
+        data.put("latit", 0);
+        data.put("longtit", 0);
+        ref.updateChildren(data);
+
     }
 
 
@@ -305,10 +427,11 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     }
 
 
+
     /**
      * Updates User status
      */
-    private void updateUserData(long timestamp, String parkingHouseId) {
+    private void updateUserData2(long timestamp, String parkingHouseId) {
 
         // Update user table
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
@@ -352,6 +475,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
     private void updateMap(float latit, float longtit) {
 
+
         // First check for user coordinates
         double userLat = user.getLatit();
         double userLong = user.getLongtit();
@@ -390,6 +514,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
 
     private void getCurrentLocation() {
+        Log.i(TAG, "CURRENT LOCATION");
         // Get current location
         if (!Permissions.Check_FINE_LOCATION(ReportSpotActivity.this)) {
             //if not permisson granted so request permisson with request code
@@ -400,12 +525,14 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                         @Override
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
+                            Log.i(TAG, "CURRENT LOCATION again");
                             if (location != null) {
+                                Log.i(TAG, "CURRENT LOCATION");
                                 latit = (float) location.getLatitude();
                                 longtit = (float) location.getLongitude();
                                 updateMap(latit, longtit);
                             } else {
-
+                                updateMap(0, 0);
                             }
                         }
                     });
@@ -428,13 +555,17 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
         // Init collections - HashMaps
         streetHouses = new HashMap<String, StreetParking>();
+        privateHouses = new HashMap<String, PrivateParking>();
         parkingSpots = new HashMap<String, ParkingSpot>();
+        rentHouses = new HashMap<String, RentParking>();
 
         // Init Firebase
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mParkingSpotDBRef = mFirebaseDatabase.getReference().child("parking_spots");
         mStreetParkingRef = mFirebaseDatabase.getReference().child("street_parking");
+        mPrivateParkingRef = mFirebaseDatabase.getReference().child("private_parking");
+        mRentedParkingRef = mFirebaseDatabase.getReference().child("rented_parking");
         mUsersRef = mFirebaseDatabase.getReference().child("users").child(mAuth.getCurrentUser().getUid());
         mFunctions = FirebaseFunctions.getInstance();
 

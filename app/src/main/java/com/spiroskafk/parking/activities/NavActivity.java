@@ -188,10 +188,7 @@ public class NavActivity extends AppCompatActivity
             }
         });
 
-
-
-        // TODO: Unpark button will be removed, so this will not be necessary any more
-        // This is used to show / hide the unpark button
+        // Get user information
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -200,19 +197,19 @@ public class NavActivity extends AppCompatActivity
                 if (currentUser != null) {
                     user = currentUser;
 
-                    Log.i(TAG, "User info changed!");
-
-                    // Render user position
-                    if (user.isParked() && user.getLatit() != 0 && user.getLongtit() != 0) {
-                        renderUserOnMap();
-                    }
-
-                    if (currentUser.isParked())
-                        mUnPark.setVisibility(View.VISIBLE);
-                    else
-                        mUnPark.setVisibility(View.INVISIBLE);
+                    // Get user locatioon
+                    if (user.getParkingHouseId() == "0") {
+                        // Use the GPS lat/lng
+                        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+                            //if not permisson granted so request permisson with request code
+                            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+                            getCurrentLocation();
+                        } else {
+                            getCurrentLocation();
+                        }
                     }
                 }
+            }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -220,21 +217,6 @@ public class NavActivity extends AppCompatActivity
         });
 
 
-        // Unpark
-        mUnPark.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (user.isParked()) {
-                    user.setParked(false);
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
-                    HashMap<String, Object> data = new HashMap<>();
-                    data.put("parked", false);
-                    ref.updateChildren(data);
-                    mUnPark.setVisibility(View.INVISIBLE);
-                    updateParkingHouse(-1);
-                }
-            }
-        });
 
         // Setup AutoComplete listener
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -253,7 +235,7 @@ public class NavActivity extends AppCompatActivity
         });
 
 
-        // Listener For StreetHouses
+        // Listener For StreetHouses+
         mStreetParkingRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -392,7 +374,16 @@ public class NavActivity extends AppCompatActivity
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
                 if (privateHouse != null) {
-                    privateHouses.put(dataSnapshot.getKey(), privateHouse);
+                    if (privateHouse != null) {
+                        if (user != null && user.isParked()) {
+                            Log.i(TAG, "Not null user");
+                            privateHouses.remove(dataSnapshot.getKey());
+                        } else {
+                            Log.i(TAG, "Street House: " + privateHouse.toString());
+                            privateHouses.put(dataSnapshot.getKey(), privateHouse);
+                        }
+                    }
+                    //privateHouses.put(dataSnapshot.getKey(), privateHouse);
                     updateMap();
                 }
             }
@@ -417,21 +408,59 @@ public class NavActivity extends AppCompatActivity
 
     }
 
+    private void getCurrentLocation() {
+        // Get current location
+        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+            //if not permisson granted so request permisson with request code
+            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+        } else {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                updateUserLatLng(location.getLatitude(), location.getLongitude());
+                                //renderUserOnMap();
+                            } else {
+
+                            }
+                        }
+                    });
+        }
+    }
+
 
     private void renderUserOnMap() {
         Log.i(TAG, "renderUseOnMap");
 
-        MarkerOptions marker = new MarkerOptions();
-        marker.position(new LatLng(user.getLatit(), user.getLongtit()))
-            .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon));
+        // Get latest lat/lng
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User currentUser = dataSnapshot.getValue(User.class);
+                if (currentUser != null) {
+                    Log.i(TAG, "HI");;
+                    MarkerOptions marker = new MarkerOptions();
+                    marker.position(new LatLng(currentUser.getLatit(), currentUser.getLongtit()))
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon));
 
-        final InfoWindowData info = new InfoWindowData();
-        CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
-        mMap.setInfoWindowAdapter(adapter);
+                    final InfoWindowData info = new InfoWindowData();
+                    CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
+                    mMap.setInfoWindowAdapter(adapter);
 
-        Marker m = mMap.addMarker(marker);
-        m.setTag(info);
-        m.setSnippet("user_info");
+                    Marker m = mMap.addMarker(marker);
+                    m.setTag(info);
+                    m.setSnippet("user_info");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
     }
@@ -448,6 +477,21 @@ public class NavActivity extends AppCompatActivity
             HashMap<String, Object> data = new HashMap<>();
             Log.i(TAG, "ParkingHouse: " + streetHouses.get(parkingHouseId).getAddress());
             data.put("occupied", streetHouses.get(parkingHouseId).getOccupied() + value);
+            ref.updateChildren(data);
+        }
+    }
+
+    /**
+     * Updates the ParkingHouse data that the user has just parked!
+     * @param value
+     */
+    private void updatePrivateHouse(int value) {
+
+        if (parkingHouseId != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("private_parking").child(parkingHouseId);
+            HashMap<String, Object> data = new HashMap<>();
+            Log.i(TAG, "ParkingHouse: " + privateHouses.get(parkingHouseId).getAddress());
+            data.put("occupied", privateHouses.get(parkingHouseId).getOccupied() + value);
             ref.updateChildren(data);
         }
     }
@@ -613,69 +657,112 @@ public class NavActivity extends AppCompatActivity
             markerToDBkeys.put(m.getId(), entry.getKey());
         }
 
-        // render user
-//        if (user != null) {
-//            if (user.isParked() && user.getLatit() != 0 && user.getLongtit() != 0) {
-//                renderUserOnMap();
-//            }
-//        }
-
-
-
-//
-//        long l2 = System.nanoTime();
-//        Log.i(TAG, "l1-l2: " + (l2 - l1));
-//        elapsedTime += (l2-l1);
-//        Log.i(TAG, "ELAPSED: " + elapsedTime);
-
+        if (user != null) {
+            Log.i(TAG, "Gonna render user position");
+            renderUserOnMap();
+        }
     }
 
     
     @Override
     public void onInfoWindowClick(Marker marker) {
 
+        Log.i(TAG, marker.getSnippet());
+
+        String typeOfMarker = marker.getSnippet();
+
         // Get the marker id that User has pressed
         final String id = markerToDBkeys.get(marker.getId());
 
-        // Get the ParkingHouse that the User has pressed
-        final StreetParking house = streetHouses.get(id);
+        if (typeOfMarker.equals("street_parking")) {
+            // Get the ParkingHouse that the User has pressed
+            final StreetParking house = streetHouses.get(id);
 
-        // If user is not parked, park his car here!
-        if (house != null && !user.isParked()) {
-            mStreetParkingRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            // If user is not parked, park his car here!
+            if (house != null && !user.isParked()) {
+                mStreetParkingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    // Update ParkingHouseId
-                    parkingHouseId = id;
+                        // Update ParkingHouseId
+                        parkingHouseId = id;
 
-                    // Update ParkingHouse stats
-                    updateParkingHouse(1);
+                        // Update ParkingHouse stats
+                        updateParkingHouse(1);
 
-                    parkedStreet = house.getAddress();
+                        parkedStreet = house.getAddress();
 
-                    // Updates User status
-                    updateUserStatus();
+                        // Updates User status
+                        updateUserStatus();
 
-                    // Find the user that has reported this position and update his points
-                    String reportedSpotUserId = findUserReportedSpot(id);
+                        // Find the user that has reported this position and update his points
+                        String reportedSpotUserId = findUserReportedSpot(id);
 
-                    // Handle: If the same user reported this position and parks here, don't award him points
-                    if (!mAuth.getCurrentUser().getUid().equals(reportedSpotUserId)) {
-                        rewardPoints(reportedSpotUserId);
+                        // Handle: If the same user reported this position and parks here, don't award him points
+                        Log.i(TAG, "Gonna reward points");
+                        if (!mAuth.getCurrentUser().getUid().equals(reportedSpotUserId)) {
+                            Log.i(TAG, "REWARD");
+                            rewardPoints(reportedSpotUserId);
+                        }
+
+                        mUnPark.setVisibility(View.VISIBLE);
+                        Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+
                     }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {}
+                });
+            } else {
+                // Popup message that he is already parked
+                Toast.makeText(NavActivity.this, "Your car is already parked at:  " + house.getAddress(), Toast.LENGTH_SHORT).show();
+            }
+        } else if (typeOfMarker.equals("parking_house")) {
+            // Get the ParkingHouse that the User has pressed
+            final PrivateParking house = privateHouses.get(id);
 
-                    mUnPark.setVisibility(View.VISIBLE);
-                    Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "PrivateHouse: " + house.getAddress());
 
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {}
-            });
-        } else {
-            // Popup message that he is already parked
-            Toast.makeText(NavActivity.this, "Your car is already parked at:  " + house.getAddress(), Toast.LENGTH_SHORT).show();
+            // If user is not parked, park his car here!
+            if (house != null && !user.isParked()) {
+                mPrivateHouseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        // Update ParkingHouseId
+                        parkingHouseId = id;
+
+                        Log.i(TAG, "ParkingHouseId: " + parkingHouseId);
+
+                        // Update ParkingHouse stats
+                        updatePrivateHouse(1);
+
+                        parkedStreet = house.getAddress();
+
+                        // Updates User status
+                        updateUserStatus2();
+
+                        // Find the user that has reported this position and update his points
+                        String reportedSpotUserId = findUserReportedSpot(id);
+
+                        // Handle: If the same user reported this position and parks here, don't award him points
+                        if (!mAuth.getCurrentUser().getUid().equals(reportedSpotUserId)) {
+                            rewardPoints(reportedSpotUserId);
+                        }
+
+                        mUnPark.setVisibility(View.VISIBLE);
+                        Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {}
+                });
+            } else {
+                // Popup message that he is already parked
+                Toast.makeText(NavActivity.this, "Your car is already parked at:  " + house.getAddress(), Toast.LENGTH_SHORT).show();
+            }
         }
+
+
     }
 
 
@@ -691,6 +778,37 @@ public class NavActivity extends AppCompatActivity
             data.put("parkingHouseId", parkingHouseId);
             data.put("latit", streetHouses.get(parkingHouseId).getLatit());
             data.put("longtit", streetHouses.get(parkingHouseId).getLongtit());
+            ref.updateChildren(data);
+            user.setParked(true);
+
+            // Erase marker from map
+
+        }
+    }
+
+    private void updateUserLatLng(double latit, double longtit) {
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("latit", latit);
+        data.put("longtit", longtit);
+        ref.updateChildren(data);
+//        user.setLatit(latit);
+//        user.setLongtit(longtit);
+    }
+
+    /**
+     * Updates User status on database
+     */
+    private void updateUserStatus2() {
+
+        if (parkingHouseId != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("parked", true);
+            data.put("parkingHouseId", parkingHouseId);
+            data.put("latit", privateHouses.get(parkingHouseId).getLatit());
+            data.put("longtit", privateHouses.get(parkingHouseId).getLongtit());
             ref.updateChildren(data);
             user.setParked(true);
 
@@ -800,25 +918,23 @@ public class NavActivity extends AppCompatActivity
         mMap = googleMap;
         mMap.setOnInfoWindowClickListener(this);
 
-
-
-        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
-            //if not permisson granted so request permisson with request code
-            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
-        } else {
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
-                            } else {
-
-                            }
-                        }
-                    });
-        }
+//        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+//            //if not permisson granted so request permisson with request code
+//            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+//        } else {
+//            mFusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            // Got last known location. In some rare situations this can be null.
+//                            if (location != null) {
+//                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+//                            } else {
+//
+//                            }
+//                        }
+//                    });
+//        }
 
     }
 
