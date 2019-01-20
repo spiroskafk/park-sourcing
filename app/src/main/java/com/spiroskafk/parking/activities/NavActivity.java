@@ -702,7 +702,9 @@ public class NavActivity extends AppCompatActivity
                         Log.i(TAG, "Gonna reward points");
                         if (!mAuth.getCurrentUser().getUid().equals(reportedSpotUserId)) {
                             Log.i(TAG, "REWARD");
-                            rewardPoints(reportedSpotUserId);
+                            rewardReports(reportedSpotUserId);
+                            // Reward points
+                            rewardPoints(parkingHouseId);
                         }
 
                         mUnPark.setVisibility(View.VISIBLE);
@@ -746,7 +748,7 @@ public class NavActivity extends AppCompatActivity
 
                         // Handle: If the same user reported this position and parks here, don't award him points
                         if (!mAuth.getCurrentUser().getUid().equals(reportedSpotUserId)) {
-                            rewardPoints(reportedSpotUserId);
+                            rewardReports(reportedSpotUserId);
                         }
 
                         mUnPark.setVisibility(View.VISIBLE);
@@ -763,6 +765,20 @@ public class NavActivity extends AppCompatActivity
         }
 
 
+    }
+
+    private void rewardPoints(String houseId) {
+        for (HashMap.Entry<String, ParkingSpot> entry : parkingSpots.entrySet()) {
+            if (entry.getValue().getParkingHouseID().equals(houseId)) {
+                // Parking Spot Id
+                int rewardPoints = entry.getValue().getReward();
+                // Update userID, with those reward points
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+                HashMap<String, Object> data = new HashMap<>();
+                data.put("rewardPoints", user.getRewardPoints() + rewardPoints);
+                ref.updateChildren(data);
+            }
+        }
     }
 
 
@@ -854,7 +870,7 @@ public class NavActivity extends AppCompatActivity
      * Updates user report points
      * @param userId
      */
-    private void rewardPoints(final String userId) {
+    private void rewardReports(final String userId) {
         // First get user data
         if (userId != null) {
             mUsersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -918,23 +934,23 @@ public class NavActivity extends AppCompatActivity
         mMap = googleMap;
         mMap.setOnInfoWindowClickListener(this);
 
-//        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
-//            //if not permisson granted so request permisson with request code
-//            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
-//        } else {
-//            mFusedLocationClient.getLastLocation()
-//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                        @Override
-//                        public void onSuccess(Location location) {
-//                            // Got last known location. In some rare situations this can be null.
-//                            if (location != null) {
-//                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
-//                            } else {
-//
-//                            }
-//                        }
-//                    });
-//        }
+        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+            //if not permisson granted so request permisson with request code
+            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+        } else {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+                            } else {
+
+                            }
+                        }
+                    });
+        }
 
     }
 

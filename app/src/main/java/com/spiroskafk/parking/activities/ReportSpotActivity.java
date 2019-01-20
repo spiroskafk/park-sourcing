@@ -136,6 +136,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(User.class);
+                userID = dataSnapshot.getKey();
             }
 
             @Override
@@ -414,6 +415,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
      * @param parkingHouseID
      */
     private void createParkingSpot(String parkingHouseID, long timestamp) {
+
 
         ParkingSpot spot = new ParkingSpot(streetHouses.get(parkingHouseID).getLatit(),
                 streetHouses.get(parkingHouseID).getLongtit(), 5, timestamp, parkingHouseID, userID);

@@ -19,6 +19,7 @@ public class ParkingSpot {
         this.reward = reward;
         this.timestamp = timestamp;
         this.parkingHouseID = parkingHouseID;
+        this.userID = userID;
     }
 
     public String getUserID() {
