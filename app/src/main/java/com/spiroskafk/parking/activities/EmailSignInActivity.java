@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -116,6 +117,7 @@ public class EmailSignInActivity extends AppCompatActivity {
 
                                 String userType = dataSnapshot.child("type").getValue().toString();
                                 if (userType.equals("user") && mUserCheckBbox.isChecked()) {
+                                    Log.i(TAG, "User signed in");
                                     Toast.makeText(EmailSignInActivity.this, "User signed in", Toast.LENGTH_SHORT).show();
                                     finish();
                                     startActivity(new Intent(EmailSignInActivity.this, NavActivity.class));

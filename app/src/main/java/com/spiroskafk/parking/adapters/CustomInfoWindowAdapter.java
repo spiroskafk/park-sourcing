@@ -85,6 +85,15 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
             return view;
 
+        } else if (marker.getSnippet().equals("user_info")) {
+            View view = ((Activity) context).getLayoutInflater().inflate(R.layout.user_info_window, null);
+//            TextView mAddressTv = view.findViewById(R.id.address_user_position_tv);
+
+            InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
+
+//            mAddressTv.setText(infoWindowData.getAddress());
+
+            return view;
         }
 
         return null;

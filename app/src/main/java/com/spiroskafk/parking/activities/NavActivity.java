@@ -203,9 +203,9 @@ public class NavActivity extends AppCompatActivity
                     Log.i(TAG, "User info changed!");
 
                     // Render user position
-//                    if (user.isParked() && user.getLatit() != 0 && user.getLongtit() != 0) {
-//                        renderUserOnMap();
-//                    }
+                    if (user.isParked() && user.getLatit() != 0 && user.getLongtit() != 0) {
+                        renderUserOnMap();
+                    }
 
                     if (currentUser.isParked())
                         mUnPark.setVisibility(View.VISIBLE);
@@ -268,8 +268,16 @@ public class NavActivity extends AppCompatActivity
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 StreetParking streetHouse = dataSnapshot.getValue(StreetParking.class);
+                Log.i(TAG, "Street position changed!");
                 if (streetHouse != null) {
-                    streetHouses.put(dataSnapshot.getKey(), streetHouse);
+                    if (user != null && user.isParked()) {
+                        Log.i(TAG, "Not null user");
+                        streetHouses.remove(dataSnapshot.getKey());
+                    } else {
+                        Log.i(TAG, "Street House: " + streetHouse.toString());
+                        streetHouses.put(dataSnapshot.getKey(), streetHouse);
+                    }
+
                     updateMap();
                 }
             }
@@ -412,10 +420,20 @@ public class NavActivity extends AppCompatActivity
 
     private void renderUserOnMap() {
         Log.i(TAG, "renderUseOnMap");
-        mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(user.getLatit(), user.getLongtit()))
-                .title("You are here!")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon)));
+
+        MarkerOptions marker = new MarkerOptions();
+        marker.position(new LatLng(user.getLatit(), user.getLongtit()))
+            .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon));
+
+        final InfoWindowData info = new InfoWindowData();
+        CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
+        mMap.setInfoWindowAdapter(adapter);
+
+        Marker m = mMap.addMarker(marker);
+        m.setTag(info);
+        m.setSnippet("user_info");
+
+
     }
 
 
@@ -596,11 +614,13 @@ public class NavActivity extends AppCompatActivity
         }
 
         // render user
-        if (user != null) {
-            if (user.isParked() && user.getLatit() != 0 && user.getLongtit() != 0) {
-                renderUserOnMap();
-            }
-        }
+//        if (user != null) {
+//            if (user.isParked() && user.getLatit() != 0 && user.getLongtit() != 0) {
+//                renderUserOnMap();
+//            }
+//        }
+
+
 
 //
 //        long l2 = System.nanoTime();
@@ -779,6 +799,7 @@ public class NavActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnInfoWindowClickListener(this);
+
 
 
         if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {

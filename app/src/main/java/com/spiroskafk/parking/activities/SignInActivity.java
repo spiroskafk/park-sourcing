@@ -23,19 +23,30 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.model.User;
 import com.spiroskafk.parking.utils.Permissions;
+import com.spiroskafk.parking.utils.Utils;
+
+import okhttp3.internal.Util;
 
 public class SignInActivity extends AppCompatActivity {
 
     // Log TAG
     private static final String TAG = SignInActivity.class.getSimpleName();
-    // Rest
+
+    // Sign in request code
     private static final int RC_SIGN_IN = 1;
-    // Firebase
+
+    // Firebase variables
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseDatabase mFirebaseDatabase;
     private Firebase ref;
 
     // UI components
@@ -45,14 +56,12 @@ public class SignInActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private Boolean exit = false;
 
-    private FirebaseDatabase mFirebaseDatabase;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-
 
         // Initialize phase
         init();
@@ -61,7 +70,6 @@ public class SignInActivity extends AppCompatActivity {
 
         // Check if user is signed in, then proceed
         isSignedIn();
-
 
 
         // GSign in
@@ -113,14 +121,30 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = mAuth.getCurrentUser();
-                //Log.i(TAG, "User:: " + user.toString());
                 if (user != null) {
-                    Log.i(TAG, "USER IS SIGNED IN");
-                    // Launch sign in activity
-                    startActivity(new Intent(SignInActivity.this, NavActivity.class));
+                    Log.i(TAG, "mAuth user : " + mAuth.getCurrentUser().getUid());
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            User currentUser = dataSnapshot.getValue(User.class);
+                            if (currentUser != null) {
+                                String userType = currentUser.getType();
+                                if (userType != null) {
+                                    if (userType.equals("user")) {
+                                        startActivity(new Intent(SignInActivity.this, NavActivity.class));
+                                    } else if (userType.equals("company")) {
+                                        startActivity(new Intent(SignInActivity.this, CompanyNavActivity.class));
+                                    }
+                                }
+                            }
+                        }
 
-                } else {
-                    Log.i(TAG, "NOT SIGNED IN");
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             }
         };

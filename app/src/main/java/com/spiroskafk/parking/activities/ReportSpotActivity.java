@@ -199,11 +199,13 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         if (!user.getParkingHouseId().equals("0")) {
             String parkingHouseId = user.getParkingHouseId();
 
+            // Update user data
+            updateUserData(currentTimestamp, parkingHouseId);
+
             // Update parkinghouse data
             updateParkingHouse(parkingHouseId);
 
-            // Update user data
-            updateUserData(currentTimestamp, parkingHouseId);
+
 
             // Create new entry in database
             createParkingSpot(parkingHouseId, currentTimestamp);
