@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.activities.SplashActivity;
 import com.spiroskafk.parking.activities.company.CompanyActivity;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
@@ -130,7 +131,8 @@ public class SignInActivity extends AppCompatActivity {
                                 String userType = currentUser.getType();
                                 if (userType != null) {
                                     if (userType.equals("user")) {
-                                        startActivity(new Intent(SignInActivity.this, UserActivity.class));
+                                        //startActivity(new Intent(SignInActivity.this, UserActivity.class));
+                                        startActivity(new Intent(SignInActivity.this, SplashActivity.class));
                                     } else if (userType.equals("company")) {
                                         startActivity(new Intent(SignInActivity.this, CompanyActivity.class));
                                     }
