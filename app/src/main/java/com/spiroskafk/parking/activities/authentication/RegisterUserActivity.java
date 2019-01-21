@@ -1,4 +1,4 @@
-package com.spiroskafk.parking.activities;
+package com.spiroskafk.parking.activities.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +19,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.activities.company.CompanyActivity;
+import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
 
 
@@ -105,10 +107,11 @@ public class RegisterUserActivity extends AppCompatActivity {
                                             if (mUserCheckBbox.isChecked()) {
                                                 // launch NavUserActivity
                                                 finish();
-                                                startActivity(new Intent(RegisterUserActivity.this, NavActivity.class));
+                                                startActivity(new Intent(RegisterUserActivity.this, UserActivity.class));
                                             } else {
                                                 finish();
-                                                startActivity(new Intent(RegisterUserActivity.this, CompanyNavActivity.class));
+                                                startActivity(new Intent(RegisterUserActivity.this, CompanyActivity
+                                                        .class));
                                             }
                                         } else {
                                             // display failure message

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/graylight"
     android:orientation="vertical"
-    tools:context=".activities.RentYourPlace">
+    tools:context=".activities.user.RentYourPlace">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

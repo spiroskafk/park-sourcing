@@ -1,4 +1,4 @@
-package com.spiroskafk.parking.activities;
+package com.spiroskafk.parking.activities.company;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

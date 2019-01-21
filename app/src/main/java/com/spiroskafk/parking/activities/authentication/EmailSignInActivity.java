@@ -1,4 +1,4 @@
-package com.spiroskafk.parking.activities;
+package com.spiroskafk.parking.activities.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,8 +22,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.spiroskafk.parking.activities.company.CompanyActivity;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.activities.user.UserActivity;
 
 public class EmailSignInActivity extends AppCompatActivity {
 
@@ -120,11 +122,11 @@ public class EmailSignInActivity extends AppCompatActivity {
                                     Log.i(TAG, "User signed in");
                                     Toast.makeText(EmailSignInActivity.this, "User signed in", Toast.LENGTH_SHORT).show();
                                     finish();
-                                    startActivity(new Intent(EmailSignInActivity.this, NavActivity.class));
+                                    startActivity(new Intent(EmailSignInActivity.this, UserActivity.class));
                                 } else if (userType.equals("company") && mCompanyCheckBox.isChecked()) {
                                     Toast.makeText(EmailSignInActivity.this, "Company signed in!", Toast.LENGTH_SHORT).show();
                                     finish();
-                                    startActivity(new Intent(EmailSignInActivity.this, CompanyNavActivity.class));
+                                    startActivity(new Intent(EmailSignInActivity.this, CompanyActivity.class));
                                 }
                             }
 

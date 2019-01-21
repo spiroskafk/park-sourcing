@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:background="@drawable/rewards_bg"
     android:weightSum="10"
-    tools:context=".activities.RewardsActivity">
+    tools:context=".activities.user.RewardsActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

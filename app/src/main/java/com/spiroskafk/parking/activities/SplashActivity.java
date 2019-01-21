@@ -5,6 +5,9 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.spiroskafk.parking.activities.user.UserActivity;
+import com.spiroskafk.parking.model.User;
+
 public class SplashActivity extends AppCompatActivity
 {
     protected int _splashTime = 2000;
@@ -20,7 +23,7 @@ public class SplashActivity extends AppCompatActivity
             public void run()
             {
                 startActivity(new Intent(SplashActivity.this,
-                        NavActivity.class));
+                        UserActivity.class));
                 finish();
             }
         }, secondsDelayed * 1000);

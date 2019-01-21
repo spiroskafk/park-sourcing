@@ -1,4 +1,4 @@
-package com.spiroskafk.parking.activities;
+package com.spiroskafk.parking.activities.company;
 
 import android.content.Intent;
 import android.location.Location;
@@ -41,11 +41,11 @@ import com.spiroskafk.parking.utils.Utils;
 
 import java.util.HashMap;
 
-public class CompanyNavActivity extends AppCompatActivity
+public class CompanyActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     // Log TAG
-    private static final String TAG = CompanyNavActivity.class.getSimpleName();
+    private static final String TAG = CompanyActivity.class.getSimpleName();
 
     // Google map
     private GoogleMap mMap;
@@ -208,7 +208,7 @@ public class CompanyNavActivity extends AppCompatActivity
                     });
 
             //Set Custom InfoWindow Adapter
-            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(CompanyNavActivity.this);
+            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(CompanyActivity.this);
             mMap.setInfoWindowAdapter(adapter);
 
             Marker m = mMap.addMarker(marker);
@@ -241,7 +241,7 @@ public class CompanyNavActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (item.getItemId() == R.id.menu_update) {
-            startActivity(new Intent(CompanyNavActivity.this, InventoryActivity.class));
+            startActivity(new Intent(CompanyActivity.this, InventoryActivity.class));
         } else if (id == R.id.nav_sign_out) {
             FirebaseAuth.getInstance().signOut();
             finish();

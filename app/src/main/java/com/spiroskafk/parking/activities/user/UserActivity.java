@@ -1,13 +1,11 @@
-package com.spiroskafk.parking.activities;
+package com.spiroskafk.parking.activities.user;
 
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -19,11 +17,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TimingLogger;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,11 +64,11 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 
-public class NavActivity extends AppCompatActivity
+public class UserActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     // Log TAG
-    private static final String TAG = NavActivity.class.getSimpleName();
+    private static final String TAG = UserActivity.class.getSimpleName();
 
     // Google map
     private GoogleMap mMap;
@@ -200,9 +196,9 @@ public class NavActivity extends AppCompatActivity
                     // Get user locatioon
                     if (user.getParkingHouseId() == "0") {
                         // Use the GPS lat/lng
-                        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+                        if (!Permissions.Check_FINE_LOCATION(UserActivity.this)) {
                             //if not permisson granted so request permisson with request code
-                            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+                            Permissions.Request_FINE_LOCATION(UserActivity.this, 22);
                             getCurrentLocation();
                         } else {
                             getCurrentLocation();
@@ -410,9 +406,9 @@ public class NavActivity extends AppCompatActivity
 
     private void getCurrentLocation() {
         // Get current location
-        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+        if (!Permissions.Check_FINE_LOCATION(UserActivity.this)) {
             //if not permisson granted so request permisson with request code
-            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+            Permissions.Request_FINE_LOCATION(UserActivity.this, 22);
         } else {
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -447,7 +443,7 @@ public class NavActivity extends AppCompatActivity
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon));
 
                     final InfoWindowData info = new InfoWindowData();
-                    CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
+                    CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(UserActivity.this);
                     mMap.setInfoWindowAdapter(adapter);
 
                     Marker m = mMap.addMarker(marker);
@@ -502,9 +498,9 @@ public class NavActivity extends AppCompatActivity
         mMap.clear();
 
         // Get current location
-//        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+//        if (!Permissions.Check_FINE_LOCATION(UserActivity.this)) {
 //            //if not permisson granted so request permisson with request code
-//            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+//            Permissions.Request_FINE_LOCATION(UserActivity.this, 22);
 //        } else {
 //            mFusedLocationClient.getLastLocation()
 //                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -556,7 +552,7 @@ public class NavActivity extends AppCompatActivity
                     });
 
             //Set Custom InfoWindow Adapter
-            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
+            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(UserActivity.this);
             mMap.setInfoWindowAdapter(adapter);
 
             Marker m = mMap.addMarker(marker);
@@ -602,7 +598,7 @@ public class NavActivity extends AppCompatActivity
                     });
 
             //Set Custom InfoWindow Adapter
-            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
+            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(UserActivity.this);
             mMap.setInfoWindowAdapter(adapter);
 
 
@@ -647,7 +643,7 @@ public class NavActivity extends AppCompatActivity
                     });
 
             //Set Custom InfoWindow Adapter
-            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(NavActivity.this);
+            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(UserActivity.this);
             mMap.setInfoWindowAdapter(adapter);
 
             Marker m = mMap.addMarker(marker);
@@ -708,7 +704,7 @@ public class NavActivity extends AppCompatActivity
                         }
 
                         mUnPark.setVisibility(View.VISIBLE);
-                        Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UserActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
 
                     }
                     @Override
@@ -716,7 +712,7 @@ public class NavActivity extends AppCompatActivity
                 });
             } else {
                 // Popup message that he is already parked
-                Toast.makeText(NavActivity.this, "Your car is already parked at:  " + house.getAddress(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(UserActivity.this, "Your car is already parked at:  " + house.getAddress(), Toast.LENGTH_SHORT).show();
             }
         } else if (typeOfMarker.equals("parking_house")) {
             // Get the ParkingHouse that the User has pressed
@@ -752,7 +748,7 @@ public class NavActivity extends AppCompatActivity
                         }
 
                         mUnPark.setVisibility(View.VISIBLE);
-                        Toast.makeText(NavActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UserActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
 
                     }
                     @Override
@@ -760,7 +756,7 @@ public class NavActivity extends AppCompatActivity
                 });
             } else {
                 // Popup message that he is already parked
-                Toast.makeText(NavActivity.this, "Your car is already parked at:  " + house.getAddress(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(UserActivity.this, "Your car is already parked at:  " + house.getAddress(), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -911,13 +907,13 @@ public class NavActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_report_spot) {
-            startActivity(new Intent(NavActivity.this, ReportSpotActivity.class));
+            startActivity(new Intent(UserActivity.this, ReportSpotActivity.class));
         } else if (id == R.id.nav_myprofile) {
-            startActivity(new Intent(NavActivity.this, ProfileActivity.class));
+            startActivity(new Intent(UserActivity.this, ProfileActivity.class));
         } else if (id == R.id.nav_rent_your_space) {
-            startActivity(new Intent(NavActivity.this, RentYourPlace.class));
+            startActivity(new Intent(UserActivity.this, RentYourPlace.class));
         } else if (id == R.id.nav_reward) {
-            startActivity(new Intent(NavActivity.this, RewardsActivity.class));
+            startActivity(new Intent(UserActivity.this, RewardsActivity.class));
         } else if (id == R.id.nav_sign_out) {
             FirebaseAuth.getInstance().signOut();
             finish();
@@ -934,9 +930,9 @@ public class NavActivity extends AppCompatActivity
         mMap = googleMap;
         mMap.setOnInfoWindowClickListener(this);
 
-        if (!Permissions.Check_FINE_LOCATION(NavActivity.this)) {
+        if (!Permissions.Check_FINE_LOCATION(UserActivity.this)) {
             //if not permisson granted so request permisson with request code
-            Permissions.Request_FINE_LOCATION(NavActivity.this, 22);
+            Permissions.Request_FINE_LOCATION(UserActivity.this, 22);
         } else {
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {

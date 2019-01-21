@@ -26,7 +26,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".activities.RegisterUserActivity" />
+        <activity android:name=".activities.authentication.RegisterUserActivity" />
         <activity
             android:name=".activities.SplashActivity"
             android:theme="@style/SplashTheme">
@@ -39,26 +39,26 @@
             <!-- </intent-filter> -->
         </activity>
         <activity
-            android:name=".activities.NavActivity"
+            android:name=".activities.user.NavActivity"
             android:label="@string/title_activity_nav" />
-        <activity android:name=".activities.ReportSpotActivity" />
-        <activity android:name=".activities.SignInActivity">
+        <activity android:name=".activities.user.ReportSpotActivity" />
+        <activity android:name=".activities.authentication.SignInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.EmailSignInActivity" />
-        <activity android:name=".activities.ProfileActivity" />
+        <activity android:name=".activities.authentication.EmailSignInActivity" />
+        <activity android:name=".activities.user.ProfileActivity" />
         <activity android:name=".activities.VehicleActivity" />
-        <activity android:name=".activities.RentYourPlace" />
+        <activity android:name=".activities.user.RentYourPlace" />
         <activity
-            android:name=".activities.CompanyNavActivity"
+            android:name=".activities.company.CompanyActivity"
             android:label="@string/title_activity_company_nav"
             android:theme="@style/AppTheme" />
-        <activity android:name=".activities.InventoryActivity" />
-        <activity android:name=".activities.RewardsActivity" />
+        <activity android:name=".activities.company.InventoryActivity" />
+        <activity android:name=".activities.user.RewardsActivity" />
     </application>
 
 </manifest>

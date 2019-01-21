@@ -1,9 +1,7 @@
-package com.spiroskafk.parking.activities;
+package com.spiroskafk.parking.activities.user;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

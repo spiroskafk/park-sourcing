@@ -3,27 +3,12 @@ package com.spiroskafk.parking.utils;
 import android.app.Activity;
 import android.location.Address;
 import android.location.Geocoder;
-import android.support.annotation.NonNull;
 import android.util.Log;
-
-import com.firebase.client.Firebase;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.spiroskafk.parking.activities.EmailSignInActivity;
-import com.spiroskafk.parking.model.User;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-
-import okhttp3.internal.Util;
-
-import static com.firebase.ui.auth.AuthUI.TAG;
 
 public class Utils {
     public static String userType;

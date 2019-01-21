@@ -1,4 +1,4 @@
-package com.spiroskafk.parking.activities;
+package com.spiroskafk.parking.activities.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,11 +29,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.activities.company.CompanyActivity;
+import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
-import com.spiroskafk.parking.utils.Permissions;
-import com.spiroskafk.parking.utils.Utils;
-
-import okhttp3.internal.Util;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -132,9 +130,9 @@ public class SignInActivity extends AppCompatActivity {
                                 String userType = currentUser.getType();
                                 if (userType != null) {
                                     if (userType.equals("user")) {
-                                        startActivity(new Intent(SignInActivity.this, NavActivity.class));
+                                        startActivity(new Intent(SignInActivity.this, UserActivity.class));
                                     } else if (userType.equals("company")) {
-                                        startActivity(new Intent(SignInActivity.this, CompanyNavActivity.class));
+                                        startActivity(new Intent(SignInActivity.this, CompanyActivity.class));
                                     }
                                 }
                             }
@@ -179,8 +177,8 @@ public class SignInActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account);
                 Log.i(TAG, "Google sign in successful");
 
-                // launch NavActivity
-                startActivity(new Intent(SignInActivity.this, NavActivity.class));
+                // launch UserActivity
+                startActivity(new Intent(SignInActivity.this, UserActivity.class));
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.i(TAG, "Google sign in failed", e);
