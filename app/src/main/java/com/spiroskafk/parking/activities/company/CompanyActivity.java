@@ -32,11 +32,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.adapters.CustomInfoWindowAdapter;
 import com.spiroskafk.parking.model.PrivateParking;
 import com.spiroskafk.parking.model.InfoWindowData;
+import com.spiroskafk.parking.model.User;
 import com.spiroskafk.parking.utils.Utils;
 
 import java.util.HashMap;
@@ -56,12 +58,15 @@ public class CompanyActivity extends AppCompatActivity
     // Firebase
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDbRef;
+    private FirebaseAuth mAuth;
 
     // LocationClient
     private FusedLocationProviderClient mFusedLocationClient;
 
     private HashMap<String, PrivateParking> privateHouses;
     private String houseId;
+
+    private User user;
 
 
     @Override
@@ -101,6 +106,7 @@ public class CompanyActivity extends AppCompatActivity
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDbRef = mFirebaseDatabase.getReference().child("private_houses");
+        mAuth = FirebaseAuth.getInstance();
 
         // Init google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -110,15 +116,39 @@ public class CompanyActivity extends AppCompatActivity
     }
 
     private void setupListeners() {
-//        mDbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        // Get company info
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+        usersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User currentUser = dataSnapshot.getValue(User.class);
+                if (currentUser != null)
+                    user = currentUser;
+                    Log.i(TAG, "User: " + user.getName());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        // Find out which PrivateParking
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("private_parking");
+//        ref.addValueEventListener(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                Company comp = dataSnapshot.getValue(Company.class);
-//                Log.i(TAG, "Latit: " + comp.getLatit());
-//                Log.i(TAG, "mail: " + comp.getEmail());
-//                privateHouses.put(dataSnapshot.getKey(), comp);
-//                houseId = dataSnapshot.getKey();
-//                updateMap();
+//                PrivateParking parking = dataSnapshot.getValue(PrivateParking.class);
+//                if (parking != null) {
+//                    Log.i(TAG, "ParkingHouse: " + parking.getEmail());
+//                    //Log.i(TAG, "parking : " + parking.getEmail().toString());
+////                    if (parking.getEmail().equals(user.getEmail())) {
+////                        privateHouses.put(dataSnapshot.getKey(), parking);
+////                        houseId = dataSnapshot.getKey();
+////                        updateMap();
+////                    }
+//                }
 //            }
 //
 //            @Override
@@ -127,15 +157,20 @@ public class CompanyActivity extends AppCompatActivity
 //            }
 //        });
 
-        mDbRef.addChildEventListener(new ChildEventListener() {
+
+        ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                PrivateParking comp = dataSnapshot.getValue(PrivateParking.class);
-                Log.i(TAG, "Latit: " + comp.getLatit());
-                Log.i(TAG, "mail: " + comp.getEmail());
-                privateHouses.put(dataSnapshot.getKey(), comp);
-                houseId = dataSnapshot.getKey();
-                updateMap();
+                PrivateParking parking = dataSnapshot.getValue(PrivateParking.class);
+                if (parking != null && user != null) {
+                    Log.i(TAG, "ParkingHouse: " + parking.getEmail());
+                    //Log.i(TAG, "parking : " + parking.getEmail().toString());
+                    if (parking.getEmail().equals(user.getEmail())) {
+                        privateHouses.put(dataSnapshot.getKey(), parking);
+                        houseId = dataSnapshot.getKey();
+                        updateMap();
+                    }
+                }
             }
 
             @Override
@@ -158,6 +193,63 @@ public class CompanyActivity extends AppCompatActivity
 
             }
         });
+
+
+
+
+
+
+
+
+
+//        mDbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                PrivateParking comp = dataSnapshot.getValue(PrivateParking.class);
+//                Log.i(TAG, "Latit: " + comp.getLatit());
+//                Log.i(TAG, "mail: " + comp.getEmail());
+//                privateHouses.put(dataSnapshot.getKey(), comp);
+//                houseId = dataSnapshot.getKey();
+//                updateMap();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//
+//        mDbRef.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//                PrivateParking comp = dataSnapshot.getValue(PrivateParking.class);
+//                Log.i(TAG, "Latit: " + comp.getLatit());
+//                Log.i(TAG, "mail: " + comp.getEmail());
+//                privateHouses.put(dataSnapshot.getKey(), comp);
+//                houseId = dataSnapshot.getKey();
+//                updateMap();
+//            }
+//
+//            @Override
+//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//            }
+//
+//            @Override
+//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 
 
@@ -176,7 +268,7 @@ public class CompanyActivity extends AppCompatActivity
     private void updateMap() {
         // Update map
         Log.i(TAG, "houseID: " + houseId);
-        if (houseId != null) {
+        if (privateHouses != null) {
             Log.i(TAG, "LATIT: " + privateHouses.get(houseId).getLatit());
             LatLng coordinates = new LatLng(privateHouses.get(houseId).getLatit(), privateHouses.get(houseId).getLongtit());
             MarkerOptions marker = new MarkerOptions();
