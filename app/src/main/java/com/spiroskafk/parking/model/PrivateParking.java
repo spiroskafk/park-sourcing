@@ -1,6 +1,10 @@
 package com.spiroskafk.parking.model;
 
-public class PrivateParking
+import java.io.Serializable;
+
+
+@SuppressWarnings("serial")
+public class PrivateParking implements Serializable
 {
     public String name;
     public String address;

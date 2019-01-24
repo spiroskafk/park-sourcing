@@ -28,7 +28,6 @@
 
         <activity android:name=".activities.authentication.RegisterUserActivity" />
         <activity android:name=".activities.SplashActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -50,11 +49,13 @@
             android:label="@string/title_activity_nav" />
         <activity android:name=".activities.user.ReportSpotActivity" />
         <activity android:name=".activities.authentication.SignInActivity">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity android:name=".activities.authentication.EmailSignInActivity" />
         <activity android:name=".activities.user.ProfileActivity" />
@@ -68,6 +69,8 @@
         <activity android:name=".activities.user.RewardsActivity" />
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.SignupActivity" />
+        <activity android:name=".activities.experimental.CompanyDashboard" />
+        <activity android:name=".activities.experimental.CompanyMaps"></activity>
     </application>
 
 </manifest>

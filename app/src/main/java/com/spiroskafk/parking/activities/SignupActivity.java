@@ -19,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.activities.authentication.RegisterUserActivity;
 import com.spiroskafk.parking.activities.company.CompanyActivity;
+import com.spiroskafk.parking.activities.experimental.CompanyDashboard;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
 
@@ -98,7 +99,7 @@ public class SignupActivity extends AppCompatActivity {
                                         startActivity(new Intent(SignupActivity.this, UserActivity.class));
                                     } else {
                                         finish();
-                                        startActivity(new Intent(SignupActivity.this, CompanyActivity
+                                        startActivity(new Intent(SignupActivity.this, CompanyDashboard
                                                 .class));
                                     }
                                 } else {

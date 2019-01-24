@@ -25,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.activities.company.CompanyActivity;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.activities.experimental.CompanyDashboard;
 import com.spiroskafk.parking.activities.user.UserActivity;
 
 public class EmailSignInActivity extends AppCompatActivity {
@@ -126,7 +127,7 @@ public class EmailSignInActivity extends AppCompatActivity {
                                 } else if (userType.equals("company") && mCompanyCheckBox.isChecked()) {
                                     Toast.makeText(EmailSignInActivity.this, "Company signed in!", Toast.LENGTH_SHORT).show();
                                     finish();
-                                    startActivity(new Intent(EmailSignInActivity.this, CompanyActivity.class));
+                                    startActivity(new Intent(EmailSignInActivity.this, CompanyDashboard.class));
                                 }
                             }
 

@@ -20,6 +20,7 @@ import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.activities.authentication.EmailSignInActivity;
 import com.spiroskafk.parking.activities.authentication.SignInActivity;
 import com.spiroskafk.parking.activities.company.CompanyActivity;
+import com.spiroskafk.parking.activities.experimental.CompanyDashboard;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
 
@@ -111,7 +112,7 @@ public class SplashActivity extends AppCompatActivity {
                                         //startActivity(new Intent(SignInActivity.this, UserActivity.class));
                                         startActivity(new Intent(SplashActivity.this, UserActivity.class));
                                     } else if (userType.equals("company")) {
-                                        startActivity(new Intent(SplashActivity.this, CompanyActivity.class));
+                                        startActivity(new Intent(SplashActivity.this, CompanyDashboard.class));
                                     }
                                 }
                             }

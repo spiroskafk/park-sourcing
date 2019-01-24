@@ -21,7 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.company.CompanyActivity;
+import com.spiroskafk.parking.activities.experimental.CompanyDashboard;
 import com.spiroskafk.parking.activities.user.UserActivity;
 
 public class LoginActivity extends AppCompatActivity {
@@ -105,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
                                     case "company":
                                         mProgress.setVisibility(View.INVISIBLE);
                                         finish();
-                                        startActivity(new Intent(LoginActivity.this, CompanyActivity.class));
+                                        startActivity(new Intent(LoginActivity.this, CompanyDashboard.class));
                                         break;
                                 }
                             }

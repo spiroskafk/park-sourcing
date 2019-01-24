@@ -1,6 +1,9 @@
 package com.spiroskafk.parking.model;
 
-public class User {
+import java.io.Serializable;
+
+@SuppressWarnings("serial")
+public class User implements Serializable {
     public String name;
     public String email;
     public String type;
