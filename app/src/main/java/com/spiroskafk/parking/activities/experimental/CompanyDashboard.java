@@ -23,7 +23,6 @@ import com.spiroskafk.parking.model.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class CompanyDashboard extends AppCompatActivity {
 
@@ -189,7 +188,7 @@ public class CompanyDashboard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (houseId != null) {
-                    Intent i = new Intent(CompanyDashboard.this, Recyclerview.class);
+                    Intent i = new Intent(CompanyDashboard.this, ParkedUsersActivity.class);
                     i.putExtra("houseId", houseId);
                     startActivity(i);
                 }

@@ -97,20 +97,21 @@ public class InventoryActivity extends AppCompatActivity {
 
                 Log.i(TAG, "onClick");
                 Log.i(TAG, "Occupied : " + occupied);
+                Log.i(TAG, "Capacitiy: " + capacity);
 
                 if (!occupied.isEmpty()) {
                     mOccupiedTv.setText(occupied);
-                    updateDatabase("occupied", String.valueOf(occupied));
+                    updateDatabase("occupied", occupied);
 
                 }
                 if (!capacity.isEmpty()) {
                     mCapacityTv.setText(capacity);
-                    updateDatabase("capacity", String.valueOf(occupied));
+                    updateDatabase("capacity", capacity);
                 }
 
                 if (!charge.isEmpty()) {
                     mHourlyChargeTv.setText(charge + "€");
-                    updateDatabase("entrance", String.valueOf(occupied));
+                    updateDatabase("entrance", charge);
                 }
 
             }
@@ -150,16 +151,31 @@ public class InventoryActivity extends AppCompatActivity {
         int capacity;
         int occupied;
 
+        Log.i(TAG, "Key = " + key);
+        Log.i(TAG, "Value = " + value);
+
         if (key.equals("capacity")) {
             capacity = Integer.parseInt(value);
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("private_parking").child(houseId);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put(key, capacity);
+            ref.updateChildren(data);
+            Log.i(TAG, "Capacity in update: " + capacity);
         } else if (key.equals("occupied")) {
             occupied = Integer.parseInt(value);
+
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("private_parking").child(houseId);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put(key, occupied);
+            ref.updateChildren(data);
+        } else {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("private_parking").child(houseId);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put(key, value);
+            ref.updateChildren(data);
         }
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("private_parking").child(houseId);
-        HashMap<String, Object> data = new HashMap<>();
-        data.put(key, value);
-        ref.updateChildren(data);
+
     }
 
     @Override

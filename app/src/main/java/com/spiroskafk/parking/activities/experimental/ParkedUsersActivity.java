@@ -1,14 +1,13 @@
 package com.spiroskafk.parking.activities.experimental;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -17,33 +16,50 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.adapters.UserAdapter;
-import com.spiroskafk.parking.model.PrivateParking;
 import com.spiroskafk.parking.model.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.ListIterator;
 
-public class Recyclerview extends AppCompatActivity {
+public class ParkedUsersActivity extends AppCompatActivity {
 
     // Log TAG
-    private static final String TAG = Recyclerview.class.getSimpleName();
+    private static final String TAG = ParkedUsersActivity.class.getSimpleName();
 
+    // ID of the specific PrivateParking company
     private String houseId;
-    private User company;
-    private HashMap<String, PrivateParking> privateHouses;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
 
+    // Parked users
     private ArrayList<User> userList;
 
+    // Application context
     private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recyclerview);
+        setContentView(R.layout.activity_parked_users);
+
+        init();
+
+        // Read data from firebase
+        readFromDatabase();
+
+    }
+
+    private void init() {
+
+        // Init toolbar
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        // Init context
         context = this;
 
         // Get data from CompanyDashboard
@@ -52,18 +68,22 @@ public class Recyclerview extends AppCompatActivity {
             houseId = extras.getString("houseId");
         }
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
+        // Init recyclerview
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Init userList - contains parked users
         userList = new ArrayList<>();
+    }
 
+    /**
+     * Setups firebase database listeners in order to read data
+     */
+    private void readFromDatabase() {
+
+        // Callback in order to get all available users
+        // Saves in userList only the users that are parked in this specific PrivateParking
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users");
         ref.addChildEventListener(new ChildEventListener() {
             @Override
@@ -86,22 +106,20 @@ public class Recyclerview extends AppCompatActivity {
                 if (currentUser != null && houseId != null) {
                     if (currentUser.getType().equals("user")) {
                         if (currentUser.getParkingHouseId().equals(houseId)) {
-                            Log.i(TAG, "changed in if");
                             userList.add(currentUser);
                             adapter = new UserAdapter(context, userList);
                             recyclerView.setAdapter(adapter);
                         } else {
-                            Log.i(TAG, "changed in else");
-                            Log.i(TAG, "USERLIST : " + userList.toString());
                             if (contains(userList, currentUser)) {
-                                Log.i(TAG, "HEY");
                                 if (!userList.isEmpty()) {
-                                    for (User item : userList) {
-                                        if (item.getEmail().equals(currentUser.getEmail()))
-                                            userList.remove(item);
+
+                                    ListIterator<User> iter = userList.listIterator();
+                                    while (iter.hasNext()) {
+                                        if (iter.next().getEmail().equals(currentUser.getEmail())) {
+                                            iter.remove();
+                                        }
                                     }
                                 }
-                                Log.i(TAG, "listi nside: " + userList.toString());
                                 adapter = new UserAdapter(context, userList);
                                 recyclerView.setAdapter(adapter);
                             }
@@ -137,6 +155,12 @@ public class Recyclerview extends AppCompatActivity {
         });
     }
 
+    /**
+     * Checks if user exists on the list
+     * @param list
+     * @param user
+     * @return true if user found in list
+     */
     private boolean contains(ArrayList<User> list, User user) {
         for (User item : list) {
             if (item.getEmail().equals(user.getEmail())) {
