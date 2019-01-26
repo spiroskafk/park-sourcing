@@ -48,6 +48,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.activities.LoginActivity;
 import com.spiroskafk.parking.model.PrivateParking;
 import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.model.StreetParking;
@@ -70,7 +71,7 @@ public class UserActivity extends AppCompatActivity
     // Log TAG
     private static final String TAG = UserActivity.class.getSimpleName();
 
-    // Google map
+    // Map component
     private GoogleMap mMap;
 
     // UI Components
@@ -111,18 +112,19 @@ public class UserActivity extends AppCompatActivity
     private User user;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav);
 
-
         // Initialize phase
         init();
 
-        // Setup listeners
-        setupListeners();
+        // Read data from Firebase database
+        readFromDatabase();
+
+        // UI listeners
+        registerUIListeners();
     }
 
 
@@ -165,24 +167,17 @@ public class UserActivity extends AppCompatActivity
         // Init Firebase
         initFirebaseComponents();
 
-
         // Init UI
         mLegendView = findViewById(R.id.legend_cardview);
         mUnPark = findViewById(R.id.button_unpark);
 
     }
 
-    private void setupListeners() {
 
-        // Legend View
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mLegendView.getVisibility() == View.INVISIBLE) mLegendView.setVisibility(View.VISIBLE);
-                else mLegendView.setVisibility(View.INVISIBLE);
-            }
-        });
+    /**
+     * Setup callbacks in order to read data from database
+     */
+    private void readFromDatabase() {
 
         // Get user information
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
@@ -193,11 +188,11 @@ public class UserActivity extends AppCompatActivity
                 if (currentUser != null) {
                     user = currentUser;
 
-                    // Get user locatioon
-                    if (user.getParkingHouseId() == "0") {
+                    // TODO: Find out what's going on here!
+                    if (user.getParkingHouseId().equals("0")) {
                         // Use the GPS lat/lng
                         if (!Permissions.Check_FINE_LOCATION(UserActivity.this)) {
-                            //if not permisson granted so request permisson with request code
+                            Log.i(TAG, "Request location from GPS");
                             Permissions.Request_FINE_LOCATION(UserActivity.this, 22);
                             getCurrentLocation();
                         } else {
@@ -212,26 +207,7 @@ public class UserActivity extends AppCompatActivity
             }
         });
 
-
-
-        // Setup AutoComplete listener
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                // TODO: Get info about the selected place.
-                Log.i(TAG, "Place: " + place.getName());
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 15));
-            }
-
-            @Override
-            public void onError(Status status) {
-                // TODO: Handle the error.
-                Log.i(TAG, "An error occurred: " + status);
-            }
-        });
-
-
-        // Listener For StreetHouses+
+        // Populates streetHouses<String, StreetParking> HashMap
         mStreetParkingRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -240,22 +216,17 @@ public class UserActivity extends AppCompatActivity
                     streetHouses.put(dataSnapshot.getKey(), streetHouse);
                     updateMap();
                 }
-
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 StreetParking streetHouse = dataSnapshot.getValue(StreetParking.class);
-                Log.i(TAG, "Street position changed!");
                 if (streetHouse != null) {
                     if (user != null && user.isParked()) {
-                        Log.i(TAG, "Not null user");
                         streetHouses.remove(dataSnapshot.getKey());
                     } else {
-                        Log.i(TAG, "Street House: " + streetHouse.toString());
                         streetHouses.put(dataSnapshot.getKey(), streetHouse);
                     }
-
                     updateMap();
                 }
             }
@@ -278,8 +249,7 @@ public class UserActivity extends AppCompatActivity
             }
         });
 
-
-        // Listener For RentedHouses
+        // Populates rentHouses<String, RentParking> HashMap
         mRentedParkingRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -288,7 +258,6 @@ public class UserActivity extends AppCompatActivity
                     rentedHouses.put(dataSnapshot.getKey(), rentHouse);
                     updateMap();
                 }
-
             }
 
             @Override
@@ -320,8 +289,50 @@ public class UserActivity extends AppCompatActivity
             }
         });
 
+        // Populates privateHouses<String, PrivateParking> HashMap
+        mPrivateHouseRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
+                if (privateHouse != null) {
+                    privateHouses.put(dataSnapshot.getKey(), privateHouse);
+                    updateMap();
+                }
 
-        // Listener For ParkingSpots
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
+                if (privateHouse != null) {
+                    if (user != null && user.isParked()) {
+                        privateHouses.remove(dataSnapshot.getKey());
+                    } else {
+                        privateHouses.put(dataSnapshot.getKey(), privateHouse);
+                    }
+                    updateMap();
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
+                if (privateHouse != null) {
+                    privateHouses.remove(dataSnapshot.getKey());
+                    updateMap();
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+        // Populates parkingSpots<String, ParkingSpot> HashMapp
         mParkingSpotRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -353,91 +364,54 @@ public class UserActivity extends AppCompatActivity
             }
         });
 
+    }
 
-        // Listener For PrivateParking
-        mPrivateHouseRef.addChildEventListener(new ChildEventListener() {
+
+    /**
+     * Register UI listeners
+     */
+    private void registerUIListeners() {
+
+        // Legend View
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
-                if (privateHouse != null) {
-                    privateHouses.put(dataSnapshot.getKey(), privateHouse);
-                    updateMap();
-                }
+            public void onClick(View view) {
+                if (mLegendView.getVisibility() == View.INVISIBLE) mLegendView.setVisibility(View.VISIBLE);
+                else mLegendView.setVisibility(View.INVISIBLE);
+            }
+        });
 
+        // Setup AutoComplete listener
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+                Log.i(TAG, "Place: " + place.getName());
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 15));
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
-                if (privateHouse != null) {
-                    if (privateHouse != null) {
-                        if (user != null && user.isParked()) {
-                            Log.i(TAG, "Not null user");
-                            privateHouses.remove(dataSnapshot.getKey());
-                        } else {
-                            Log.i(TAG, "Street House: " + privateHouse.toString());
-                            privateHouses.put(dataSnapshot.getKey(), privateHouse);
-                        }
-                    }
-                    //privateHouses.put(dataSnapshot.getKey(), privateHouse);
-                    updateMap();
-                }
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                PrivateParking privateHouse = dataSnapshot.getValue(PrivateParking.class);
-                if (privateHouse != null) {
-                    privateHouses.remove(dataSnapshot.getKey());
-                    updateMap();
-                }
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
             }
         });
 
     }
 
-    private void getCurrentLocation() {
-        // Get current location
-        if (!Permissions.Check_FINE_LOCATION(UserActivity.this)) {
-            //if not permisson granted so request permisson with request code
-            Permissions.Request_FINE_LOCATION(UserActivity.this, 22);
-        } else {
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                updateUserLatLng(location.getLatitude(), location.getLongitude());
-                                //renderUserOnMap();
-                            } else {
 
-                            }
-                        }
-                    });
-        }
-    }
-
-
+    /**
+     * Renders user on map with a custom marker
+     */
     private void renderUserOnMap() {
-        Log.i(TAG, "renderUseOnMap");
-
-        // Get latest lat/lng
+        // Get latest user location
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User currentUser = dataSnapshot.getValue(User.class);
                 if (currentUser != null) {
-                    Log.i(TAG, "HI");;
                     MarkerOptions marker = new MarkerOptions();
                     marker.position(new LatLng(currentUser.getLatit(), currentUser.getLongtit()))
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon));
@@ -457,8 +431,6 @@ public class UserActivity extends AppCompatActivity
 
             }
         });
-
-
     }
 
 
@@ -654,7 +626,7 @@ public class UserActivity extends AppCompatActivity
         }
 
         if (user != null) {
-            Log.i(TAG, "Gonna render user position");
+            //Log.i(TAG, "Gonna render user position");
             renderUserOnMap();
         }
     }
@@ -947,7 +919,26 @@ public class UserActivity extends AppCompatActivity
                         }
                     });
         }
+    }
 
+    private void getCurrentLocation() {
+        // Get current location
+        if (!Permissions.Check_FINE_LOCATION(UserActivity.this)) {
+            //if not permisson granted so request permisson with request code
+            Permissions.Request_FINE_LOCATION(UserActivity.this, 22);
+        } else {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                updateUserLatLng(location.getLatitude(), location.getLongitude());
+                                renderUserOnMap();
+                            }
+                        }
+                    });
+        }
     }
 
     @Override

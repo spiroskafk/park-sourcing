@@ -42,6 +42,7 @@ public class SplashActivity extends AppCompatActivity {
 
         init();
 
+        buttonListeners();
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -51,8 +52,6 @@ public class SplashActivity extends AppCompatActivity {
         });
 
         // Check if user is already signed in
-
-
 //        int secondsDelayed = 1;
 //        new Handler().postDelayed(new Runnable()
 //        {
@@ -71,15 +70,21 @@ public class SplashActivity extends AppCompatActivity {
         Log.i(TAG, "mAuth: " + mAuth.getCurrentUser());
         loginButton = findViewById(R.id.btn_login);
         signupButton = findViewById(R.id.btn_get_started);
+
+
+    }
+
+    private void buttonListeners() {
+        // Handle login
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                //startActivity(new Intent(SplashActivity.this, EmailSignInActivity.class));
             }
         });
 
 
+        // Handle register
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,13 +106,11 @@ public class SplashActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             User currentUser = dataSnapshot.getValue(User.class);
-                            Log.i(TAG, "HI");
                             if (currentUser != null) {
-                                Log.i(TAG, "User is : " + currentUser.getName());
+                                Log.i(TAG, "User logged in: " + currentUser.getName());
                                 String userType = currentUser.getType();
                                 if (userType != null) {
                                     if (userType.equals("user")) {
-                                        //startActivity(new Intent(SignInActivity.this, UserActivity.class));
                                         startActivity(new Intent(SplashActivity.this, UserActivity.class));
                                     } else if (userType.equals("company")) {
                                         startActivity(new Intent(SplashActivity.this, CompanyDashboard.class));

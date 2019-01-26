@@ -1,13 +1,9 @@
 package com.spiroskafk.parking.activities.user;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,7 +14,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.VehicleActivity;
 import com.spiroskafk.parking.model.User;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -27,7 +22,6 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = ProfileActivity.class.getSimpleName();
 
     // UI components
-    private Button mAddVehicle;
     private TextView mDisplayName;
     private TextView mEmail;
     private TextView mReports;
@@ -36,7 +30,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     // Firebase
     private FirebaseAuth mAuth;
-    private FirebaseUser mUser;
     private DatabaseReference mFirebaseRef;
     private FirebaseDatabase mFirebaseDatabase;
 
@@ -50,15 +43,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Initialize phase
         init();
-
-        // Add vehicle
-        mAddVehicle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(ProfileActivity.this, VehicleActivity.class));
-            }
-        });
-
 
         // Update user Profile
         userId = mAuth.getInstance().getCurrentUser().getUid();
@@ -76,7 +60,6 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Init UI
-        mAddVehicle = findViewById(R.id.button_add_vehicle);
         mDisplayName = findViewById(R.id.text_display_name);
         mEmail = findViewById(R.id.text_email);
         mReports = findViewById(R.id.text_reports);
@@ -94,7 +77,6 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                Log.i(TAG, "User Name: " + user.getEmail());
 
                 // Trustworthyness system
                 if (user.getReports() < 10) {

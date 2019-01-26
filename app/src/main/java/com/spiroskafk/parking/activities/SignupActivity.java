@@ -1,14 +1,15 @@
 package com.spiroskafk.parking.activities;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -17,8 +18,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.authentication.RegisterUserActivity;
-import com.spiroskafk.parking.activities.company.CompanyActivity;
 import com.spiroskafk.parking.activities.experimental.CompanyDashboard;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
@@ -32,6 +31,7 @@ public class SignupActivity extends AppCompatActivity {
     private CheckBox mUserCheckBbox;
     private CheckBox mCompanyCheckBox;
     private Button mSignup;
+    private TextView mLogin;
     private ProgressBar mProgress;
 
     // Firebase vars
@@ -46,16 +46,13 @@ public class SignupActivity extends AppCompatActivity {
 
         init();
 
-        mSignup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signup();
-            }
-        });
+        buttonListeners();
+
     }
 
     private void init() {
         mSignup = findViewById(R.id.btn_signup);
+        mLogin = findViewById(R.id.textview_login);
         mName = findViewById(R.id.et_full_name);
         mEmailAddress = findViewById(R.id.et_email_address);
         mPassword = findViewById(R.id.et_password);
@@ -64,6 +61,24 @@ public class SignupActivity extends AppCompatActivity {
         mProgress = findViewById(R.id.progressBar);
         mProgress.setVisibility(View.INVISIBLE);
         mAuth = FirebaseAuth.getInstance();
+    }
+
+    private void buttonListeners() {
+
+        mSignup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signup();
+            }
+        });
+
+        mLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(SignupActivity.this, LoginActivity.class));
+                finish();
+            }
+        });
     }
 
     private void signup() {
@@ -95,15 +110,14 @@ public class SignupActivity extends AppCompatActivity {
                                     Toast.makeText(SignupActivity.this, "You have successfulled registered a new " + type + " account", Toast.LENGTH_SHORT).show();
                                     if (mUserCheckBbox.isChecked()) {
                                         // launch NavUserActivity
-                                        finish();
                                         startActivity(new Intent(SignupActivity.this, UserActivity.class));
-                                    } else {
                                         finish();
-                                        startActivity(new Intent(SignupActivity.this, CompanyDashboard
-                                                .class));
+                                    } else {
+                                        startActivity(new Intent(SignupActivity.this, CompanyDashboard.class));
+                                        finish();
                                     }
                                 } else {
-                                    // display failure message
+                                    Toast.makeText(SignupActivity.this, "Unable to create new account", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });

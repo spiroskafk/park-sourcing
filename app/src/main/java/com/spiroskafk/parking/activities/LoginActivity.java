@@ -47,6 +47,20 @@ public class LoginActivity extends AppCompatActivity {
 
         init();
 
+        buttonListeners();
+    }
+
+    private void init() {
+        mEmailAddress = findViewById(R.id.et_email_address);
+        mPassword = findViewById(R.id.et_password);
+        mLoginButton = findViewById(R.id.btn_login);
+        mProgress = findViewById(R.id.progressBar);
+        mSignup = findViewById(R.id.sign_up);
+        mAuth = FirebaseAuth.getInstance();
+
+    }
+
+    private void buttonListeners() {
         mSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,16 +75,6 @@ public class LoginActivity extends AppCompatActivity {
                 login();
             }
         });
-    }
-
-    private void init() {
-        mEmailAddress = findViewById(R.id.et_email_address);
-        mPassword = findViewById(R.id.et_password);
-        mLoginButton = findViewById(R.id.btn_login);
-        mProgress = findViewById(R.id.progressBar);
-        mSignup = findViewById(R.id.sign_up);
-        mAuth = FirebaseAuth.getInstance();
-
     }
 
     private void login() {
@@ -98,14 +102,14 @@ public class LoginActivity extends AppCompatActivity {
                                 switch (userType) {
                                     case "user":
                                         mProgress.setVisibility(View.INVISIBLE);
-                                        finish();
                                         startActivity(new Intent(LoginActivity.this, UserActivity.class));
+                                        finish();
                                         break;
 
                                     case "company":
                                         mProgress.setVisibility(View.INVISIBLE);
-                                        finish();
                                         startActivity(new Intent(LoginActivity.this, CompanyDashboard.class));
+                                        finish();
                                         break;
                                 }
                             }

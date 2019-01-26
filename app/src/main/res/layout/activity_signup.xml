@@ -174,11 +174,11 @@
                     android:textSize="16sp" />
 
                 <TextView
-                    android:id="@+id/login"
+                    android:id="@+id/textview_login"
                     style="@style/LabelStyle"
                     android:layout_toEndOf="@id/have_account"
                     android:fontFamily="@font/sf_pro_display_medium"
-                    android:onClick="login"
+                    android:clickable="true"
                     android:text="@string/login_label"
                     android:textColor="@color/orange"
                     android:textSize="16sp" />
