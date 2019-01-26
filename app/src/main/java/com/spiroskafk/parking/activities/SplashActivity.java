@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +22,7 @@ import com.spiroskafk.parking.activities.authentication.EmailSignInActivity;
 import com.spiroskafk.parking.activities.authentication.SignInActivity;
 import com.spiroskafk.parking.activities.company.CompanyActivity;
 import com.spiroskafk.parking.activities.experimental.CompanyDashboard;
+import com.spiroskafk.parking.activities.experimental.Recyclerview;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
 
@@ -44,6 +46,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         init();
+
 
         AsyncTask.execute(new Runnable() {
             @Override

@@ -21,7 +21,9 @@ import com.spiroskafk.parking.activities.company.InventoryActivity;
 import com.spiroskafk.parking.model.PrivateParking;
 import com.spiroskafk.parking.model.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class CompanyDashboard extends AppCompatActivity {
 
@@ -42,6 +44,8 @@ public class CompanyDashboard extends AppCompatActivity {
 
     private User user;
 
+    private ArrayList<User> userList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +64,7 @@ public class CompanyDashboard extends AppCompatActivity {
         mSignOut = findViewById(R.id.sign_out);
         mAuth = FirebaseAuth.getInstance();
         privateHouses = new HashMap<String, PrivateParking>();
+        userList = new ArrayList<User>();
     }
 
     private void setupListeners() {
@@ -118,14 +123,52 @@ public class CompanyDashboard extends AppCompatActivity {
             }
         });
 
+        final DatabaseReference users = FirebaseDatabase.getInstance().getReference().child("users");
+        users.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                User currentUser = dataSnapshot.getValue(User.class);
+                if (currentUser != null && houseId != null) {
+                    if (currentUser.getType().equals("user")) {
+                        if (currentUser.getParkingHouseId().equals(houseId)) {
+                            userList.add(currentUser);
+                        }
+                    }
+                }
+            }
 
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
         mStatistics.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(CompanyDashboard.this, InventoryActivity.class));
+                if (user != null && privateHouses != null & houseId != null) {
+                    Intent i = new Intent(CompanyDashboard.this, InventoryActivity.class);
+                    i.putExtra("houses", privateHouses);
+                    i.putExtra("user", user);
+                    i.putExtra("houseId", houseId);
+                    startActivity(i);
+                }
             }
         });
 
@@ -136,6 +179,17 @@ public class CompanyDashboard extends AppCompatActivity {
                     Intent i = new Intent(CompanyDashboard.this, CompanyMaps.class);
                     i.putExtra("houses", privateHouses);
                     i.putExtra("user", user);
+                    i.putExtra("houseId", houseId);
+                    startActivity(i);
+                }
+            }
+        });
+
+        mProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (houseId != null) {
+                    Intent i = new Intent(CompanyDashboard.this, Recyclerview.class);
                     i.putExtra("houseId", houseId);
                     startActivity(i);
                 }

@@ -48,6 +48,11 @@ public class User implements Serializable {
         this.longtit = longtit;
     }
 
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
     public String getParkingHouseId() {
         return parkingHouseId;
     }

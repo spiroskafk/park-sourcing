@@ -70,7 +70,8 @@
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.SignupActivity" />
         <activity android:name=".activities.experimental.CompanyDashboard" />
-        <activity android:name=".activities.experimental.CompanyMaps"></activity>
+        <activity android:name=".activities.experimental.CompanyMaps" />
+        <activity android:name=".activities.experimental.Recyclerview"></activity>
     </application>
 
 </manifest>
