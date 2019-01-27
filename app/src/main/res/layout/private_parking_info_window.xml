@@ -14,52 +14,52 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_marginTop="1dp"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
-                android:layout_weight="0.01"
                 android:layout_marginLeft="35dp"
-                android:src="@drawable/icon_info_window"/>
+                android:layout_marginTop="1dp"
+                android:layout_weight="0.01"
+                android:src="@drawable/icon_info_window" />
 
             <TextView
                 android:id="@+id/info_window_title"
-                android:layout_weight="0.1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="0.1"
+                android:textColor="@color/black"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/black"/>
+                android:textStyle="bold" />
 
         </LinearLayout>
 
 
         <LinearLayout
-            android:layout_marginTop="17dp"
             android:layout_width="match_parent"
             android:layout_height="100dp"
+            android:layout_marginTop="17dp"
             android:orientation="vertical">
 
             <LinearLayout
-                android:layout_marginTop="-60dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginTop="-60dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
                     android:text="Street: "
-                    android:textStyle="bold"
-                    android:textSize="10sp" />
+                    android:textColor="@color/black"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/street_private_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
                     android:maxLines="1"
+                    android:text=""
                     android:textColor="@color/startblue"
                     android:textSize="10sp"
                     android:textStyle="bold" />
@@ -67,26 +67,26 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_marginTop="-115dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginTop="-115dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
                     android:text="Distance: "
-                    android:textStyle="bold"
-                    android:textSize="10sp" />
+                    android:textColor="@color/black"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/distance_private_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
                     android:maxLines="1"
+                    android:text=""
                     android:textColor="@color/startblue"
                     android:textSize="10sp"
                     android:textStyle="bold" />
@@ -94,9 +94,9 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_marginTop="-85dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginTop="-85dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -104,9 +104,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Spaces: "
-                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="10sp" />
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/spaces_private_tv"
@@ -120,9 +120,9 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_marginTop="-55dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginTop="-55dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -130,9 +130,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Entrance: "
-                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="10sp" />
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/entrance_tv"
@@ -146,9 +146,9 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_marginTop="-20dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="-20dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -156,9 +156,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Hourly charge: "
-                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="10sp" />
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/hourly_charge_tv"
@@ -172,10 +172,6 @@
             </LinearLayout>
 
         </LinearLayout>
-
-
-
-
 
 
     </RelativeLayout>

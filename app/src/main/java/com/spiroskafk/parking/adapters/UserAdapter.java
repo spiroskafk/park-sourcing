@@ -1,7 +1,6 @@
 package com.spiroskafk.parking.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +27,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public UserAdapter.UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // Inflating and returning our view holder
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.list_item, parent, false);
+        View view = inflater.inflate(R.layout.parked_users_cardview, parent, false);
         return new UserViewHolder(view);
     }
 

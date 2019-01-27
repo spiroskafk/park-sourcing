@@ -1,4 +1,4 @@
-package com.spiroskafk.parking.activities.experimental;
+package com.spiroskafk.parking.activities.company;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -45,7 +45,7 @@ public class ParkedUsersActivity extends AppCompatActivity {
 
         init();
 
-        // Read data from firebase
+        // Read data from database
         readFromDatabase();
 
     }

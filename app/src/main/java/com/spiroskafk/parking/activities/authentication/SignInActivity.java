@@ -30,8 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.activities.SplashActivity;
-import com.spiroskafk.parking.activities.company.CompanyActivity;
-import com.spiroskafk.parking.activities.experimental.CompanyDashboard;
+import com.spiroskafk.parking.activities.company.CompanyDashboard;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
 
@@ -81,23 +80,23 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
-        // Email Sign in
-        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Launch email sign in
-                startActivity(new Intent(SignInActivity.this, EmailSignInActivity.class));
-            }
-        });
-
-        // Register button
-        mRegisterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Launch register
-                startActivity(new Intent(SignInActivity.this, RegisterUserActivity.class));
-            }
-        });
+//        // Email Sign in
+//        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // Launch email sign in
+//                startActivity(new Intent(SignInActivity.this, EmailSignInActivity.class));
+//            }
+//        });
+//
+//        // Register button
+//        mRegisterButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // Launch register
+//                startActivity(new Intent(SignInActivity.this, RegisterUserActivity.class));
+//            }
+//        });
     }
 
 

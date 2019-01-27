@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="170dp"
     android:layout_height="50dp"
     android:layout_gravity="center"
@@ -18,29 +17,29 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_marginTop="1dp"
                 android:layout_width="12dp"
                 android:layout_height="14dp"
-                android:layout_weight="0.01"
                 android:layout_marginLeft="35dp"
-                android:src="@drawable/custom_marker"/>
+                android:layout_marginTop="1dp"
+                android:layout_weight="0.01"
+                android:src="@drawable/custom_marker" />
 
             <TextView
-                android:layout_weight="0.1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="0.1"
                 android:text="User Position"
+                android:textColor="#075e54"
                 android:textSize="11sp"
-                android:textStyle="bold"
-                android:textColor="#075e54"/>
+                android:textStyle="bold" />
 
         </LinearLayout>
 
 
         <LinearLayout
-            android:layout_marginTop="15dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="15dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -52,15 +51,14 @@
 
 
             <TextView
-                android:layout_marginTop="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="You are right here!"
-                android:textStyle="bold|italic"
-                android:textColor="#075e54"
                 android:layout_gravity="center_horizontal"
-                android:textSize="9sp"/>
-
+                android:layout_marginTop="5dp"
+                android:text="You are right here!"
+                android:textColor="#075e54"
+                android:textSize="9sp"
+                android:textStyle="bold|italic" />
 
 
         </LinearLayout>

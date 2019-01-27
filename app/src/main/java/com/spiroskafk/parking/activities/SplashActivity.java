@@ -17,7 +17,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.experimental.CompanyDashboard;
+import com.spiroskafk.parking.activities.authentication.LoginActivity;
+import com.spiroskafk.parking.activities.authentication.SignupActivity;
+import com.spiroskafk.parking.activities.company.CompanyDashboard;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
 

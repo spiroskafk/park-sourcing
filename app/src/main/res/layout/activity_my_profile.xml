@@ -194,14 +194,14 @@
     </LinearLayout>
 
     <!--<Button-->
-        <!--android:id="@+id/button_add_vehicle"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:layout_marginTop="90dp"-->
-        <!--android:background="@drawable/buttonstyle"-->
-        <!--android:text="Add Vehicle"-->
-        <!--android:textAllCaps="false"-->
-        <!--android:textColor="#fff" />-->
+    <!--android:id="@+id/button_add_vehicle"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_horizontal"-->
+    <!--android:layout_marginTop="90dp"-->
+    <!--android:background="@drawable/buttonstyle"-->
+    <!--android:text="Add Vehicle"-->
+    <!--android:textAllCaps="false"-->
+    <!--android:textColor="#fff" />-->
 
 </LinearLayout>

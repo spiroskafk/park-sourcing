@@ -1,4 +1,4 @@
-package com.spiroskafk.parking.activities;
+package com.spiroskafk.parking.activities.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,7 +18,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.experimental.CompanyDashboard;
+import com.spiroskafk.parking.activities.company.CompanyDashboard;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
 
@@ -98,7 +98,7 @@ public class SignupActivity extends AppCompatActivity {
                             type = "company";
                         }
 
-                        User user = new User(name, email, type, "Not Rated Yet", null, 0, 0, false, 0, 0, 0);
+                        User user = new User(name, email, type, "Not Rated Yet", "0", 0, 0, false, 0, 0, 0);
 
                         FirebaseDatabase.getInstance().getReference("users")
                                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())

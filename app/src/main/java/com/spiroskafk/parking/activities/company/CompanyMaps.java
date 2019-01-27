@@ -1,8 +1,7 @@
-package com.spiroskafk.parking.activities.experimental;
+package com.spiroskafk.parking.activities.company;
 
-import android.location.Location;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
@@ -12,19 +11,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.company.CompanyActivity;
-import com.spiroskafk.parking.activities.user.UserActivity;
-import com.spiroskafk.parking.adapters.CustomInfoWindowAdapter;
-import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.model.PrivateParking;
 import com.spiroskafk.parking.model.User;
-import com.spiroskafk.parking.utils.Permissions;
-import com.spiroskafk.parking.utils.Utils;
 
 import java.util.HashMap;
 

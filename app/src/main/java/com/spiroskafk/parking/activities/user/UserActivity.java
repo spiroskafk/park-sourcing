@@ -48,7 +48,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.LoginActivity;
 import com.spiroskafk.parking.model.PrivateParking;
 import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.model.StreetParking;
@@ -76,7 +75,6 @@ public class UserActivity extends AppCompatActivity
 
     // UI Components
     private CardView mLegendView;
-    private Button mUnPark;
 
     private long elapsedTime = 0;
 
@@ -169,7 +167,6 @@ public class UserActivity extends AppCompatActivity
 
         // Init UI
         mLegendView = findViewById(R.id.legend_cardview);
-        mUnPark = findViewById(R.id.button_unpark);
 
     }
 
@@ -469,27 +466,6 @@ public class UserActivity extends AppCompatActivity
         long l1 = System.nanoTime();
         mMap.clear();
 
-        // Get current location
-//        if (!Permissions.Check_FINE_LOCATION(UserActivity.this)) {
-//            //if not permisson granted so request permisson with request code
-//            Permissions.Request_FINE_LOCATION(UserActivity.this, 22);
-//        } else {
-//            mFusedLocationClient.getLastLocation()
-//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                        @Override
-//                        public void onSuccess(Location location) {
-//                            // Got last known location. In some rare situations this can be null.
-//                            if (location != null) {
-//                                mMap.addMarker(new MarkerOptions()
-//                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
-//                                        .title("You are here!")
-//                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon)));
-//                            } else {
-//
-//                            }
-//                        }
-//                    });
-//        }
 
         // Space to Rent - Blue
         for (final HashMap.Entry<String, RentParking> entry : rentedHouses.entrySet()) {
@@ -516,7 +492,6 @@ public class UserActivity extends AppCompatActivity
                                 LatLng spotLocation = new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit());
                                 // Calculate distance
                                 Double meters = SphericalUtil.computeDistanceBetween(currentLocation, spotLocation);
-                                //Log.i(TAG, "Meters: " + meters);
                                 double m = Utils.round(meters/1000, 2);
                                 info.setDistance(m + " km");
                             }
@@ -626,7 +601,6 @@ public class UserActivity extends AppCompatActivity
         }
 
         if (user != null) {
-            //Log.i(TAG, "Gonna render user position");
             renderUserOnMap();
         }
     }
@@ -634,8 +608,6 @@ public class UserActivity extends AppCompatActivity
     
     @Override
     public void onInfoWindowClick(Marker marker) {
-
-        Log.i(TAG, marker.getSnippet());
 
         String typeOfMarker = marker.getSnippet();
 
@@ -667,15 +639,12 @@ public class UserActivity extends AppCompatActivity
                         String reportedSpotUserId = findUserReportedSpot(id);
 
                         // Handle: If the same user reported this position and parks here, don't award him points
-                        Log.i(TAG, "Gonna reward points");
                         if (!mAuth.getCurrentUser().getUid().equals(reportedSpotUserId)) {
-                            Log.i(TAG, "REWARD");
                             rewardReports(reportedSpotUserId);
                             // Reward points
                             rewardPoints(parkingHouseId);
                         }
 
-                        mUnPark.setVisibility(View.VISIBLE);
                         Toast.makeText(UserActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
 
                     }
@@ -701,8 +670,6 @@ public class UserActivity extends AppCompatActivity
                         // Update ParkingHouseId
                         parkingHouseId = id;
 
-                        Log.i(TAG, "ParkingHouseId: " + parkingHouseId);
-
                         // Update ParkingHouse stats
                         updatePrivateHouse(1);
 
@@ -719,7 +686,6 @@ public class UserActivity extends AppCompatActivity
                             rewardReports(reportedSpotUserId);
                         }
 
-                        mUnPark.setVisibility(View.VISIBLE);
                         Toast.makeText(UserActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
 
                     }

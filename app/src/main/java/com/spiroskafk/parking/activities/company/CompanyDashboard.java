@@ -1,4 +1,4 @@
-package com.spiroskafk.parking.activities.experimental;
+package com.spiroskafk.parking.activities.company;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -17,7 +17,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.company.InventoryActivity;
 import com.spiroskafk.parking.model.PrivateParking;
 import com.spiroskafk.parking.model.User;
 
@@ -35,25 +34,32 @@ public class CompanyDashboard extends AppCompatActivity {
     private CardView mProfile;
     private CardView mSignOut;
 
-    // Firebase
+    // Firebase components
     private FirebaseAuth mAuth;
 
+    // HashMapp
     private HashMap<String, PrivateParking> privateHouses;
+
+    // ParkingHouseId
     private String houseId;
 
+    // Current company user
     private User user;
 
-    private ArrayList<User> userList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-
+        // Initialize vars
         init();
 
-        setupListeners();
+        // Read data from database
+        readFromDatabase();
+
+        // Setup UI listeners
+        registerUIListeners();
     }
 
     private void init() {
@@ -63,11 +69,9 @@ public class CompanyDashboard extends AppCompatActivity {
         mSignOut = findViewById(R.id.sign_out);
         mAuth = FirebaseAuth.getInstance();
         privateHouses = new HashMap<String, PrivateParking>();
-        userList = new ArrayList<User>();
     }
 
-    private void setupListeners() {
-
+    private void readFromDatabase() {
         // Get company info
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
         usersRef.addValueEventListener(new ValueEventListener() {
@@ -76,7 +80,6 @@ public class CompanyDashboard extends AppCompatActivity {
                 User currentUser = dataSnapshot.getValue(User.class);
                 if (currentUser != null)
                     user = currentUser;
-                Log.i(TAG, "User: " + user.getName());
             }
 
             @Override
@@ -85,15 +88,13 @@ public class CompanyDashboard extends AppCompatActivity {
             }
         });
 
-
+        // Populates privateHouses<String, PrivateParking> HashMap
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("private_parking");
         ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 PrivateParking parking = dataSnapshot.getValue(PrivateParking.class);
                 if (parking != null && user != null) {
-                    Log.i(TAG, "ParkingHouse: " + parking.getEmail());
-                    //Log.i(TAG, "parking : " + parking.getEmail().toString());
                     if (parking.getEmail().equals(user.getEmail())) {
                         privateHouses.put(dataSnapshot.getKey(), parking);
                         houseId = dataSnapshot.getKey();
@@ -121,43 +122,9 @@ public class CompanyDashboard extends AppCompatActivity {
 
             }
         });
+    }
 
-        final DatabaseReference users = FirebaseDatabase.getInstance().getReference().child("users");
-        users.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                User currentUser = dataSnapshot.getValue(User.class);
-                if (currentUser != null && houseId != null) {
-                    if (currentUser.getType().equals("user")) {
-                        if (currentUser.getParkingHouseId().equals(houseId)) {
-                            userList.add(currentUser);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
+    private void registerUIListeners() {
         mStatistics.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -194,7 +161,6 @@ public class CompanyDashboard extends AppCompatActivity {
                 }
             }
         });
-
 
         mSignOut.setOnClickListener(new View.OnClickListener() {
             @Override

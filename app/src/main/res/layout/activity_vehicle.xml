@@ -68,9 +68,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="Vehicle make"
-            android:textStyle="bold"
             android:textColor="@color/black"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <EditText
             android:layout_width="match_parent"
@@ -85,9 +85,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:text="Plate number"
-            android:textStyle="bold"
             android:textColor="@color/black"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <EditText
             android:layout_width="match_parent"
@@ -97,14 +97,14 @@
             android:padding="1dp" />
 
         <TextView
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center_horizontal"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Choose type of vehicle"/>
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:text="Choose type of vehicle"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <RadioGroup
             android:id="@+id/radio_group"
@@ -120,35 +120,34 @@
                 android:textSize="18sp" />
 
             <RadioButton
-                android:layout_marginTop="3dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="Limousine"
                 android:textSize="18sp" />
 
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Normal"
                 android:layout_marginTop="3dp"
+                android:text="Normal"
                 android:textSize="18sp" />
 
             <RadioButton
-                android:layout_marginTop="3dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="Trailer"
                 android:textSize="18sp" />
 
             <RadioButton
-                android:layout_marginTop="3dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="Truck"
                 android:textSize="18sp" />
 
         </RadioGroup>
-
 
 
         <Button

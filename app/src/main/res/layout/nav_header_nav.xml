@@ -24,15 +24,15 @@
         android:fontFamily="@font/dancing"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="ParkSource"
-        android:textSize="20sp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="20sp" />
 
     <TextView
-        android:textSize="18sp"
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/dancing"
-        android:text="support@parking.net" />
+        android:text="support@parking.net"
+        android:textSize="18sp" />
 
 </LinearLayout>

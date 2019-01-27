@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ParKING Thesis</string>
+    <string name="app_name">ParkSource</string>
     <string name="loading">Loading…</string>
     <string name="log_error_occurred">"Error occurred: "</string>
     <string name="drawer_open">Open</string>
@@ -43,8 +43,8 @@ watch the money roll in!</string>
     <string name="login_label">" Login"</string>
     <string name="signup_label">" Signup"</string>
 
-    <string name="login_fb_btn_label">"{faw-facebook-f}    Login with Facebook"</string>
-    <string name="signup_fb_btn_label">"{faw-facebook-f}    Signup with Facebook"</string>
+    <string name="login_fb_btn_label">"Login with Facebook"</string>
+    <string name="signup_fb_btn_label">"Signup with Facebook"</string>
 
     <string name="get_started_btn_label">Get Started</string>
 

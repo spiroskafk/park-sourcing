@@ -1,4 +1,4 @@
-package com.spiroskafk.parking.activities;
+package com.spiroskafk.parking.activities.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,7 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.experimental.CompanyDashboard;
+import com.spiroskafk.parking.activities.company.CompanyDashboard;
 import com.spiroskafk.parking.activities.user.UserActivity;
 
 public class LoginActivity extends AppCompatActivity {

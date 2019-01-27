@@ -26,7 +26,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".activities.authentication.RegisterUserActivity" />
         <activity android:name=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -57,21 +56,16 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".activities.authentication.EmailSignInActivity" />
         <activity android:name=".activities.user.ProfileActivity" />
         <activity android:name=".activities.VehicleActivity" />
         <activity android:name=".activities.user.RentYourPlace" />
-        <activity
-            android:name=".activities.company.CompanyActivity"
-            android:label="@string/title_activity_company_nav"
-            android:theme="@style/AppTheme" />
         <activity android:name=".activities.company.InventoryActivity" />
         <activity android:name=".activities.user.RewardsActivity" />
-        <activity android:name=".activities.LoginActivity" />
-        <activity android:name=".activities.SignupActivity" />
-        <activity android:name=".activities.experimental.CompanyDashboard" />
-        <activity android:name=".activities.experimental.CompanyMaps" />
-        <activity android:name=".activities.experimental.ParkedUsersActivity"></activity>
+        <activity android:name=".activities.authentication.LoginActivity" />
+        <activity android:name=".activities.authentication.SignupActivity" />
+        <activity android:name=".activities.company.CompanyDashboard" />
+        <activity android:name=".activities.company.CompanyMaps" />
+        <activity android:name=".activities.company.ParkedUsersActivity"></activity>
     </application>
 
 </manifest>
