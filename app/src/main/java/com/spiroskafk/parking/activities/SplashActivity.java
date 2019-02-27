@@ -20,6 +20,8 @@ import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.activities.authentication.LoginActivity;
 import com.spiroskafk.parking.activities.authentication.SignupActivity;
 import com.spiroskafk.parking.activities.company.CompanyDashboard;
+import com.spiroskafk.parking.activities.company.CreateOffersActivity;
+import com.spiroskafk.parking.activities.experimental.NewLoginActivity;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
 
@@ -43,6 +45,8 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         init();
+
+        startActivity(new Intent(SplashActivity.this, CreateOffersActivity.class));
 
         buttonListeners();
 

@@ -2,6 +2,7 @@ package com.spiroskafk.parking.activities.user;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -411,7 +413,7 @@ public class UserActivity extends AppCompatActivity
                 if (currentUser != null) {
                     MarkerOptions marker = new MarkerOptions();
                     marker.position(new LatLng(currentUser.getLatit(), currentUser.getLongtit()))
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.custom_marker_icon));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_parking));
 
                     final InfoWindowData info = new InfoWindowData();
                     CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(UserActivity.this);
@@ -867,6 +869,20 @@ public class UserActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnInfoWindowClickListener(this);
+
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.style_json));
+
+            if (!success) {
+                Log.i(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.i(TAG, "Can't find style. Error: ", e);
+        }
 
         if (!Permissions.Check_FINE_LOCATION(UserActivity.this)) {
             //if not permisson granted so request permisson with request code
