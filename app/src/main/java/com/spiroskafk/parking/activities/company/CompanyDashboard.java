@@ -142,7 +142,7 @@ public class CompanyDashboard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (user != null && privateHouses != null & houseId != null) {
-                    Intent i = new Intent(CompanyDashboard.this, CompanyMaps.class);
+                    Intent i = new Intent(CompanyDashboard.this, CreateOffersActivity.class);
                     i.putExtra("houses", privateHouses);
                     i.putExtra("user", user);
                     i.putExtra("houseId", houseId);

@@ -50,6 +50,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.R;
+import com.spiroskafk.parking.model.Offer;
 import com.spiroskafk.parking.model.PrivateParking;
 import com.spiroskafk.parking.model.InfoWindowData;
 import com.spiroskafk.parking.model.StreetParking;
@@ -87,6 +88,7 @@ public class UserActivity extends AppCompatActivity
     private DatabaseReference mRentedParkingRef;
     private DatabaseReference mParkingSpotRef;
     private DatabaseReference mPrivateHouseRef;
+    private DatabaseReference mOffersRef;
     private DatabaseReference mUsersRef;
 
     // Auto-complete address
@@ -101,6 +103,7 @@ public class UserActivity extends AppCompatActivity
     private HashMap<String, String> markerToDBkeys;
     private HashMap<String, ParkingSpot> parkingSpots;
     private HashMap<String, PrivateParking> privateHouses;
+    private HashMap<String, Offer> offers;
 
     // Parked street
     private String parkedStreet;
@@ -160,6 +163,7 @@ public class UserActivity extends AppCompatActivity
         markerToDBkeys = new HashMap<String, String>();
         parkingSpots = new HashMap<String, ParkingSpot>();
         privateHouses = new HashMap<String, PrivateParking>();
+        offers = new HashMap<String, Offer>();
 
         // Location Service
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -177,6 +181,8 @@ public class UserActivity extends AppCompatActivity
      * Setup callbacks in order to read data from database
      */
     private void readFromDatabase() {
+
+
 
         // Get user information
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
@@ -362,6 +368,54 @@ public class UserActivity extends AppCompatActivity
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+
+        // Populates offers<String, Offer> HashMap
+        mOffersRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Offer offer = dataSnapshot.getValue(Offer.class);
+                if (offer != null) {
+                    Log.i(TAG, "THERE IS AN OFFER: " + offer.toString());
+                    offers.put(offer.getParkingHouseId(), offer);
+                    updateMap();
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Offer offer = dataSnapshot.getValue(Offer.class);
+                if (offer != null) {
+                    Log.i(TAG, "THERE IS AN OFFER: " + offer.toString());
+                    offers.put(offer.getParkingHouseId(), offer);
+                    updateMap();
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                Offer offer = dataSnapshot.getValue(Offer.class);
+                if (offer != null) {
+                    offers.remove(offer.getParkingHouseId());
+                    updateMap();
+                }
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//                RentParking rentHouse = dataSnapshot.getValue(RentParking.class);
+//                if (rentHouse != null) {
+//                    rentedHouses.remove(dataSnapshot.getKey());
+//                    updateMap();
+//                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+
 
     }
 
@@ -566,6 +620,8 @@ public class UserActivity extends AppCompatActivity
                     .title(entry.getValue().getAddress())
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
+
+
             final InfoWindowData info = new InfoWindowData();
             info.setTitle("Parking House");
             info.setAddress(entry.getValue().getAddress());
@@ -573,6 +629,21 @@ public class UserActivity extends AppCompatActivity
             info.setOccupied(entry.getValue().getOccupied());
             info.setHourlyCharge(entry.getValue().getHourlyCharge() + "€");
             info.setEntrance(entry.getValue().getEntrance() + "€");
+
+
+            Log.i(TAG, "OFFERS HASHMAP: " + offers.toString());
+            Log.i(TAG, "Key : " + entry.getKey());
+            Offer myOffer = offers.get(entry.getKey());
+            if (myOffer != null) {
+                Log.i(TAG, "MYOFFER: " + myOffer.toString());
+                info.setOffer(myOffer.getOffer());
+                info.setTimeFrom(myOffer.getFromTime());
+                info.setTimeUntil(myOffer.getUntilTime());
+            } else {
+                info.setOffer("N/A");
+                info.setTimeFrom("N/A"
+                info.setTimeUntil("N/A");
+            }
 
             // Get current location
             mFusedLocationClient.getLastLocation()
@@ -836,6 +907,7 @@ public class UserActivity extends AppCompatActivity
         mRentedParkingRef = mFirebaseDatabase.getReference().child("rented_parking");
         mParkingSpotRef = mFirebaseDatabase.getReference().child("parking_spots");
         mPrivateHouseRef = mFirebaseDatabase.getReference().child("private_parking");
+        mOffersRef = mFirebaseDatabase.getReference().child("offers");
         mUsersRef = mFirebaseDatabase.getReference().child("users");
     }
 

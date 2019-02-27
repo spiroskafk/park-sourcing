@@ -33,13 +33,16 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         // Based on Marker's Tag (StreetParking, PrivateParking, etc)
         // load the appropriate layout
         if (marker.getSnippet().equals("parking_house")) {
-            View view = ((Activity) context).getLayoutInflater().inflate(R.layout.parking_house_infowindow, null);
+            View view = ((Activity) context).getLayoutInflater().inflate(R.layout.new_private_infowindow, null);
 
             TextView mAddressTv = view.findViewById(R.id.address_parking_house_tv);
             TextView mEntrance = view.findViewById(R.id.entrance_parking_house_tv);
             TextView mSpaces = view.findViewById(R.id.spaces_parking_house_tv);
             TextView mHourlyChargeTv = view.findViewById(R.id.charge_parking_house_tv);
             TextView mDistanceTv = view.findViewById(R.id.distance_parking_house_tv);
+            TextView mOfferTv = view.findViewById(R.id.tv_offer);
+            TextView mTimeFromTv = view.findViewById(R.id.tv_time_from);
+            TextView mTimeUntilTv = view.findViewById(R.id.tv_time_until);
 
             InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
 
@@ -47,7 +50,9 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             mSpaces.setText(String.valueOf(infoWindowData.getCapacity() - infoWindowData.getOccupied()));
             mEntrance.setText(String.valueOf(infoWindowData.getEntrance()));
             mHourlyChargeTv.setText(String.valueOf(infoWindowData.getHourlyCharge()));
-            mDistanceTv.setText(String.valueOf(infoWindowData.getDistance()));
+            mOfferTv.setText(String.valueOf(infoWindowData.getOffer()));
+            mTimeFromTv.setText(String.valueOf(infoWindowData.getTimeFrom()));
+            mTimeUntilTv.setText(String.valueOf(infoWindowData.getTimeUntil()));
 
             return view;
 

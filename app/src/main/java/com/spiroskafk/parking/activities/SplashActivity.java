@@ -46,7 +46,7 @@ public class SplashActivity extends AppCompatActivity {
 
         init();
 
-        startActivity(new Intent(SplashActivity.this, CreateOffersActivity.class));
+        //startActivity(new Intent(SplashActivity.this, CreateOffersActivity.class));
 
         buttonListeners();
 

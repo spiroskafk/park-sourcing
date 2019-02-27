@@ -13,6 +13,34 @@ public class InfoWindowData {
     private String entrance;
     private String hourlyCharge;
 
+    public String getOffer() {
+        return offer;
+    }
+
+    public void setOffer(String offer) {
+        this.offer = offer;
+    }
+
+    public String getTimeFrom() {
+        return timeFrom;
+    }
+
+    public void setTimeFrom(String timeFrom) {
+        this.timeFrom = timeFrom;
+    }
+
+    public String getTimeUntil() {
+        return timeUntil;
+    }
+
+    public void setTimeUntil(String timeUntil) {
+        this.timeUntil = timeUntil;
+    }
+
+    private String offer;
+    private String timeFrom;
+    private String timeUntil;
+
     public InfoWindowData(String address, String spaces, String distance) {
         this.address = address;
         this.spaces = spaces;
