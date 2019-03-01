@@ -67,7 +67,8 @@
         <activity android:name=".activities.company.CompanyMaps" />
         <activity android:name=".activities.company.ParkedUsersActivity" />
         <activity android:name=".activities.experimental.NewLoginActivity" />
-        <activity android:name=".activities.company.CreateOffersActivity"></activity>
+        <activity android:name=".activities.company.CreateOffersActivity" />
+        <activity android:name=".activities.company.SetupCompany"></activity>
     </application>
 
 </manifest>

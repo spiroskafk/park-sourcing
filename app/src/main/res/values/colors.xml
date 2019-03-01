@@ -22,7 +22,8 @@
 
 
     <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <!--<color name="colorPrimaryDark">#303F9F</color>-->
+    <color name="colorPrimaryDark">#696969</color>
     <color name="colorAccent">#ff563f</color>
     <color name="primary_txt">#212121</color>
     <color name="orange">#ff563f</color>

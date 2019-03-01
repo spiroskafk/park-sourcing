@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -30,7 +31,7 @@ public class CompanyDashboard extends AppCompatActivity {
 
     // UI Components
     private CardView mStatistics;
-    private CardView mGoogleMaps;
+    private CardView mSetupCompany;
     private CardView mProfile;
     private CardView mSignOut;
 
@@ -64,7 +65,7 @@ public class CompanyDashboard extends AppCompatActivity {
 
     private void init() {
         mStatistics = findViewById(R.id.statistics);
-        mGoogleMaps = findViewById(R.id.maps);
+        mSetupCompany = findViewById(R.id.setup_company);
         mProfile = findViewById(R.id.profile);
         mSignOut = findViewById(R.id.sign_out);
         mAuth = FirebaseAuth.getInstance();
@@ -128,21 +129,25 @@ public class CompanyDashboard extends AppCompatActivity {
         mStatistics.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i(TAG, "Privatehouses: " + privateHouses.toString());
                 if (user != null && privateHouses != null & houseId != null) {
                     Intent i = new Intent(CompanyDashboard.this, InventoryActivity.class);
                     i.putExtra("houses", privateHouses);
                     i.putExtra("user", user);
                     i.putExtra("houseId", houseId);
                     startActivity(i);
+                } else {
+                    Toast.makeText(CompanyDashboard.this, "You haven't added your company yet to our list. Use the profile button", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        mGoogleMaps.setOnClickListener(new View.OnClickListener() {
+        mSetupCompany.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (user != null && privateHouses != null & houseId != null) {
-                    Intent i = new Intent(CompanyDashboard.this, CreateOffersActivity.class);
+                Log.i(TAG, "User: " + user.getEmail());
+                if (user != null) {
+                    Intent i = new Intent(CompanyDashboard.this, SetupCompany.class);
                     i.putExtra("houses", privateHouses);
                     i.putExtra("user", user);
                     i.putExtra("houseId", houseId);

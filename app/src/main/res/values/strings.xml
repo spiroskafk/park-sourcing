@@ -19,11 +19,13 @@
 watch the money roll in!</string>
     <string name="access_instructions_text">These details are only sent to drivers after they have booked your space!</string>
     <string name="title_activity_company_nav">CompanyNavActivity</string>
+    <string name="setup_company_text">Fill in a few quick details and add your company to our system</string>
 
     <string name="reward_1">-5% on your next parking\n50 points</string>
     <string name="reward_2">-20% on your next parking\n150 points</string>
     <string name="reward_3">Free day pass\n300 points</string>
     <string name="reward_4">One week free parking\n500 points</string>
+    <string name="create_offers_text">Fill in a few quick details and create your company offers for your customers"</string>
 
 
     <!--Titles-->

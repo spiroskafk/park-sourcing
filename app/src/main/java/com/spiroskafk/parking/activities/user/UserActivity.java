@@ -641,7 +641,7 @@ public class UserActivity extends AppCompatActivity
                 info.setTimeUntil(myOffer.getUntilTime());
             } else {
                 info.setOffer("N/A");
-                info.setTimeFrom("N/A"
+                info.setTimeFrom("N/A");
                 info.setTimeUntil("N/A");
             }
 

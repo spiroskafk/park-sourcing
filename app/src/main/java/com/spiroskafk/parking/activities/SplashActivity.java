@@ -21,6 +21,7 @@ import com.spiroskafk.parking.activities.authentication.LoginActivity;
 import com.spiroskafk.parking.activities.authentication.SignupActivity;
 import com.spiroskafk.parking.activities.company.CompanyDashboard;
 import com.spiroskafk.parking.activities.company.CreateOffersActivity;
+import com.spiroskafk.parking.activities.company.SetupCompany;
 import com.spiroskafk.parking.activities.experimental.NewLoginActivity;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
@@ -46,7 +47,7 @@ public class SplashActivity extends AppCompatActivity {
 
         init();
 
-        //startActivity(new Intent(SplashActivity.this, CreateOffersActivity.class));
+        startActivity(new Intent(SplashActivity.this, NewLoginActivity.class));
 
         buttonListeners();
 

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/graylight"
     android:orientation="vertical"
-    tools:context=".activities.user.RentYourPlace">
+    tools:context=".activities.company.CreateOffersActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -71,7 +71,7 @@
                     android:layout_margin="2dp"
                     android:layout_marginTop="5dp"
                     android:padding="8dp"
-                    android:text="@string/rent_your_place_text"
+                    android:text="@string/create_offers_text"
                     android:textSize="16sp"
                     android:textStyle="italic" />
 
