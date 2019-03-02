@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,7 +78,8 @@ public class UserActivity extends AppCompatActivity
     private GoogleMap mMap;
 
     // UI Components
-    private CardView mLegendView;
+//    private CardView mLegendView;
+    private LinearLayout mLegendView;
 
     private long elapsedTime = 0;
 
@@ -172,7 +174,7 @@ public class UserActivity extends AppCompatActivity
         initFirebaseComponents();
 
         // Init UI
-        mLegendView = findViewById(R.id.legend_cardview);
+        mLegendView = findViewById(R.id.map_legend_view);
 
     }
 

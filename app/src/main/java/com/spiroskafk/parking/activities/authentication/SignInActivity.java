@@ -1,6 +1,7 @@
 package com.spiroskafk.parking.activities.authentication;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -10,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.firebase.client.Firebase;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -29,7 +29,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.SplashActivity;
 import com.spiroskafk.parking.activities.company.CompanyDashboard;
 import com.spiroskafk.parking.activities.user.UserActivity;
 import com.spiroskafk.parking.model.User;
@@ -46,7 +45,6 @@ public class SignInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseDatabase mFirebaseDatabase;
-    private Firebase ref;
 
     // UI components
     private Button mGSignInButton;
@@ -62,41 +60,22 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+        // TestActivity
+        //startActivity(new Intent(SignInActivity.this, NewLoginActivity.class));
+
         // Initialize phase
         init();
 
-        //startActivity(new Intent(SignInActivity.this, SplashActivity.class));
-
-        // Check if user is signed in, then proceed
-        isSignedIn();
-
-
-        // GSign in
-        mGSignInButton.setOnClickListener(new View.OnClickListener() {
+        AsyncTask.execute(new Runnable() {
             @Override
-            public void onClick(View view) {
-                Toast.makeText(SignInActivity.this, "Needs fixing. Don't use it for now", Toast.LENGTH_SHORT).show();
-                //signInWithGoogle();
+            public void run() {
+                isSignedIn();
             }
         });
 
-//        // Email Sign in
-//        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // Launch email sign in
-//                startActivity(new Intent(SignInActivity.this, EmailSignInActivity.class));
-//            }
-//        });
-//
-//        // Register button
-//        mRegisterButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // Launch register
-//                startActivity(new Intent(SignInActivity.this, RegisterUserActivity.class));
-//            }
-//        });
+        // Setup listeners
+        setupListeners();
+
     }
 
 
@@ -105,34 +84,57 @@ public class SignInActivity extends AppCompatActivity {
         // Init UI
         initUIComponents();
 
-//        Firebase.setAndroidContext(this.getApplicationContext());
-//        ref = new Firebase("https://parking-application-e04ff.firebaseio.com/");
-//
-//        ref.unauth();
-
         // Init firebase
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
     }
 
+    private void setupListeners() {
+        mGSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(SignInActivity.this, "Needs fixing. Don't use it for now", Toast.LENGTH_SHORT).show();
+                //signInWithGoogle();
+            }
+        });
+
+        // Email Sign in
+        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Launch email sign in
+                startActivity(new Intent(SignInActivity.this, LoginActivity.class));
+            }
+        });
+
+        // Register button
+        mRegisterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Launch register
+                startActivity(new Intent(SignInActivity.this, SignupActivity.class));
+            }
+        });
+    }
+
     private void isSignedIn() {
+        Log.i(TAG, "isSignedIn");
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null) {
-                    Log.i(TAG, "mAuth user : " + mAuth.getCurrentUser().getUid());
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
                     ref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             User currentUser = dataSnapshot.getValue(User.class);
                             if (currentUser != null) {
+                                Log.i(TAG, "User logged in: " + currentUser.getName());
                                 String userType = currentUser.getType();
                                 if (userType != null) {
                                     if (userType.equals("user")) {
-                                        //startActivity(new Intent(SignInActivity.this, UserActivity.class));
-                                        startActivity(new Intent(SignInActivity.this, SplashActivity.class));
+                                        startActivity(new Intent(SignInActivity.this, UserActivity.class));
                                     } else if (userType.equals("company")) {
                                         startActivity(new Intent(SignInActivity.this, CompanyDashboard.class));
                                     }
@@ -246,7 +248,7 @@ public class SignInActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         // Detatch the authStateListener
-        mAuth.removeAuthStateListener(mAuthStateListener);
+       mAuth.removeAuthStateListener(mAuthStateListener);
     }
 
 

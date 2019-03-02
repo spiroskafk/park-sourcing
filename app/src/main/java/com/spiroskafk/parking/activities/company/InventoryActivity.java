@@ -31,8 +31,10 @@ public class InventoryActivity extends AppCompatActivity {
     private EditText mCapacity;
     private EditText mOccupied;
     private EditText mHourlyCharge;
+    private EditText mEntranceFee;
     private TextView mCapacityTv;
     private TextView mOccupiedTv;
+    private TextView mEntraceFeeTv;
     private TextView mHourlyChargeTv;
     private Button mUpdateBtn;
 
@@ -73,10 +75,12 @@ public class InventoryActivity extends AppCompatActivity {
         mCapacity = findViewById(R.id.edittext_capacity);
         mOccupied = findViewById(R.id.edittext_occupied);
         mHourlyCharge = findViewById(R.id.edittext_hourly_charge);
+        mEntranceFee = findViewById(R.id.edittext_entrance_fee);
 
         mCapacityTv = findViewById(R.id.textview_capacity);
         mOccupiedTv = findViewById(R.id.textview_occupied);
         mHourlyChargeTv = findViewById(R.id.textview_hourly_charge);
+        mEntraceFeeTv = findViewById(R.id.textview_entrance_fee);
 
         mUpdateBtn = findViewById(R.id.button_update);
 
@@ -93,6 +97,7 @@ public class InventoryActivity extends AppCompatActivity {
                 String occupied = mOccupied.getText().toString();
                 String capacity = mCapacity.getText().toString();
                 String charge = mHourlyCharge.getText().toString();
+                String entrance = mEntranceFee.getText().toString();
 
                 Log.i(TAG, "onClick");
                 Log.i(TAG, "Occupied : " + occupied);
@@ -110,7 +115,12 @@ public class InventoryActivity extends AppCompatActivity {
 
                 if (!charge.isEmpty()) {
                     mHourlyChargeTv.setText(charge + "€");
-                    updateDatabase("entrance", charge);
+                    updateDatabase("hourlyCharge", charge);
+                }
+
+                if (!entrance.isEmpty()) {
+                    mEntraceFeeTv.setText(entrance + "€");
+                    updateDatabase("entrance", entrance);
                 }
 
             }
@@ -133,7 +143,8 @@ public class InventoryActivity extends AppCompatActivity {
 
                 mCapacityTv.setText(String.valueOf(parking.getCapacity()));
                 mOccupiedTv.setText(String.valueOf(parking.getOccupied()));
-                mHourlyChargeTv.setText(parking.getEntrance() + "€");
+                mHourlyChargeTv.setText(parking.getHourlyCharge() + "€");
+                mEntraceFeeTv.setText(parking.getEntrance() + "€");
 
 
             }
