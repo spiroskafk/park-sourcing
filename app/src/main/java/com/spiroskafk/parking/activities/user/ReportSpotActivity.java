@@ -1,6 +1,7 @@
 package com.spiroskafk.parking.activities.user;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.location.Location;
@@ -13,7 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -69,6 +69,9 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     // UI components
     private Button mLeaveBtn;
 
+    // Application context
+    private Context mContext;
+
     // LocationClient
     private FusedLocationProviderClient mFusedLocationClient;
 
@@ -93,6 +96,9 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_spot);
+
+        // Init app context
+        mContext = this;
 
         // Initialize phase
         init();
@@ -260,7 +266,6 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private void leaveButton() {
-        // Reports spot
         mLeaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -276,13 +281,34 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
                 // Don't allow user to continually report positions
                 if (minutesDiff < 2) {
-                    Toast.makeText(ReportSpotActivity.this, "You have already reported a parking spot. You can't report so soon again!", Toast.LENGTH_SHORT).show();
+                    String msg = "You have already reported a parking spot. You can't report so soon again!";
+                    showMessageToUser(mContext, msg);
                     return;
                 }
 
                 reportParkingSpot(currentTimestamp);
             }
         });
+    }
+
+    /**
+     * Creates a popup message to user
+     * @param context
+     * @param message
+     */
+    public void showMessageToUser(Context context, String message) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setMessage(message)
+                .setTitle("Attention!")
+                .setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int which) {
+                        dialog.dismiss();
+                    }
+
+                });
+
+        builder.show();
     }
 
 
@@ -302,14 +328,16 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             // User is reporting spot from private_house
             updateParkingHouse(parkingHouseId, "private_parking", privateHouses.get(parkingHouseId).getOccupied() - 1);
 
-            Toast.makeText(ReportSpotActivity.this, "You have just left the Parking House", Toast.LENGTH_SHORT).show();
+            String msg = "You have just left the Parking House";
+            showMessageToUser(mContext, msg);
 
         } else if (rentHouses.containsKey(parkingHouseId)) {
             // update user data
             updateUserData(0);
 
             // updateParkingHouse(parkingHouseId, "rented_parking", rentHouses.get(parkingHouseId).getOccupied() - 1);
-            Toast.makeText(ReportSpotActivity.this, "You have just left the Rented Spot", Toast.LENGTH_SHORT).show();
+            String msg = "You have just left the Rented Spot";
+            showMessageToUser(mContext, msg);
 
         } else if (streetHouses.containsKey(parkingHouseId)) {
             // Update user data
@@ -321,7 +349,9 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             // Create new ParkingSpot in database
             createParkingSpot(parkingHouseId, currentTimestamp);
 
-            Toast.makeText(ReportSpotActivity.this, "You have just reported a free spot at: " + streetHouses.get(parkingHouseId).getAddress(), Toast.LENGTH_SHORT).show();
+            // Show message to user
+            String msg = "You have just reported a free spot at: " + streetHouses.get(parkingHouseId).getAddress();
+            showMessageToUser(mContext, msg);
         } else {
             // User is not parked in a parking house, so we promt a
             // popup window with possible roads he is leaving from
@@ -337,7 +367,9 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             HashMap<String, StreetParking> closestHouses = getClosestHouses(new LatLng(latit, longtit));
 
             if (closestHouses.size() == 0) {
-                Toast.makeText(ReportSpotActivity.this, "There isn't any StreetHouse close to you, in order to report a free spot!", Toast.LENGTH_SHORT).show();
+                // Show message to user
+                String msg = "There isn't any StreetHouse close to you, in order to report a free spot!";
+                showMessageToUser(mContext, msg);
                 return;
             }
 
