@@ -107,7 +107,7 @@
                             android:layout_weight="1.5">
 
                             <TextView
-                                android:id="@+id/address_to_rent_tv"
+                                android:id="@+id/user_tv"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:maxLines="1"

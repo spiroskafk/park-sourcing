@@ -61,12 +61,16 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             TextView mAddressTv = view.findViewById(R.id.address_street_parking_tv);
             TextView mSpacesTv = view.findViewById(R.id.spaces_street_parking_tv);
             TextView mDistanceTv = view.findViewById(R.id.distance_street_parking_tv);
+            TextView mUserTv = view.findViewById(R.id.reporter_tv);
+            TextView mRatingTv = view.findViewById(R.id.rating_tv);
 
             InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
 
             mAddressTv.setText(infoWindowData.getAddress());
             mSpacesTv.setText(infoWindowData.getSpaces());
             mDistanceTv.setText(infoWindowData.getDistance());
+            mUserTv.setText(infoWindowData.getUser());
+            mRatingTv.setText(infoWindowData.getRating());
 
             return view;
         } else if (marker.getSnippet().equals("space_to_rent")) {

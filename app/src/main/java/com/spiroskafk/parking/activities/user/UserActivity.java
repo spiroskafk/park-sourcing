@@ -1,5 +1,6 @@
 package com.spiroskafk.parking.activities.user;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -69,7 +70,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class UserActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
     // Log TAG
     private static final String TAG = UserActivity.class.getSimpleName();
@@ -183,8 +184,6 @@ public class UserActivity extends AppCompatActivity
      * Setup callbacks in order to read data from database
      */
     private void readFromDatabase() {
-
-
 
         // Get user information
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
@@ -339,7 +338,7 @@ public class UserActivity extends AppCompatActivity
             }
         });
 
-        // Populates parkingSpots<String, ParkingSpot> HashMapp
+        // Populates parkingSpots<String, ParkingSpot> HashMap
         mParkingSpotRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -432,8 +431,7 @@ public class UserActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mLegendView.getVisibility() == View.INVISIBLE) mLegendView.setVisibility(View.VISIBLE);
-                else mLegendView.setVisibility(View.INVISIBLE);
+                showPopup(view);
             }
         });
 
@@ -469,7 +467,7 @@ public class UserActivity extends AppCompatActivity
                 if (currentUser != null) {
                     MarkerOptions marker = new MarkerOptions();
                     marker.position(new LatLng(currentUser.getLatit(), currentUser.getLongtit()))
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_parking));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user));
 
                     final InfoWindowData info = new InfoWindowData();
                     CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(UserActivity.this);
@@ -530,7 +528,8 @@ public class UserActivity extends AppCompatActivity
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_blue));
+                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 
             final InfoWindowData info = new InfoWindowData();
             info.setAddress(entry.getValue().getAddress());
@@ -577,13 +576,17 @@ public class UserActivity extends AppCompatActivity
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_green));
+
 
             Integer freeSpaces = entry.getValue().getCapacity() - entry.getValue().getOccupied();
             final InfoWindowData info = new InfoWindowData();
             info.setTitle("Street Parking");
             info.setAddress(entry.getValue().getAddress());
             info.setSpaces(freeSpaces.toString());
+            info.setUser("N/A");
+            info.setRating("N/A");
 
             // Get current location
             mFusedLocationClient.getLastLocation()
@@ -602,16 +605,40 @@ public class UserActivity extends AppCompatActivity
                         }
                     });
 
-            //Set Custom InfoWindow Adapter
-            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(UserActivity.this);
-            mMap.setInfoWindowAdapter(adapter);
 
 
             Marker m = mMap.addMarker(marker);
             m.setTag(info);
             m.setSnippet("street_parking");
-
             markerToDBkeys.put(m.getId(), entry.getKey());
+
+            // Loop through each parking spot and find which one the user reported
+            String reportedId = findUser(markerToDBkeys.get(m.getId()));
+
+            Log.i(TAG, "USERRRRRRRRRRRRRR");
+
+            if (reportedId != null) {
+                // We know which user reported this parking Spot. We need to get his info from the database
+                mUsersRef.child(reportedId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        User reporterUser = dataSnapshot.getValue(User.class);
+                        Log.i(TAG, "Reporter: " + reporterUser.getName());
+                        info.setUser(reporterUser.getName());
+                        info.setRating(reporterUser.getRating());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            //Set Custom InfoWindow Adapter
+            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(UserActivity.this);
+            mMap.setInfoWindowAdapter(adapter);
+
         }
 
 
@@ -620,7 +647,8 @@ public class UserActivity extends AppCompatActivity
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_red));
 
 
 
@@ -866,6 +894,34 @@ public class UserActivity extends AppCompatActivity
 
                     // Delete from database
                     mParkingSpotRef.child(entry.getKey()).removeValue();
+
+                    // TODO: REMOVE THE ITEM ALSO FROM DATABASE
+                    return userId;
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    private String findUser(String houseId) {
+        String userId = null;
+        for (HashMap.Entry<String, ParkingSpot> entry : parkingSpots.entrySet()) {
+            if (entry.getValue().getParkingHouseID().equals(houseId)) {
+
+                long reportedTimestamp = entry.getValue().getTimestamp();
+                long currentTimestamp = Instant.now().toEpochMilli();
+                Date reportedDate = new Date(reportedTimestamp);
+                Date currentDate = new Date(currentTimestamp);
+                long minutesDiff = Utils.getDateDiff(reportedDate, currentDate, TimeUnit.MINUTES);
+
+                // Only return userId if the time passed is less than 5 minutes
+                if (minutesDiff <= 5) {
+                    userId = entry.getValue().getUserID();
+
+
+                    // TODO: REMOVE THE ITEM ALSO FROM DATABASE
                     return userId;
                 } else {
                     return null;
@@ -938,10 +994,47 @@ public class UserActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Log.i(TAG, "MarkerClicked: " + marker.getTag());
+        Log.i(TAG, "MarkerTODB" + markerToDBkeys.get(marker.getId()));
+
+        // HOW CAN I KNOW WHICH USER REPORTED THIS SPOT?!
+
+        // User ID
+        Log.i(TAG, "User ID: " + mAuth.getCurrentUser().getUid());
+
+        // Check Parking Spots
+        Log.i(TAG, "ParkingSpots: " + parkingSpots.toString());
+
+        // Loop through each parking spot and find which one the user reported
+        String reportedId = findUser(markerToDBkeys.get(marker.getId()));
+
+        if (reportedId != null) {
+            // We know which user reported this parking Spot. We need to get his info from the database
+            mUsersRef.child(reportedId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User reporterUser = dataSnapshot.getValue(User.class);
+                    Log.i(TAG, "Reporer: " + reporterUser.getName());
+                    String userRating = reporterUser.getRating();
+                    showPopupV2(userRating);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+        return true;
+    }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        //mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
 
         try {
@@ -1024,24 +1117,50 @@ public class UserActivity extends AppCompatActivity
 
     /**
      * Not Used For Now
-     * @param v
+     * @param view
      */
-    public void showPopup(View v) {
+    public void showPopup(View view) {
         final Dialog myDialog = new Dialog(this);
-        myDialog.setContentView(R.layout.custom_popup);
+        //myDialog.setContentView(R.layout.custom_popup);
+        myDialog.setContentView(R.layout.popup_legendview);
         TextView txtClose = myDialog.findViewById(R.id.close_tv);
 
-
-        txtClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                myDialog.dismiss();
-            }
-        });
+//        Log.i(TAG, "Inside popup : " + view.toString());
+//        txtClose.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                myDialog.dismiss();
+//            }
+//        });
 
         myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         myDialog.show();
-
     }
+
+    public void showPopupV2(String userReputation) {
+        final Dialog myDialog = new Dialog(this);
+        //myDialog.setContentView(R.layout.custom_popup);
+        myDialog.setContentView(R.layout.custom_popup);
+        TextView txtClose = myDialog.findViewById(R.id.user_tv);
+        txtClose.setText(userReputation);
+
+//        Log.i(TAG, "Inside popup : " + view.toString());
+//        txtClose.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                myDialog.dismiss();
+//            }
+//        });
+
+        myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        myDialog.show();
+    }
+
+//    @Override
+//    public boolean onMarkerClick(Marker marker) {
+//        Log.i(TAG, "RootView: " + getWindow().getDecorView().getRootView().toString());
+////        showPopup();
+//        return true;
+//    }
 
 }

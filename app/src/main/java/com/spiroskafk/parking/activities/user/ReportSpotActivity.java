@@ -2,12 +2,14 @@ package com.spiroskafk.parking.activities.user;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,6 +23,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -466,7 +469,8 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             mMap.addMarker(new MarkerOptions()
                     .position(coordinates)
                     .title(address)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user)));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
         } else {
             // Otherwise, get status from gps
@@ -475,7 +479,8 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             mMap.addMarker(new MarkerOptions()
                     .position(coordinates)
                     .title(address)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user)));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
         }
 
@@ -485,6 +490,20 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.style_json));
+
+            if (!success) {
+                Log.i(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.i(TAG, "Can't find style. Error: ", e);
+        }
 
         // Get user last known location and render it on map
         getCurrentLocation();

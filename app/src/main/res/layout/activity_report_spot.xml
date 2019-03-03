@@ -38,14 +38,14 @@
 
     <Button
         android:id="@+id/button_leave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="25dp"
-        android:background="@drawable/buttonstyle"
-        android:text="Leave"
+        android:background="@drawable/btn_circle"
+        android:text="L"
         android:textAllCaps="false"
         android:textColor="#fff" />
 

@@ -8,6 +8,25 @@ public class InfoWindowData {
     private String from;
     private String util;
     private String type;
+    private String user;
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
+
+    private String rating;
     private int capacity;
     private int occupied;
     private String entrance;
