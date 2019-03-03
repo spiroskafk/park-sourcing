@@ -17,7 +17,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="end"
-            android:background="@drawable/circlebackground"
+            android:background="@drawable/bg_btn_circle"
             android:gravity="center"
             android:text="X"
             android:textColor="@color/white"
@@ -58,7 +58,7 @@
                         android:layout_marginLeft="35dp"
                         android:layout_marginTop="1dp"
                         android:layout_weight="0.01"
-                        android:src="@drawable/custom_marker" />
+                        android:src="@drawable/ic_map_legend" />
 
                     <TextView
                         android:id="@+id/info_window_title"

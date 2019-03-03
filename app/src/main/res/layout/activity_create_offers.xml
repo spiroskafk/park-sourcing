@@ -41,7 +41,7 @@
                 android:layout_height="64dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="70dp"
-                android:src="@drawable/icon_house" />
+                android:src="@drawable/ic_rent_your_place" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -238,7 +238,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/buttonstyle"
+                android:background="@drawable/bg_btn_oval"
                 android:text="Create offer"
                 android:textAllCaps="false"
                 android:textColor="#fff" />

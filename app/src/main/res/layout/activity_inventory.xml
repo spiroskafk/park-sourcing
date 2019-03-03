@@ -40,7 +40,7 @@
                 android:layout_height="64dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="70dp"
-                android:src="@drawable/icon_company_parking" />
+                android:src="@drawable/ic_company_inventory" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -239,7 +239,7 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="12dp"
-            android:background="@drawable/buttonstyle"
+            android:background="@drawable/bg_btn_oval"
             android:text="Update "
             android:textAllCaps="false"
             android:textColor="#fff" />

@@ -22,7 +22,7 @@
                 android:layout_marginLeft="35dp"
                 android:layout_marginTop="1dp"
                 android:layout_weight="0.01"
-                android:src="@drawable/custom_marker" />
+                android:src="@drawable/ic_map_legend" />
 
             <TextView
                 android:layout_width="wrap_content"

@@ -40,7 +40,7 @@
                 android:layout_height="120dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="45dp"
-                android:src="@drawable/prof" />
+                android:src="@drawable/ic_user_profile" />
 
             <TextView
                 android:id="@+id/text_display_name"
@@ -136,7 +136,7 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_email_signin" />
+                android:src="@drawable/ic_email" />
 
             <TextView
                 android:id="@+id/text_email"
@@ -158,7 +158,7 @@
             <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/icon_telephone" />
+                android:src="@drawable/ic_telephone" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -179,7 +179,7 @@
             <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/icon_credibility" />
+                android:src="@drawable/ic_rating" />
 
             <TextView
                 android:id="@+id/text_rating"
@@ -199,7 +199,7 @@
     <!--android:layout_height="wrap_content"-->
     <!--android:layout_gravity="center_horizontal"-->
     <!--android:layout_marginTop="90dp"-->
-    <!--android:background="@drawable/buttonstyle"-->
+    <!--android:background="@drawable/bg_btn_oval"-->
     <!--android:text="Add Vehicle"-->
     <!--android:textAllCaps="false"-->
     <!--android:textColor="#fff" />-->

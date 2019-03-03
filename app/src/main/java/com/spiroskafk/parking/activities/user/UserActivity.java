@@ -1,6 +1,5 @@
 package com.spiroskafk.parking.activities.user;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -16,13 +15,11 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -467,7 +464,7 @@ public class UserActivity extends AppCompatActivity
                 if (currentUser != null) {
                     MarkerOptions marker = new MarkerOptions();
                     marker.position(new LatLng(currentUser.getLatit(), currentUser.getLongtit()))
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_user));
 
                     final InfoWindowData info = new InfoWindowData();
                     CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(UserActivity.this);
@@ -528,7 +525,7 @@ public class UserActivity extends AppCompatActivity
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_blue));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_blue));
                     //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 
             final InfoWindowData info = new InfoWindowData();
@@ -577,7 +574,7 @@ public class UserActivity extends AppCompatActivity
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
                     //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_green));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_green));
 
 
             Integer freeSpaces = entry.getValue().getCapacity() - entry.getValue().getOccupied();
@@ -648,7 +645,7 @@ public class UserActivity extends AppCompatActivity
             marker.position(new LatLng(entry.getValue().getLatit(), entry.getValue().getLongtit()))
                     .title(entry.getValue().getAddress())
                     //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_red));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_red));
 
 
 

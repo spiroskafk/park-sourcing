@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/rewards_bg"
+    android:background="@drawable/bg_rewards"
     android:orientation="vertical"
     android:weightSum="10"
     tools:context=".activities.user.RewardsActivity">
@@ -83,7 +83,7 @@
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/gifts" />
+                    android:src="@drawable/ic_rewards" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -124,7 +124,7 @@
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/gifts" />
+                    android:src="@drawable/ic_rewards" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -165,7 +165,7 @@
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/gifts" />
+                    android:src="@drawable/ic_rewards" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -206,7 +206,7 @@
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/gifts" />
+                    android:src="@drawable/ic_rewards" />
 
                 <TextView
                     android:layout_width="wrap_content"

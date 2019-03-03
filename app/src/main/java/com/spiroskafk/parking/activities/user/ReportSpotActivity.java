@@ -33,7 +33,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.functions.FirebaseFunctions;
 import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.model.ParkingSpot;
@@ -470,7 +469,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                     .position(coordinates)
                     .title(address)
                     //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user)));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_user)));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
         } else {
             // Otherwise, get status from gps
@@ -480,7 +479,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                     .position(coordinates)
                     .title(address)
                     //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user)));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_user)));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
         }
 
