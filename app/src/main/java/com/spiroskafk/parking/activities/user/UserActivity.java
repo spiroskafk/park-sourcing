@@ -1,6 +1,7 @@
 package com.spiroskafk.parking.activities.user;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -22,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -49,13 +49,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.model.Offer;
-import com.spiroskafk.parking.model.PrivateParking;
-import com.spiroskafk.parking.model.InfoWindowData;
-import com.spiroskafk.parking.model.StreetParking;
-import com.spiroskafk.parking.model.ParkingSpot;
-import com.spiroskafk.parking.model.RentParking;
 import com.spiroskafk.parking.adapters.CustomInfoWindowAdapter;
+import com.spiroskafk.parking.model.InfoWindowData;
+import com.spiroskafk.parking.model.Offer;
+import com.spiroskafk.parking.model.ParkingSpot;
+import com.spiroskafk.parking.model.PrivateParking;
+import com.spiroskafk.parking.model.RentParking;
+import com.spiroskafk.parking.model.StreetParking;
 import com.spiroskafk.parking.model.User;
 import com.spiroskafk.parking.utils.Permissions;
 import com.spiroskafk.parking.utils.Utils;
@@ -76,8 +76,10 @@ public class UserActivity extends AppCompatActivity
     private GoogleMap mMap;
 
     // UI Components
-//    private CardView mLegendView;
     private LinearLayout mLegendView;
+
+    // Application context
+    private Context mContext;
 
     private long elapsedTime = 0;
 
@@ -147,6 +149,9 @@ public class UserActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Init application context
+        mContext = this;
 
         // Init Google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -745,7 +750,8 @@ public class UserActivity extends AppCompatActivity
                             rewardPoints(parkingHouseId);
                         }
 
-                        Toast.makeText(UserActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+                        String msg = "You have successfully parked at:  " + parkedStreet;
+                        Utils.showMessageToUser(mContext, "Congratulations!", msg);
 
                     }
                     @Override
@@ -753,7 +759,8 @@ public class UserActivity extends AppCompatActivity
                 });
             } else {
                 // Popup message that he is already parked
-                Toast.makeText(UserActivity.this, "Your car is already parked at:  " + house.getAddress(), Toast.LENGTH_SHORT).show();
+                String msg = "Your car is already parked at:  " + house.getAddress();
+                Utils.showMessageToUser(mContext, "Attention!", msg);
             }
         } else if (typeOfMarker.equals("parking_house")) {
             // Get the ParkingHouse that the User has pressed
@@ -786,7 +793,8 @@ public class UserActivity extends AppCompatActivity
                             rewardReports(reportedSpotUserId);
                         }
 
-                        Toast.makeText(UserActivity.this, "You have successfully parked at:  " + parkedStreet, Toast.LENGTH_SHORT).show();
+                        String msg = "You have successfully parked at:  " + parkedStreet;
+                        Utils.showMessageToUser(mContext, "Congratulations!", msg);
 
                     }
                     @Override
@@ -794,7 +802,8 @@ public class UserActivity extends AppCompatActivity
                 });
             } else {
                 // Popup message that he is already parked
-                Toast.makeText(UserActivity.this, "Your car is already parked at:  " + house.getAddress(), Toast.LENGTH_SHORT).show();
+                String msg = "Your car is already parked at:  " + house.getAddress();
+                Utils.showMessageToUser(mContext, "Attention!", msg);
             }
         }
 

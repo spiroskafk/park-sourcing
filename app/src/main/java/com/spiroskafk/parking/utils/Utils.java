@@ -1,6 +1,9 @@
 package com.spiroskafk.parking.utils;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.util.Log;
@@ -55,4 +58,23 @@ public class Utils {
     }
 
 
+    /**
+     * Creates a popup message to user
+     * @param context
+     * @param message
+     */
+    public static void showMessageToUser(Context context, String title, String message) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setMessage(message)
+                .setTitle(title)
+                .setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int which) {
+                        dialog.dismiss();
+                    }
+
+                });
+
+        builder.show();
+    }
 }

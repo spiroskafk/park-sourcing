@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+
 public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     // Log TAG
@@ -282,7 +283,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
                 // Don't allow user to continually report positions
                 if (minutesDiff < 2) {
                     String msg = "You have already reported a parking spot. You can't report so soon again!";
-                    showMessageToUser(mContext, msg);
+                    Utils.showMessageToUser(mContext, "Attention!", msg);
                     return;
                 }
 
@@ -291,25 +292,6 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
         });
     }
 
-    /**
-     * Creates a popup message to user
-     * @param context
-     * @param message
-     */
-    public void showMessageToUser(Context context, String message) {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setMessage(message)
-                .setTitle("Attention!")
-                .setPositiveButton("OK",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int which) {
-                        dialog.dismiss();
-                    }
-
-                });
-
-        builder.show();
-    }
 
 
     /**
@@ -329,7 +311,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             updateParkingHouse(parkingHouseId, "private_parking", privateHouses.get(parkingHouseId).getOccupied() - 1);
 
             String msg = "You have just left the Parking House";
-            showMessageToUser(mContext, msg);
+            Utils.showMessageToUser(mContext, "Attention", msg);
 
         } else if (rentHouses.containsKey(parkingHouseId)) {
             // update user data
@@ -337,7 +319,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
             // updateParkingHouse(parkingHouseId, "rented_parking", rentHouses.get(parkingHouseId).getOccupied() - 1);
             String msg = "You have just left the Rented Spot";
-            showMessageToUser(mContext, msg);
+            Utils.showMessageToUser(mContext, "Attention", msg);
 
         } else if (streetHouses.containsKey(parkingHouseId)) {
             // Update user data
@@ -351,7 +333,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
 
             // Show message to user
             String msg = "You have just reported a free spot at: " + streetHouses.get(parkingHouseId).getAddress();
-            showMessageToUser(mContext, msg);
+            Utils.showMessageToUser(mContext, "Attention", msg);
         } else {
             // User is not parked in a parking house, so we promt a
             // popup window with possible roads he is leaving from
@@ -369,7 +351,7 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             if (closestHouses.size() == 0) {
                 // Show message to user
                 String msg = "There isn't any StreetHouse close to you, in order to report a free spot!";
-                showMessageToUser(mContext, msg);
+                Utils.showMessageToUser(mContext, "Attention!", msg);
                 return;
             }
 

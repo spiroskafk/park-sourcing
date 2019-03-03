@@ -69,81 +69,15 @@
                 android:layout_toEndOf="@+id/checkbox_register_user"
                 android:text="Company" />
 
-            <!--<CheckBox-->
-            <!--android:layout_marginBottom="150dp"-->
-            <!--android:id="@+id/checkbox_register_user"-->
-            <!--android:layout_width="100dp"-->
-            <!--android:layout_height="80dp"-->
-            <!--android:layout_below="@+id/edittext_register_password"-->
-            <!--android:layout_toStartOf="@+id/checkbox_register_company"-->
-            <!--android:text="User" />-->
-
-            <!--<CheckBox-->
-            <!--android:id="@+id/checkbox_register_company"-->
-            <!--android:layout_width="100dp"-->
-            <!--android:layout_height="80dp"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--android:layout_below="@+id/edittext_register_password"-->
-            <!--android:layout_marginEnd="97dp"-->
-            <!--android:text="Company" />-->
-
 
             <Button
                 android:id="@+id/btn_signup"
                 style="@style/SolidButtonStyle"
                 android:layout_width="match_parent"
+                android:paddingTop="5dp"
                 android:layout_below="@id/et_password"
                 android:layout_marginTop="100dp"
                 android:text="@string/signup_btn_label" />
-
-            <RelativeLayout
-                android:id="@+id/divider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/btn_signup"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp">
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/divider_height"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="8dp"
-                    android:layout_toStartOf="@id/divider_or"
-                    android:background="@color/divider" />
-
-                <TextView
-                    android:id="@+id/divider_or"
-                    style="@style/LabelStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/divider_or"
-
-                    android:textColor="@color/divider_or"
-                    android:textSize="16sp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/divider_height"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="8dp"
-                    android:layout_toEndOf="@id/divider_or"
-                    android:background="@color/divider" />
-
-
-            </RelativeLayout>
-
-            <Button
-                android:id="@+id/btn_signup_fb"
-                style="@style/SolidButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_below="@id/divider"
-                android:backgroundTint="@color/fb_blue"
-                android:text="@string/signup_fb_btn_label"
-                android:textSize="16sp" />
 
 
             <RelativeLayout

@@ -136,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="2dp"
-                android:background="@drawable/oval"
+                android:background="@drawable/edittext_style"
                 android:padding="1dp" />
 
             <TextView
@@ -164,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="2dp"
-                android:background="@drawable/oval"
+                android:background="@drawable/edittext_style"
                 android:padding="1dp" />
 
 

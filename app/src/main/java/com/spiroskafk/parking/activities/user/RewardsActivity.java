@@ -1,12 +1,12 @@
 package com.spiroskafk.parking.activities.user;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.model.User;
+import com.spiroskafk.parking.utils.Utils;
 
 import java.util.HashMap;
 
@@ -23,6 +24,9 @@ public class RewardsActivity extends AppCompatActivity {
 
     // Log TAG
     private static final String TAG = RewardsActivity.class.getSimpleName();
+
+    // Activity context
+    private Context mContext;
 
     // UI Components
     private CardView mReward1Cardview;
@@ -60,6 +64,9 @@ public class RewardsActivity extends AppCompatActivity {
         mReward2Cardview = findViewById(R.id.reward_2_cardview);
         mReward3Cardview = findViewById(R.id.reward_3_cardview);
         mReward4Cardview = findViewById(R.id.reward_4_cardview);
+
+        // Init activity context
+        mContext = this;
 
         // Get current user
         userId = mAuth.getInstance().getCurrentUser().getUid();
@@ -128,10 +135,14 @@ public class RewardsActivity extends AppCompatActivity {
                     HashMap<String, Object> data = new HashMap<>();
                     data.put("rewardPoints", user.getRewardPoints() - points);
                     mFirebaseRef.updateChildren(data);
-                    Toast.makeText(RewardsActivity.this, "Purchased successfully!", Toast.LENGTH_SHORT).show();
+                    String msg = "Purchased Successfully";
+                    String title = "Congratulations";
+                    Utils.showMessageToUser(mContext, title, msg);
 
                 } else {
-                    Toast.makeText(RewardsActivity.this, "You don't have enough points to buy this reward!", Toast.LENGTH_SHORT).show();
+                    String msg = "You don't have enough points to buy this reward!";
+                    String title = "Attention!";
+                    Utils.showMessageToUser(mContext, title, msg);
                 }
 
             }
@@ -139,6 +150,7 @@ public class RewardsActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) { }
         });
     }
+
 
     @Override
     public boolean onSupportNavigateUp() {

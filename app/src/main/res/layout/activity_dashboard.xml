@@ -57,7 +57,7 @@
                 android:clickable="true"
                 android:elevation="60dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                app:cardCornerRadius="12dp">
+                app:cardCornerRadius="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -67,8 +67,8 @@
                     android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
                         android:src="@drawable/ic_menu_comp_stats" />
 
                     <TextView
@@ -94,7 +94,7 @@
                 android:clickable="true"
                 android:elevation="60dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                app:cardCornerRadius="12dp">
+                app:cardCornerRadius="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -104,8 +104,8 @@
                     android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
                         android:src="@drawable/icon_setup_company" />
 
                     <TextView
@@ -132,7 +132,7 @@
                 android:clickable="true"
                 android:elevation="60dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                app:cardCornerRadius="12dp">
+                app:cardCornerRadius="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -142,15 +142,15 @@
                     android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
                         android:src="@drawable/ic_company_profile" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="Parked users"
+                        android:text="Users"
                         android:textColor="#6f6f6f"
                         android:textSize="18sp" />
 
@@ -170,7 +170,7 @@
                 android:clickable="true"
                 android:elevation="60dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                app:cardCornerRadius="12dp">
+                app:cardCornerRadius="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -180,8 +180,8 @@
                     android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
                         android:src="@drawable/ic_menu_sign_out" />
 
                     <TextView
