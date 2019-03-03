@@ -34,6 +34,8 @@ public class CompanyDashboard extends AppCompatActivity {
     private CardView mSetupCompany;
     private CardView mProfile;
     private CardView mSignOut;
+    private CardView mOffers;
+    private CardView mMaps;
 
     // Firebase components
     private FirebaseAuth mAuth;
@@ -68,6 +70,8 @@ public class CompanyDashboard extends AppCompatActivity {
         mSetupCompany = findViewById(R.id.setup_company);
         mProfile = findViewById(R.id.profile);
         mSignOut = findViewById(R.id.sign_out);
+        mOffers = findViewById(R.id.offers);
+        mMaps = findViewById(R.id.maps);
         mAuth = FirebaseAuth.getInstance();
         privateHouses = new HashMap<String, PrivateParking>();
     }
@@ -161,6 +165,30 @@ public class CompanyDashboard extends AppCompatActivity {
             public void onClick(View v) {
                 if (houseId != null) {
                     Intent i = new Intent(CompanyDashboard.this, ParkedUsersActivity.class);
+                    i.putExtra("houseId", houseId);
+                    startActivity(i);
+                }
+            }
+        });
+
+        mOffers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (houseId != null) {
+                    Intent i = new Intent(CompanyDashboard.this, CreateOffersActivity.class);
+                    i.putExtra("houseId", houseId);
+                    startActivity(i);
+                }
+            }
+        });
+
+        mMaps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (user != null && privateHouses != null & houseId != null) {
+                    Intent i = new Intent(CompanyDashboard.this, CompanyMaps.class);
+                    i.putExtra("houses", privateHouses);
+                    i.putExtra("user", user);
                     i.putExtra("houseId", houseId);
                     startActivity(i);
                 }

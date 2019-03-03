@@ -49,6 +49,7 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             mAddressTv.setText(infoWindowData.getAddress());
             mSpaces.setText(String.valueOf(infoWindowData.getCapacity() - infoWindowData.getOccupied()));
             mEntrance.setText(String.valueOf(infoWindowData.getEntrance()));
+            mDistanceTv.setText(String.valueOf(infoWindowData.getDistance()));
             mHourlyChargeTv.setText(String.valueOf(infoWindowData.getHourlyCharge()));
             mOfferTv.setText(String.valueOf(infoWindowData.getOffer()));
             mTimeFromTv.setText(String.valueOf(infoWindowData.getTimeFrom()));
