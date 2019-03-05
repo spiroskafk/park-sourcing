@@ -272,15 +272,24 @@ public class UserActivity extends AppCompatActivity
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 RentParking rentHouse = dataSnapshot.getValue(RentParking.class);
                 if (rentHouse != null) {
-                    rentedHouses.put(dataSnapshot.getKey(), rentHouse);
+                    if (rentHouse.isOccupied()) {
+                        rentedHouses.remove(dataSnapshot.getKey());
+                    } else {
+                        rentedHouses.put(dataSnapshot.getKey(), rentHouse);
+                    }
                     updateMap();
                 }
+
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                rentedHouses.remove(dataSnapshot.getKey());
-                updateMap();
+                RentParking rentHouse = dataSnapshot.getValue(RentParking.class);
+                if (rentHouse != null) {
+                    rentedHouses.remove(dataSnapshot.getKey());
+                    updateMap();
+                }
+
             }
 
             @Override
@@ -518,6 +527,23 @@ public class UserActivity extends AppCompatActivity
             ref.updateChildren(data);
         }
     }
+
+
+    /**
+     * Updates the ParkingHouse data that the user has just parked!
+     * @param value
+     */
+    private void updateRentedHouse(boolean value) {
+
+        if (parkingHouseId != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("rented_parking").child(parkingHouseId);
+            HashMap<String, Object> data = new HashMap<>();
+            Log.i(TAG, "Rented House: " + rentedHouses.get(parkingHouseId).getAddress());
+            data.put("occupied", value);
+            ref.updateChildren(data);
+        }
+    }
+
 
 
     private void updateMap() {
@@ -805,10 +831,47 @@ public class UserActivity extends AppCompatActivity
                 String msg = "Your car is already parked at:  " + house.getAddress();
                 Utils.showMessageToUser(mContext, "Attention!", msg);
             }
+        } else if (typeOfMarker.equals("space_to_rent")) {
+            // Get the ParkingHouse that the User has pressed
+            final RentParking house = rentedHouses.get(id);
+
+            // Debug message
+            Log.i(TAG, "Leaving From Space To Rent: " + house.getAddress());
+
+            // If user is not parked, park his car here!
+            if (house != null && !user.isParked()) {
+                mRentedParkingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        // Update ParkingHouseId
+                        parkingHouseId = id;
+
+                        parkedStreet = house.getAddress();
+
+                        // Update house
+                        updateRentedHouse(true);
+
+                        // Updates User status
+                        updateUserStatus3();
+
+                        String msg = "You have successfully parked at:  " + parkedStreet;
+                        Utils.showMessageToUser(mContext, "Congratulations!", msg);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+
+
         }
 
 
-    }
+}
 
     private void rewardPoints(String houseId) {
         for (HashMap.Entry<String, ParkingSpot> entry : parkingSpots.entrySet()) {
@@ -837,23 +900,13 @@ public class UserActivity extends AppCompatActivity
             data.put("parkingHouseId", parkingHouseId);
             data.put("latit", streetHouses.get(parkingHouseId).getLatit());
             data.put("longtit", streetHouses.get(parkingHouseId).getLongtit());
+            data.put("rewardPoints", user.getRewardPoints() + 1);
             ref.updateChildren(data);
             user.setParked(true);
 
             // Erase marker from map
 
         }
-    }
-
-    private void updateUserLatLng(double latit, double longtit) {
-
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
-        HashMap<String, Object> data = new HashMap<>();
-        data.put("latit", latit);
-        data.put("longtit", longtit);
-        ref.updateChildren(data);
-//        user.setLatit(latit);
-//        user.setLongtit(longtit);
     }
 
     /**
@@ -875,6 +928,39 @@ public class UserActivity extends AppCompatActivity
 
         }
     }
+
+    /**
+     * Updates User status on database
+     */
+    private void updateUserStatus3() {
+
+        if (parkingHouseId != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("parked", true);
+            data.put("parkingHouseId", parkingHouseId);
+            data.put("latit", rentedHouses.get(parkingHouseId).getLatit());
+            data.put("longtit", rentedHouses.get(parkingHouseId).getLongtit());
+            ref.updateChildren(data);
+            user.setParked(true);
+
+            // Erase marker from map
+
+        }
+    }
+
+    private void updateUserLatLng(double latit, double longtit) {
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("latit", latit);
+        data.put("longtit", longtit);
+        ref.updateChildren(data);
+//        user.setLatit(latit);
+//        user.setLongtit(longtit);
+    }
+
+
 
 
 

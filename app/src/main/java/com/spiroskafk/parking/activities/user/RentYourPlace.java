@@ -196,7 +196,7 @@ public class RentYourPlace extends AppCompatActivity {
             }
 
             // Create RentData
-            RentParking rentParking = new RentParking(address, userID, id, fromDate, untilDate, nos, comments, type, latit, longtit);
+            RentParking rentParking = new RentParking(address, userID, id, fromDate, untilDate, nos, comments, type, latit, longtit, false);
 
 
             // Add to firebase

@@ -24,11 +24,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.model.PrivateParking;
+import com.spiroskafk.parking.model.StreetParking;
 import com.spiroskafk.parking.model.User;
 
 import java.util.HashMap;
 
 public class SetupCompany extends AppCompatActivity{
+
+    // Log TAG
+    private static final String TAG = SetupCompany.class.getSimpleName();
 
     // Auto-complete address
     private PlaceAutocompleteFragment autocompleteFragment;
@@ -41,6 +45,9 @@ public class SetupCompany extends AppCompatActivity{
     // Location
     private LatLng location;
     private String locationName;
+
+    private HashMap<String, PrivateParking> privateHouses;
+    private boolean createdParkingHouse = false;
 
     // Firebase
     private FirebaseAuth mAuth;
@@ -59,8 +66,8 @@ public class SetupCompany extends AppCompatActivity{
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             user = (User) extras.getSerializable("user");
+            privateHouses = (HashMap<String, PrivateParking>) extras.getSerializable("houses");
         }
-
 
         init();
 
@@ -119,6 +126,18 @@ public class SetupCompany extends AppCompatActivity{
                 String telephone = mTelephoneEt.getText().toString();
                 if (location != null && locationName != null) {
                     if (!name.isEmpty() && !telephone.isEmpty()) {
+                        // Check if company with the same email exists, and pop up to user
+                        Log.i(TAG, "User: " + user.getEmail());
+                        Log.i(TAG, "privateHouses:" + privateHouses.toString());
+                        //setupCompany(name, telephone);
+                        for (HashMap.Entry<String, PrivateParking> entry : privateHouses.entrySet()) {
+                            // Get email
+                            if (user.getEmail().equals(entry.getValue().getEmail())) {
+                                Toast.makeText(SetupCompany.this, "There is already a PrivateParking registered to this account", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+                        if (createdParkingHouse) return;
                         setupCompany(name, telephone);
                     }
                 } else {
@@ -131,6 +150,9 @@ public class SetupCompany extends AppCompatActivity{
     }
 
     private void setupCompany(String name, String telephone) {
+
+        createdParkingHouse = true;
+
 
         // Create Parking
         PrivateParking privateParking = new PrivateParking(name, locationName, user.getEmail(), "0",

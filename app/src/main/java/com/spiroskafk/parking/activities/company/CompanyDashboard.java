@@ -163,9 +163,10 @@ public class CompanyDashboard extends AppCompatActivity {
         mProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (houseId != null) {
+                if (user != null) {
                     Intent i = new Intent(CompanyDashboard.this, ParkedUsersActivity.class);
                     i.putExtra("houseId", houseId);
+                    i.putExtra("houses", privateHouses);
                     startActivity(i);
                 }
             }
@@ -174,7 +175,7 @@ public class CompanyDashboard extends AppCompatActivity {
         mOffers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (houseId != null) {
+                if (user != null) {
                     Intent i = new Intent(CompanyDashboard.this, CreateOffersActivity.class);
                     i.putExtra("houseId", houseId);
                     startActivity(i);

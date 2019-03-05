@@ -317,6 +317,8 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
             // update user data
             updateUserData(0);
 
+            updateRentedHouse(parkingHouseId, "rented_parking", false);
+
             // updateParkingHouse(parkingHouseId, "rented_parking", rentHouses.get(parkingHouseId).getOccupied() - 1);
             String msg = "You have just left the Rented Spot";
             Utils.showMessageToUser(mContext, "Attention", msg);
@@ -405,6 +407,22 @@ public class ReportSpotActivity extends AppCompatActivity implements OnMapReadyC
      * @param newOccupied
      */
     private void updateParkingHouse(String parkingHouseId, String typeOfHouse, int newOccupied) {
+
+        if (parkingHouseId != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(typeOfHouse).child(parkingHouseId);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("occupied", newOccupied);
+            ref.updateChildren(data);
+        }
+    }
+
+    /**
+     * Updates RentedHouse occupied data
+     * @param parkingHouseId
+     * @param typeOfHouse
+     * @param newOccupied
+     */
+    private void updateRentedHouse(String parkingHouseId, String typeOfHouse, boolean newOccupied) {
 
         if (parkingHouseId != null) {
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(typeOfHouse).child(parkingHouseId);

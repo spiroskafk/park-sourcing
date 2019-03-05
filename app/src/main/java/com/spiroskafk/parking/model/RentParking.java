@@ -11,13 +11,23 @@ public class RentParking {
     private String nos;
     private String comments;
     private String type;
+    private boolean occupied;
+
+    public boolean isOccupied() {
+        return occupied;
+    }
+
+    public void setOccupied(boolean occupied) {
+        this.occupied = occupied;
+    }
+
     private double latit;
     private double longtit;
 
     public RentParking() {
     }
 
-    public RentParking(String address, String userId, String id, String fromDate, String untilDate, String nos, String comments, String type, double latit, double longtit) {
+    public RentParking(String address, String userId, String id, String fromDate, String untilDate, String nos, String comments, String type, double latit, double longtit, boolean occupied) {
 
         this.address = address;
         this.id = id;
@@ -29,6 +39,7 @@ public class RentParking {
         this.type = type;
         this.latit = latit;
         this.longtit = longtit;
+        this.occupied = occupied;
     }
 
     public String getAddress() {
