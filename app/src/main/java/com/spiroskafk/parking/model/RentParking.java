@@ -27,7 +27,7 @@ public class RentParking {
     public RentParking() {
     }
 
-    public RentParking(String address, String userId, String id, String fromDate, String untilDate, String nos, String comments, String type, double latit, double longtit, boolean occupied) {
+    public RentParking(String address, String userId, String id, String fromDate, String untilDate, String nos, String type, double latit, double longtit, boolean occupied) {
 
         this.address = address;
         this.id = id;
@@ -35,7 +35,6 @@ public class RentParking {
         this.fromDate = fromDate;
         this.untilDate = untilDate;
         this.nos = nos;
-        this.comments = comments;
         this.type = type;
         this.latit = latit;
         this.longtit = longtit;

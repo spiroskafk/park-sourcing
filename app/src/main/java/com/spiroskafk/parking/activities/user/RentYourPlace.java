@@ -15,8 +15,13 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -45,10 +50,15 @@ public class RentYourPlace extends AppCompatActivity {
     private RadioGroup mRadioGroup;
     private EditText mFromEditText;
     private EditText mUntilEditText;
-    private EditText mAddressEditText;
     private EditText mNOSEditText;
-    private EditText mCommentsEditText;
     private Button mRentBtn;
+
+    // Location
+    private LatLng location;
+    private String locationName;
+
+    // Auto-complete address
+    private PlaceAutocompleteFragment autocompleteFragment;
 
     // LocationClient
     private FusedLocationProviderClient mFusedLocationClient;
@@ -76,6 +86,10 @@ public class RentYourPlace extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        // Init auto-complete address
+        autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
         // Init firebase
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -91,9 +105,7 @@ public class RentYourPlace extends AppCompatActivity {
     private void initUI() {
         // Init all UI components here
         mRentBtn = findViewById(R.id.button_rent_place);
-        mAddressEditText = findViewById(R.id.edittext_address);
         mNOSEditText = findViewById(R.id.edittext_no_spaces);
-        mCommentsEditText = findViewById(R.id.edittext_comments);
         mFromEditText = findViewById(R.id.edittext_rent_from);
         mUntilEditText = findViewById(R.id.edittext_rent_until);
         mRadioGroup = findViewById(R.id.radio_group);
@@ -101,6 +113,8 @@ public class RentYourPlace extends AppCompatActivity {
     }
 
     private void setupUIListeners() {
+
+        autoCompleteListener();
 
         // Setup calendar listeners
         calendarListeners();
@@ -111,6 +125,25 @@ public class RentYourPlace extends AppCompatActivity {
         // Setup button listener
         rentBtnListener();
 
+    }
+
+    private void autoCompleteListener() {
+        // Setup AutoComplete listener
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+                //Log.i(TAG, "Place: " + place.getName());
+                location = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
+                locationName = place.getName().toString();
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                //Log.i(TAG, "An error occurred: " + status);
+            }
+        });
     }
 
     /** UI Elements Click Listeners */
@@ -128,45 +161,26 @@ public class RentYourPlace extends AppCompatActivity {
         mRentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Activity host = (Activity) view.getContext();
-
-                // Get current location
-                if (!Permissions.Check_FINE_LOCATION(RentYourPlace.this)) {
-                    //if not permisson granted so request permisson with request code
-                    Permissions.Request_FINE_LOCATION(RentYourPlace.this, 22);
-                } else {
-                    mFusedLocationClient.getLastLocation()
-                            .addOnSuccessListener(host, new OnSuccessListener<Location>() {
-                                @Override
-                                public void onSuccess(Location location) {
-                                    // Got last known location. In some rare situations this can be null.
-                                    if (location != null) {
-                                        rentSpot(location.getLatitude(), location.getLongitude());
-                                    } else {
-
-                                    }
-                                }
-                            });
+                if (location != null && locationName != null)
+                    rentSpot(location.latitude, location.longitude);
+                else {
+                    Toast.makeText(RentYourPlace.this, "You haven't filled in all the required details", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
     }
 
     private void rentSpot(double latit, double longtit) {
         // Check if all ui components are filled in with details
-        String address = mAddressEditText.getText().toString();
         String nos = mNOSEditText.getText().toString();
         String fromDate = mFromEditText.getText().toString();
         String untilDate = mUntilEditText.getText().toString();
-        String comments = mCommentsEditText.getText().toString();
 
         // RadioGroup input
         int radioGroupInput = mRadioGroup.getCheckedRadioButtonId();
 
-        if (!address.isEmpty() && !nos.isEmpty()
-                && !fromDate.isEmpty() && !untilDate.isEmpty() && !comments.isEmpty()
+        if (!nos.isEmpty()
+                && !fromDate.isEmpty() && !untilDate.isEmpty() && location != null && locationName != null
                 && radioGroupInput != -1) {
             // All input fields are filled with details
             // Create new entry in database
@@ -196,7 +210,7 @@ public class RentYourPlace extends AppCompatActivity {
             }
 
             // Create RentData
-            RentParking rentParking = new RentParking(address, userID, id, fromDate, untilDate, nos, comments, type, latit, longtit, false);
+            RentParking rentParking = new RentParking(locationName, userID, id, fromDate, untilDate, nos, type, latit, longtit, false);
 
 
             // Add to firebase
@@ -206,6 +220,7 @@ public class RentYourPlace extends AppCompatActivity {
             Toast.makeText(RentYourPlace.this, "You haven't filled in all the required details", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void updateDateEditText(EditText et) {
         String myFormat = "MM/dd/yy"; //In which you need put here

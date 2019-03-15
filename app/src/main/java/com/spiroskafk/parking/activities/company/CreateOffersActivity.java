@@ -1,7 +1,6 @@
 package com.spiroskafk.parking.activities.company;
 
 import android.app.DatePickerDialog;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -17,8 +16,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.spiroskafk.parking.R;
-import com.spiroskafk.parking.activities.user.RentYourPlace;
-import com.spiroskafk.parking.adapters.TimePickerFragment;
 import com.spiroskafk.parking.model.Offer;
 import com.spiroskafk.parking.model.PrivateParking;
 import com.spiroskafk.parking.model.User;
@@ -124,8 +121,8 @@ public class CreateOffersActivity extends AppCompatActivity {
                 // RadioGroup input
                 int radioGroupInput = mRadioGroup.getCheckedRadioButtonId();
 
-                if (!fromDate.isEmpty() && !untilDate.isEmpty() && !fromTime.isEmpty()
-                        && !untilTime.isEmpty() && radioGroupInput != -1) {
+                if (fromDate.contains("/") && untilDate.contains("/") &&
+                fromTime.contains(":") && untilTime.contains(":") && radioGroupInput != -1) {
 
                     // All input fields are filled with details
                     // Create new entry in database

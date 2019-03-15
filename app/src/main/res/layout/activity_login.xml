@@ -53,7 +53,7 @@
                 android:layout_below="@id/et_password"
                 android:layout_marginTop="@dimen/layout_in_between_margins"
                 android:fontFamily="@font/sf_pro_display_medium"
-                android:text="@string/forgot_password"
+                android:text=""
                 android:textColor="@color/orange"
                 android:textSize="16sp" />
 

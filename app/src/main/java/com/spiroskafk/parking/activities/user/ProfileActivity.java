@@ -16,6 +16,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.spiroskafk.parking.R;
 import com.spiroskafk.parking.model.User;
 
+import java.util.HashMap;
+
 public class ProfileActivity extends AppCompatActivity {
 
     // Log TAG
@@ -35,6 +37,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     // UserId
     private String userId;
+
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,17 +80,21 @@ public class ProfileActivity extends AppCompatActivity {
         mFirebaseRef.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
+                user = dataSnapshot.getValue(User.class);
 
                 // Trustworthyness system
                 if (user.getReports() < 10) {
-                    mRating.setText("Haven't prove himself yet");
+                    mRating.setText("New user");
+                    updateUserRating("New user");
                 } else if (user.getReports() < 20) {
-                    mRating.setText("He has build quite a name!");
+                    mRating.setText("Experienced user");
+                    updateUserRating("Experienced user");
                 } else if (user.getReports() < 30){
                     mRating.setText("Trustworthy");
+                    updateUserRating("Trustworthy");
                 } else {
-                    mRating.setText("Totally trusted user");
+                    mRating.setText("Veteran");
+                    updateUserRating("Veteran");
                 }
 
                 mDisplayName.setText(user.getName());
@@ -97,6 +105,15 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) { }
         });
+
+
+    }
+
+    public void updateUserRating(String rating) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("rating", rating);
+        ref.updateChildren(data);
     }
 
     @Override

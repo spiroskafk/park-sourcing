@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/graylight"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".activities.user.RentYourPlace">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -61,8 +63,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal">
+                android:layout_height="match_parent">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -79,9 +80,9 @@
         </android.support.v7.widget.CardView>
     </RelativeLayout>
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="-80dp">
 
         <LinearLayout
@@ -229,23 +230,28 @@
                 android:padding="1dp" />
 
 
+            <Button
+                android:layout_marginTop="10dp"
+                android:id="@+id/button_update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_btn_oval"
+                android:text="Update "
+                android:textAllCaps="false"
+                android:textColor="#fff" />
+
+
         </LinearLayout>
 
-        <Button
-            android:id="@+id/button_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/bg_btn_oval"
-            android:text="Update "
-            android:textAllCaps="false"
-            android:textColor="#fff" />
 
 
-    </RelativeLayout>
+
+
+    </ScrollView>
 
 
 </LinearLayout>

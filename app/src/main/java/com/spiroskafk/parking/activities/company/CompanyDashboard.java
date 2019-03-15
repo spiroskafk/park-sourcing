@@ -27,7 +27,7 @@ import java.util.HashMap;
 public class CompanyDashboard extends AppCompatActivity {
 
     // Log TAG
-    private static final String TAG = CompanyDashboard.class.getSimpleName();
+    private static final String TAG = InventoryActivity.class.getSimpleName();
 
     // UI Components
     private CardView mStatistics;
@@ -133,7 +133,11 @@ public class CompanyDashboard extends AppCompatActivity {
         mStatistics.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Read data from database
+                readFromDatabase();
                 Log.i(TAG, "Privatehouses: " + privateHouses.toString());
+                Log.i(TAG, "User: " + user.getName());
+                Log.i(TAG, "HouseId: " + houseId);
                 if (user != null && privateHouses != null & houseId != null) {
                     Intent i = new Intent(CompanyDashboard.this, InventoryActivity.class);
                     i.putExtra("houses", privateHouses);
@@ -141,8 +145,8 @@ public class CompanyDashboard extends AppCompatActivity {
                     i.putExtra("houseId", houseId);
                     startActivity(i);
                 } else {
-                    Toast.makeText(CompanyDashboard.this, "You haven't added your company yet to our list. Use the profile button", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(CompanyDashboard.this, "You haven't added your company yet to our list. Use the profile button", Toast.LENGTH_SHORT).show();
+            }
             }
         });
 
@@ -151,6 +155,8 @@ public class CompanyDashboard extends AppCompatActivity {
             public void onClick(View v) {
                 Log.i(TAG, "User: " + user.getEmail());
                 if (user != null) {
+                    // Read data from database
+                    readFromDatabase();
                     Intent i = new Intent(CompanyDashboard.this, SetupCompany.class);
                     i.putExtra("houses", privateHouses);
                     i.putExtra("user", user);
@@ -163,7 +169,10 @@ public class CompanyDashboard extends AppCompatActivity {
         mProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (user != null) {
+                readFromDatabase();
+                if (user != null && privateHouses != null & houseId != null) {
+                    // Read data from database
+
                     Intent i = new Intent(CompanyDashboard.this, ParkedUsersActivity.class);
                     i.putExtra("houseId", houseId);
                     i.putExtra("houses", privateHouses);
@@ -175,10 +184,14 @@ public class CompanyDashboard extends AppCompatActivity {
         mOffers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (user != null) {
+                readFromDatabase();
+                if (user != null && privateHouses != null & houseId != null) {
+                    // Read data from database
                     Intent i = new Intent(CompanyDashboard.this, CreateOffersActivity.class);
                     i.putExtra("houseId", houseId);
                     startActivity(i);
+                } else {
+                    Toast.makeText(CompanyDashboard.this, "You haven't added your company yet to our list. Use the profile button", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -186,12 +199,16 @@ public class CompanyDashboard extends AppCompatActivity {
         mMaps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Read data from database
+                readFromDatabase();
                 if (user != null && privateHouses != null & houseId != null) {
                     Intent i = new Intent(CompanyDashboard.this, CompanyMaps.class);
                     i.putExtra("houses", privateHouses);
                     i.putExtra("user", user);
                     i.putExtra("houseId", houseId);
                     startActivity(i);
+                } else {
+                    Toast.makeText(CompanyDashboard.this, "You haven't added your company yet to our list. Use the profile button", Toast.LENGTH_SHORT).show();
                 }
             }
         });

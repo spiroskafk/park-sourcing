@@ -79,6 +79,20 @@ public class SignupActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        mUserCheckBbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCompanyCheckBox.setChecked(false);
+            }
+        });
+
+        mCompanyCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mUserCheckBbox.setChecked(false);
+            }
+        });
     }
 
     private void signup() {
@@ -99,7 +113,6 @@ public class SignupActivity extends AppCompatActivity {
                         }
 
                         User user = new User(name, email, type, "Not Rated Yet", "0", 0, 0, false, 0, 0, 0);
-
                         FirebaseDatabase.getInstance().getReference("users")
                                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                 .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {

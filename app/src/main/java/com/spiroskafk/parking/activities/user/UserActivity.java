@@ -387,7 +387,6 @@ public class UserActivity extends AppCompatActivity
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Offer offer = dataSnapshot.getValue(Offer.class);
                 if (offer != null) {
-                    Log.i(TAG, "THERE IS AN OFFER: " + offer.toString());
                     offers.put(offer.getParkingHouseId(), offer);
                     updateMap();
                 }
@@ -397,7 +396,7 @@ public class UserActivity extends AppCompatActivity
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Offer offer = dataSnapshot.getValue(Offer.class);
                 if (offer != null) {
-                    Log.i(TAG, "THERE IS AN OFFER: " + offer.toString());
+
                     offers.put(offer.getParkingHouseId(), offer);
                     updateMap();
                 }
@@ -643,7 +642,6 @@ public class UserActivity extends AppCompatActivity
             // Loop through each parking spot and find which one the user reported
             String reportedId = findUser(markerToDBkeys.get(m.getId()));
 
-            Log.i(TAG, "USERRRRRRRRRRRRRR");
 
             if (reportedId != null) {
                 // We know which user reported this parking Spot. We need to get his info from the database
@@ -689,8 +687,8 @@ public class UserActivity extends AppCompatActivity
             info.setEntrance(entry.getValue().getEntrance() + "€");
 
 
-            Log.i(TAG, "OFFERS HASHMAP: " + offers.toString());
-            Log.i(TAG, "Key : " + entry.getKey());
+//            Log.i(TAG, "OFFERS HASHMAP: " + offers.toString());
+//            Log.i(TAG, "Key : " + entry.getKey());
             Offer myOffer = offers.get(entry.getKey());
             if (myOffer != null) {
                 Log.i(TAG, "MYOFFER: " + myOffer.toString());
@@ -771,6 +769,7 @@ public class UserActivity extends AppCompatActivity
 
                         // Handle: If the same user reported this position and parks here, don't award him points
                         if (!mAuth.getCurrentUser().getUid().equals(reportedSpotUserId)) {
+                            Log.i(TAG, "Inside DANGER AREA");
                             rewardReports(reportedSpotUserId);
                             // Reward points
                             rewardPoints(parkingHouseId);
@@ -905,8 +904,20 @@ public class UserActivity extends AppCompatActivity
             user.setParked(true);
 
             // Erase marker from map
-
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i(TAG, "onPause");
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume()");
     }
 
     /**
@@ -1010,6 +1021,7 @@ public class UserActivity extends AppCompatActivity
 
                 // Only return userId if the time passed is less than 5 minutes
                 if (minutesDiff <= 5) {
+                    Log.i(TAG, "UserId reported: " + userId);
                     userId = entry.getValue().getUserID();
 
 
