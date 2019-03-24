@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/graylight"
-    android:orientation="vertical"
-    tools:context=".LeaveSpotActivity">
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -22,8 +20,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:fontFamily="@font/dancing"
-            android:text="My Profile"
-            android:textSize="18sp" />
+            android:text="Profile"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
     </android.support.v7.widget.Toolbar>
 
     <RelativeLayout
@@ -41,14 +40,15 @@
                 android:layout_height="120dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="45dp"
-                android:src="@drawable/prof" />
+                android:src="@drawable/ic_user_profile" />
 
             <TextView
+                android:id="@+id/text_display_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
-                android:text="Spiros Kafkias"
+                android:text=""
                 android:textColor="#fff"
                 android:textSize="18sp"
                 android:textStyle="italic" />
@@ -80,10 +80,11 @@
                         android:textSize="18sp" />
 
                     <TextView
+                        android:id="@+id/text_reports"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="10dp"
-                        android:text="125"
+                        android:text=""
                         android:textColor="@color/startblue"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -104,10 +105,11 @@
                         android:textSize="20sp" />
 
                     <TextView
+                        android:id="@+id/text_points"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="10dp"
-                        android:text="360"
+                        android:text=""
                         android:textColor="@color/startblue"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -134,14 +136,15 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_email_signin" />
+                android:src="@drawable/ic_email" />
 
             <TextView
+                android:id="@+id/text_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="20dp"
-                android:text="spiroskafk@gmail.com"
+                android:text=""
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -155,11 +158,10 @@
             <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/icon_telephone" />
+                android:src="@drawable/ic_telephone" />
 
             <TextView
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="20dp"
@@ -177,28 +179,29 @@
             <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/icon_credibility" />
+                android:src="@drawable/ic_rating" />
 
             <TextView
+                android:id="@+id/text_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="20dp"
-                android:text="Trustworthy"
+                android:text=""
                 android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/add_vehicle_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="90dp"
-        android:background="@drawable/buttonstyle"
-        android:text="Add Vehicle"
-        android:textAllCaps="false"
-        android:textColor="#fff" />
+    <!--<Button-->
+    <!--android:id="@+id/button_add_vehicle"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_horizontal"-->
+    <!--android:layout_marginTop="90dp"-->
+    <!--android:background="@drawable/bg_btn_oval"-->
+    <!--android:text="Add Vehicle"-->
+    <!--android:textAllCaps="false"-->
+    <!--android:textColor="#fff" />-->
 
 </LinearLayout>

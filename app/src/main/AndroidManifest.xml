@@ -3,7 +3,7 @@
     package="com.spiroskafk.parking">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity" />
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -26,10 +26,15 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".RegisterUserActivity" />
-        <activity
-            android:name=".SplashActivity"
-            android:theme="@style/SplashTheme">
+        <activity android:name=".activities.authentication.SignInActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- android:theme="@style/SplashTheme"> -->
+
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
@@ -39,24 +44,20 @@
             <!-- </intent-filter> -->
         </activity>
         <activity
-            android:name=".NavActivity"
+            android:name=".activities.user.UserActivity"
             android:label="@string/title_activity_nav" />
-        <activity android:name=".LeaveSpotActivity" />
-        <activity android:name=".SignInActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".EmailSignInActivity" />
-        <activity android:name=".MyProfileActivity" />
-        <activity android:name=".VehicleActivity" />
-        <activity android:name=".RentYourPlace" />
-        <activity
-            android:name=".CompanyNavActivity"
-            android:label="@string/title_activity_company_nav"
-            android:theme="@style/AppTheme"></activity>
+        <activity android:name=".activities.user.ReportSpotActivity" />
+        <activity android:name=".activities.user.ProfileActivity" />
+        <activity android:name=".activities.user.RentYourPlace" />
+        <activity android:name=".activities.company.InventoryActivity" />
+        <activity android:name=".activities.user.RewardsActivity" />
+        <activity android:name=".activities.authentication.LoginActivity" />
+        <activity android:name=".activities.authentication.SignupActivity" />
+        <activity android:name=".activities.company.CompanyDashboard" />
+        <activity android:name=".activities.company.CompanyMaps" />
+        <activity android:name=".activities.company.ParkedUsersActivity" />
+        <activity android:name=".activities.company.CreateOffersActivity" />
+        <activity android:name=".activities.company.SetupCompany"></activity>
     </application>
 
 </manifest>

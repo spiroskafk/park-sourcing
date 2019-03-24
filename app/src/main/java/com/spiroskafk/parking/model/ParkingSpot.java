@@ -1,62 +1,77 @@
 package com.spiroskafk.parking.model;
 
+import java.util.Date;
+
 public class ParkingSpot {
-    private String id;
-    private String category;
-    private String address;
-    private float latitude;
-    private float longitude;
+    private String userID;
+    private double latit;
+    private double longtit;
+    private int reward;
+    private long timestamp;
+    private Date date;
+    private String parkingHouseID;
 
-    public void setLatitude(float latitude) {
-        this.latitude = latitude;
+
+    public ParkingSpot(double latit, double longtit, int reward, long timestamp, String parkingHouseID, String userID) {
+        this.userID = userID;
+        this.latit = latit;
+        this.longtit = longtit;
+        this.reward = reward;
+        this.timestamp = timestamp;
+        this.parkingHouseID = parkingHouseID;
+        this.userID = userID;
     }
 
-    public void setLongitude(float longitude) {
-        this.longitude = longitude;
+    public String getUserID() {
+
+        return userID;
     }
 
-    public float getLatitude() {
-
-        return latitude;
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
-    public float getLongitude() {
-        return longitude;
+    public double getLatit() {
+        return latit;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setLatit(float latit) {
+        this.latit = latit;
     }
 
-    public void setCategory(String description) {
-        this.category = description;
+    public double getLongtit() {
+        return longtit;
     }
 
-    public String getId() {
-
-        return id;
+    public void setLongtit(float longtit) {
+        this.longtit = longtit;
     }
 
-    public String getCategory() {
-        return category;
+    public int getReward() {
+        return reward;
     }
 
-    public ParkingSpot(String id, String category, String address, float latitude, float longitude) {
-        this.id = id;
-        this.category = category;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.address = address;
-
+    public void setReward(int reward) {
+        this.reward = reward;
     }
 
-    public String getAddress() {
-        return address;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getParkingHouseID() {
+        return parkingHouseID;
+    }
+
+    public void setParkingHouseID(String parkingHouseID) {
+        this.parkingHouseID = parkingHouseID;
     }
 
     public ParkingSpot() {}
+
+
 }

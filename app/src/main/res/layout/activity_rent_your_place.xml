@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/graylight"
     android:orientation="vertical"
-    tools:context=".RentYourPlace">
+    tools:context=".activities.user.RentYourPlace">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -16,17 +16,17 @@
         app:popupTheme="@style/AppTheme.PopupOverlay">
 
         <TextView
-            android:id="@+id/toolbar_title"
             style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:fontFamily="@font/dancing"
             android:text="Rent your place"
-            android:textSize="18sp" />
+            android:textColor="@color/white"
+            android:textSize="20sp" />
     </android.support.v7.widget.Toolbar>
 
-   <RelativeLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="340dp">
 
@@ -41,7 +41,7 @@
                 android:layout_height="64dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="70dp"
-                android:src="@drawable/icon_house" />
+                android:src="@drawable/ic_rent_your_place" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -98,42 +98,44 @@
                 android:text="Where is your parking space?!"
                 android:textAllCaps="true"
                 android:textColor="@color/black"
-                android:textStyle="bold"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+            <android.support.v7.widget.CardView
                 android:layout_marginTop="10dp"
-                android:text="Address"
-                android:textSize="15sp" />
-
-            <EditText
-                android:id="@+id/address_edit_text"
-                android:layout_width="180dp"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_margin="2dp"
-                android:background="@drawable/oval"
-                android:padding="1dp" />
+                android:layout_width="350dp"
+                android:layout_height="wrap_content">
+
+                <fragment
+                    android:id="@+id/place_autocomplete_fragment"
+                    android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp" />
+
+
+            </android.support.v7.widget.CardView>
+
+
+
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
-                android:text="City"
+                android:layout_marginTop="15dp"
+                android:text="Number of spaces"
                 android:textSize="15sp" />
 
             <EditText
-                android:id="@+id/city_edit_text"
+                android:id="@+id/edittext_no_spaces"
                 android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="2dp"
-                android:background="@drawable/oval"
+                android:background="@drawable/edittext_style"
                 android:padding="1dp" />
+
 
             <TextView
                 android:layout_width="wrap_content"
@@ -143,8 +145,8 @@
                 android:text="About your space"
                 android:textAllCaps="true"
                 android:textColor="@color/black"
-                android:textStyle="bold"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
             <RadioGroup
                 android:id="@+id/radio_group"
@@ -156,148 +158,86 @@
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Driveway"
+                    android:text="Normal spot"
                     android:textSize="15sp" />
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Garage"
+                    android:text="Big vehicle"
                     android:textSize="15sp" />
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Car Park"
+                    android:text="AMEA"
                     android:textSize="15sp" />
 
             </RadioGroup>
 
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
-                android:text="Number of spaces"
-                android:textSize="15sp" />
-
-            <EditText
-                android:id="@+id/nos_edit_text"
-                android:layout_width="180dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="2dp"
-                android:background="@drawable/oval"
-                android:padding="1dp" />
-
-            <TextView
-                android:layout_marginTop="15dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="CHOOSE DATE"
-                android:textStyle="bold"
                 android:textColor="@color/black"
-                android:textSize="15sp"/>
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
             <LinearLayout
-                android:layout_marginTop="10dp"
-                android:layout_gravity="center_horizontal"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
                 <EditText
-                    android:layout_weight="0.5"
-                    android:layout_gravity="center_horizontal"
-                    android:id="@+id/rent_from"
-                    android:background="@drawable/oval"
+                    android:id="@+id/edittext_rent_from"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="40dp"
-                    android:clickable="true"
+                    android:layout_gravity="center_horizontal"
                     android:layout_margin="2dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_weight="0.5"
+                    android:background="@drawable/edittext_style"
+                    android:clickable="true"
+                    android:focusable="false"
                     android:gravity="center_horizontal"
                     android:padding="1dp"
+                    android:text="Rent it from"
                     android:textSize="15sp"
-                    android:textStyle="italic"
-                    android:focusable="false"
-                    android:text="Rent it from" />
+                    android:textStyle="italic" />
 
                 <EditText
-                    android:id="@+id/rent_until"
-                    android:layout_weight="0.5"
-                    android:layout_margin="2dp"
-                    android:padding="1dp"
-                    android:textSize="15sp"
-                    android:textStyle="italic"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="center_horizontal"
-                    android:background="@drawable/oval"
+                    android:id="@+id/edittext_rent_until"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="2dp"
                     android:layout_marginTop="40dp"
+                    android:layout_weight="0.5"
+                    android:background="@drawable/edittext_style"
                     android:clickable="true"
                     android:focusable="false"
-                    android:text="Until" />
-
+                    android:gravity="center_horizontal"
+                    android:padding="1dp"
+                    android:text="Until"
+                    android:textSize="15sp"
+                    android:textStyle="italic" />
 
             </LinearLayout>
 
-            <TextView
-
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="15dp"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:text="ACCESS INSTRUCTIONS (optional)"
-                android:textSize="15sp" />
-
-            <android.support.v7.widget.CardView
-                android:layout_width="350dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="2dp"
-                        android:padding="8dp"
-                        android:text="@string/access_instructions_text"
-                        android:textSize="16sp"
-                        android:textStyle="italic" />
-
-                </LinearLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <EditText
-                android:id="@+id/comments_edit_text"
-                android:layout_width="350dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="15dp"
-                android:layout_marginTop="50dp"
-                android:background="@drawable/oval"
-                android:hint="Describe how would a driver find your place"
-                android:padding="1dp"
-                android:singleLine="false"
-                android:textSize="16sp" />
 
             <Button
-                android:id="@+id/rent_btn"
+                android:layout_marginTop="20dp"
+                android:id="@+id/button_rent_place"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="25dp"
-                android:background="@drawable/buttonstyle"
+                android:background="@drawable/bg_btn_oval"
                 android:text="Rent it!"
                 android:textAllCaps="false"
                 android:textColor="#fff" />
